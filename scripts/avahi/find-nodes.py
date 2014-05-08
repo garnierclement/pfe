@@ -27,7 +27,10 @@ target = open('node_list.csv','w')
 
 
 for i in range(len(hostname_array)):
-	content = hostname_array[i]+';'+address_array[i]+';'+port_array[i]+';'+info_array[i]+';'+"\n"
+	content = hostname_array[i][hostname_array[i].find("[")+1:hostname_array[i].find("]")]';'+\
+	          address_array[i][address_array[i].find("[")+1:address_array[i].find("]")]+';'+\
+	          port_array[i][port_array[i].find("[")+1:port_array[i].find("]")]+';'+\
+	          info_array[i][info_array[i].find("[")+1:info_array[i].find("]")]+';'+"\n"
 	target.write(content)
 
 target.close()
