@@ -13,7 +13,7 @@ MIN_PORT_NUMBER = 32000
 
 f = open('/home/pi/clement/pfe/definitions/node-service.txt','r') #opening node-service.txt to get the node name from definition document
 complete_nodename = f.readline()
-nodename =[complete_nodename.find("_")+1:complete_nodename.find(".")]
+nodename =complete_nodename[complete_nodename.find("_")+1:complete_nodename.find(".")]
 print nodename
 
 filename = nodename+'.service' 
