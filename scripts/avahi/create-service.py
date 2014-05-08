@@ -6,7 +6,6 @@
 #          The newly created service will have argv[1] as its name and argv[2] as its port.
 
 import os
-import sys
 import random
 
 MAX_PORT_NUMBER = 65536
@@ -19,6 +18,9 @@ os.system('sudo touch '+path) # create file with root privileges
 
 f = open('/etc/hostname','r') #opening /etc/hostname to get the hostname
 hostname = f.readline()
+
+f = open('/home/pi/clement/pfe/definitions/node-service.txt','r') #opening node-service.txt to get the node name from definition document
+nodename = f.readline()
 
 port = random.randrange(MIN_PORT_NUMBER, MAX_PORT_NUMBER) #choose a random port number between 65536 and 32000 to avoid collision
 while (str(port) in open('sample.csv').read()): # if another node service has this port number, assign a new port number
@@ -33,8 +35,8 @@ line2 = '<!DOCTYPE service-group SYSTEM "avahi-service.dtd">'
 line3 = '<service-group>'
 line4 = '  <name replace-wildcards="yes">'+hostname+'</name>'
 line5 = '  <service>'
-line6 = '    <type>_'+str(sys.argv[1])+'._tcp</type>'
-line7 = '    <port>'+str(port)+'</port>' # port number is the second cmd line argument
+line6 = '    <type>_'+nodename+'._tcp</type>'
+line7 = '    <port>'+str(port)+'</port>' 
 # line8 = '    <txt-record>path=/data/shared/Music</txt-record>' # This line should be changed...not realy sure of what to put here.
 line9 = '  </service>'
 line10 = '</service-group>'
