@@ -68,6 +68,10 @@ target.write("\n")
 
 target.close()
 
+target = open(os.path.dirname(os.path.abspath(__file__))+"../../var/run/port", 'w')
+target.write(port)
+target.close
+
 os.system('sudo service avahi-daemon restart')  # restart avahi daemon
 
 
