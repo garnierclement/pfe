@@ -20,7 +20,7 @@ target = open(path, 'w')
 line1 = '<?xml version="1.0" standalone=\'no\'?>'
 line2 = '<!DOCTYPE service-group SYSTEM "avahi-service.dtd">'
 line3 = '<service-group>'
-line4 = '  <name replace-wildcards="yes">'+str(sys.argv[1])+'</name>'
+line4 = '  <name replace-wildcards="yes">'+hostname+'</name>'
 line5 = '  <service>'
 line6 = '    <type>_'+str(sys.argv[1])+'._tcp</type>'
 line7 = '    <port>'+sys.argv[2]+'</port>' # port number is the second cmd line argument
