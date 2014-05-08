@@ -13,6 +13,8 @@ MIN_PORT_NUMBER = 32000
 
 f = open('/home/pi/clement/pfe/definitions/node-service.txt','r') #opening node-service.txt to get the node name from definition document
 nodename = f.readline()
+nodename =[nodename.find("_"):nodename.find(".")]
+print nodename
 
 filename = nodename+'.service' 
 path = '/etc/avahi/services/'+filename # create path to the /etc/avahi/services/ folder
@@ -36,7 +38,7 @@ line2 = '<!DOCTYPE service-group SYSTEM "avahi-service.dtd">'
 line3 = '<service-group>'
 line4 = '  <name replace-wildcards="yes">'+hostname+'</name>'
 line5 = '  <service>'
-line6 = '    <type>_'+nodename+'</type>'
+line6 = '    <type>'+nodename+'</type>'
 line7 = '    <port>'+str(port)+'</port>' 
 # line8 = '    <txt-record>path=/data/shared/Music</txt-record>' # This line should be changed...not realy sure of what to put here.
 line9 = '  </service>'
