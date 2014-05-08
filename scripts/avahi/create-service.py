@@ -11,9 +11,14 @@ import sys
 
 filename = str(sys.argv[1])+'.service' # file name is the first cmd line argument
 path = '/etc/avahi/services/'+filename # create path to the /etc/avahi/services/ folder
-os.system('sudo cat /etc/hostname')
-hostname = str(sys.stdin)
+
+
+
 os.system('sudo touch '+path) # create file with root privileges
+
+f = open('/etc/hostname') #opening /etc/hostname to get the hostname
+hostname = f.readlines()
+f.close()
 
 target = open(path, 'w')
 
