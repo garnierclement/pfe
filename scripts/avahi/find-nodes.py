@@ -17,3 +17,11 @@ target = open(filename, 'w')
 target.write(out)
 target.close()
 
+hostname_array = []
+with open("test", "r") as f:
+  for line in f:
+    hostname_array.append(line)
+
+print hostname_array[1]
+print hostname_array[0]
+
