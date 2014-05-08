@@ -7,17 +7,24 @@
 
 import os
 import sys
+import random
+
+MAX_PORT_NUMBER = 65536
+MIN_PORT_NUMBER = 32000
 
 
 filename = str(sys.argv[1])+'.service' # file name is the first cmd line argument
 path = '/etc/avahi/services/'+filename # create path to the /etc/avahi/services/ folder
-
-
-
 os.system('sudo touch '+path) # create file with root privileges
 
 f = open('/etc/hostname','r') #opening /etc/hostname to get the hostname
 hostname = f.readline()
+
+port = random.randrange(MIN_PORT_NUMBER, MAX_PORT_NUMBER) #choose a random port number between 65536 and 32000 to avoid collision
+while (str(port) in open('service_list.csv').read()): # if another node service has this port number, assign a new port number
+	port = random.randrange(MIN_PORT_NUMBER, MAX_PORT_NUMBER)
+
+
 
 target = open(path, 'w')
 
@@ -27,7 +34,7 @@ line3 = '<service-group>'
 line4 = '  <name replace-wildcards="yes">'+hostname+'</name>'
 line5 = '  <service>'
 line6 = '    <type>_'+str(sys.argv[1])+'._tcp</type>'
-line7 = '    <port>'+sys.argv[2]+'</port>' # port number is the second cmd line argument
+line7 = '    <port>'+str(port)+'</port>' # port number is the second cmd line argument
 # line8 = '    <txt-record>path=/data/shared/Music</txt-record>' # This line should be changed...not realy sure of what to put here.
 line9 = '  </service>'
 line10 = '</service-group>'
