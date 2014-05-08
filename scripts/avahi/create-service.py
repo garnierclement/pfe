@@ -20,12 +20,12 @@ line1 = '<?xml version="1.0" standalone=\'no\'?>'
 line2 = '<!DOCTYPE service-group SYSTEM "avahi-service.dtd">'
 line3 = '<service-group>'
 line4 = '  <name replace-wildcards="yes">'+str(sys.argv[1])+'</name>'
-line4 = '  <service>'
-line5 = '    <type>_'+str(sys.argv[1])+'._tcp</type>'
-line6 = '    <port>'+sys.argv[2]+'</port>' # port number is the second cmd line argument
-line7 = '    <txt-record>path=/data/shared/Music</txt-record>' # This line should be changed...not realy sure of what to put here.
-line8 = '  </service>'
-line9 = '</service-group>'
+line5 = '  <service>'
+line6 = '    <type>_'+str(sys.argv[1])+'._tcp</type>'
+line7 = '    <port>'+sys.argv[2]+'</port>' # port number is the second cmd line argument
+line8 = '    <txt-record>path=/data/shared/Music</txt-record>' # This line should be changed...not realy sure of what to put here.
+line9 = '  </service>'
+line10 = '</service-group>'
 
 
 target.write(line1)
@@ -45,6 +45,8 @@ target.write("\n")
 target.write(line8)
 target.write("\n")
 target.write(line9)
+target.write("\n")
+target.write(line10)
 target.write("\n")
 
 target.close()
