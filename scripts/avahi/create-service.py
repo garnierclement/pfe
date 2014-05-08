@@ -68,7 +68,7 @@ target.write("\n")
 
 target.close()
 
-target = open(os.path.dirname(os.path.abspath(__file__))+"../../var/run/port", 'w')
+target = open(os.path.dirname(os.path.abspath(__file__))+"/../../var/run/port", 'w')
 target.write(port)
 target.close
 
