@@ -51,6 +51,8 @@ target.write("\n")
 
 target.close()
 
+os.system('sudo service avahi-daemon restart')  # restart avahi daemon
+
 
 
 
