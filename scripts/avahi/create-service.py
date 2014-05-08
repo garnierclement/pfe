@@ -38,7 +38,7 @@ line2 = '<!DOCTYPE service-group SYSTEM "avahi-service.dtd">'
 line3 = '<service-group>'
 line4 = '  <name replace-wildcards="yes">'+hostname+'</name>'
 line5 = '  <service>'
-line6 = '    <type>'+nodename+'</type>'
+line6 = '    <type>'+complete_nodename[1:]+'</type>'
 line7 = '    <port>'+str(port)+'</port>' 
 # line8 = '    <txt-record>path=/data/shared/Music</txt-record>' # This line should be changed...not realy sure of what to put here.
 line9 = '  </service>'
