@@ -16,9 +16,8 @@ path = '/etc/avahi/services/'+filename # create path to the /etc/avahi/services/
 
 os.system('sudo touch '+path) # create file with root privileges
 
-f = open('/etc/hostname') #opening /etc/hostname to get the hostname
-hostname = f.readlines()
-f.close()
+f = open('/etc/hostname','r') #opening /etc/hostname to get the hostname
+hostname = f.readline()
 
 target = open(path, 'w')
 
