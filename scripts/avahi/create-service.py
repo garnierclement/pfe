@@ -12,7 +12,7 @@ import sys
 filename = str(sys.argv[1])+'.service' # file name is the first cmd line argument
 path = '/etc/avahi/services/'+filename # create path to the /etc/avahi/services/ folder
 os.system('sudo cat /etc/hostname')
-hostname = sys.stdin
+hostname = str(sys.stdin)
 os.system('sudo touch '+path) # create file with root privileges
 
 target = open(path, 'w')
