@@ -21,7 +21,7 @@ f = open('/etc/hostname','r') #opening /etc/hostname to get the hostname
 hostname = f.readline()
 
 port = random.randrange(MIN_PORT_NUMBER, MAX_PORT_NUMBER) #choose a random port number between 65536 and 32000 to avoid collision
-while (str(port) in open('service_list.csv').read()): # if another node service has this port number, assign a new port number
+while (str(port) in open('sample.csv').read()): # if another node service has this port number, assign a new port number
 	port = random.randrange(MIN_PORT_NUMBER, MAX_PORT_NUMBER)
 
 
