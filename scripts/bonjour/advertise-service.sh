@@ -1,7 +1,7 @@
 #!/bin/bash
 
-servicename="server"
+servicename=$(hostname)
 type="_node._tcp"
-port=80
+port=56789
 
 dns-sd -R "$servicename" $type . $port
