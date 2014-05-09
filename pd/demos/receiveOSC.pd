@@ -1,0 +1,16 @@
+#N canvas 1536 161 519 663 10;
+#X declare -lib mrpeach;
+#X obj 110 514 print unpacked;
+#X obj 256 594 print match_1;
+#X obj 346 554 print match_2;
+#X text -50 527 comment;
+#X text -47 570 comment;
+#X obj 47 125 import mrpeach;
+#X obj 258 454 routeOSC /note/;
+#X obj 262 377 unpackOSC;
+#X obj 258 326 udpreceive 7000;
+#X connect 6 0 1 0;
+#X connect 6 1 2 0;
+#X connect 7 0 0 0;
+#X connect 7 0 6 0;
+#X connect 8 0 7 0;
