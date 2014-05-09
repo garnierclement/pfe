@@ -1,6 +1,6 @@
 #!/bin/bash
 
-servicename="MacBook Clément node"
+servicename=$(hostname)
 type="_node._tcp"
 port=56789
 
