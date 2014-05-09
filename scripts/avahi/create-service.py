@@ -8,10 +8,12 @@
 import os
 import random
 
+
 MAX_PORT_NUMBER = 65536
 MIN_PORT_NUMBER = 32000
 
-f = open('/home/pi/clement/pfe/definitions/node-service.txt','r') #opening node-service.txt to get the node name from definition document
+
+f = open(os.path.dirname(os.path.abspath(__file__))+'/../../definitions/node-service.txt','r') #opening node-service.txt to get the node name from definition document
 complete_nodename = f.readline()
 complete_nodename = complete_nodename.replace("\n","")
 nodename =complete_nodename[complete_nodename.find("_")+1:complete_nodename.find(".")]
@@ -59,6 +61,7 @@ target.write("\n")
 target.write(line6)
 target.write("\n")
 target.write(line7)
+target.write("\n")
 #target.write(line8)
 #target.write("\n")
 target.write(line9)
