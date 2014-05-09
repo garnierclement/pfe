@@ -35,3 +35,5 @@ for i in range(len(hostname_array)):
 
 target.close()
 
+os.system('cp node_list.csv ../../projects/node/service-discovery/public/var/node_list.csv')
+
