@@ -1,6 +1,10 @@
 # Mac OS X
 *.DS_Store
 
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
 # Compiled Object files
 *.slo
 *.lo
