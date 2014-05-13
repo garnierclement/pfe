@@ -23,4 +23,5 @@ make
 echo "[Installation]"
 sudo make install
 
+echo "[Updating system’s shared library cache]"
 sudo ldconfig
