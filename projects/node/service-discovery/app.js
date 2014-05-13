@@ -56,7 +56,7 @@ app.use(function(err, req, res, next) {
 });
 
 fs = require('fs')
-fs.readFile(path.join(__dirname, '../../../scripts/avahi/node-list.csv'), 'utf8', function (err,data) {
+fs.readFile(__dirname+"/node-list.csv", 'utf8', function (err,data) {
   if (err) {
     return console.log(err);
   }
