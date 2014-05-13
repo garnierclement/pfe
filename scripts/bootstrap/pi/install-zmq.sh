@@ -25,3 +25,7 @@ sudo make install
 
 echo "[Updating system’s shared library cache]"
 sudo ldconfig
+
+echo "[Cleaning]"
+rm zeromq-3.2.4.tar.gz
+rm -rf zeromq-3.2.4
