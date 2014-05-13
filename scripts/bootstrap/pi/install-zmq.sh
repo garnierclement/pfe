@@ -2,6 +2,8 @@
 
 # Installing stable release 3.2.4
 # Instructions : http://zeromq.org/intro:get-the-software
+# 
+# launch script with sudo
 
 
 echo "[Installing dependence uuid-dev]"
@@ -14,10 +16,16 @@ echo "[Extracting]"
 tar xvzf zeromq-3.2.4.tar.gz
 
 echo "[configure && make]"
+cd zeromq-3.2.4
 ./configure --with-pgm
 make
 
 echo "[Installation]"
 sudo make install
 
+echo "[Updating system’s shared library cache]"
 sudo ldconfig
+
+echo "[Cleaning]"
+rm zeromq-3.2.4.tar.gz
+rm -rf zeromq-3.2.4
