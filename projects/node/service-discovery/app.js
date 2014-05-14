@@ -4,11 +4,27 @@ var favicon = require('static-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var csv = require('csv');
+var fs = require('fs');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
+
+//CSV parsing of the node_list.csv file
+
+
+csv()
+.from.string(
+  '#Welcome\n"1","2","3","4"\n"a","b","c","d"',
+  {comment: '#'} )
+.to.array( function(data){
+  console.log(data)
+} ); 
+
+
+console.log('test');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -55,12 +71,5 @@ app.use(function(err, req, res, next) {
     });
 });
 
-fs = require('fs')
-fs.readFile(__dirname+"/node-list.csv", 'utf8', function (err,data) {
-  if (err) {
-    return console.log(err);
-  }
-  console.log(data);
-});
 
 module.exports = app;
