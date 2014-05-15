@@ -8,8 +8,14 @@ context = zmq.Context()
 # Configuration
 local = 'ipc:///tmp/zmq0'
 
-# Sockets
+# Local socket
 localsock = context.socket(zmq.PUB)
 localsock.connect(local)
 
-### stdin
+while True:
+	message = raw_input("Sending to "+local+" ")
+	if message in ["Q","q"]: 
+		print "Closing"
+		break
+	else:
+		localsock.send_multipart(message)
