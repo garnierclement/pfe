@@ -11,7 +11,7 @@ localsock.connect(local);
 localsock.subscribe('');
 
 // Publisher
-publisher.bind(tcpport, function(err) {
+publisher.bind(multicast, function(err) {
   if(err)
     console.log(err);
   else
