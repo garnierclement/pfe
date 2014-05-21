@@ -1,9 +1,11 @@
-#N canvas 473 139 450 300 10;
+#N canvas 473 139 379 280 10;
 #X obj 52 69 MouseState;
 #X floatatom 67 151 5 0 0 0 - - -;
 #X floatatom 111 152 5 0 0 0 - - -;
 #X msg 52 39 poll;
 #X obj 52 9 loadbang;
+#X text 148 23;
+#X text 134 12 Displays x and y position of the mouse;
 #X connect 0 1 1 0;
 #X connect 0 2 2 0;
 #X connect 3 0 0 0;
