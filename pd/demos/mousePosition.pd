@@ -1,0 +1,8 @@
+#N canvas 473 139 450 300 10;
+#X obj 50 69 MouseState;
+#X floatatom 74 149 5 0 0 0 - - -;
+#X floatatom 126 142 5 0 0 0 - - -;
+#X msg 77 36 poll;
+#X connect 0 1 1 0;
+#X connect 0 2 2 0;
+#X connect 3 0 0 0;
