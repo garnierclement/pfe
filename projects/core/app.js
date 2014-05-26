@@ -2,4 +2,4 @@
 
 var core = require('./manticore.js');
 
-console.log(core.name);
+console.log(core.name());
