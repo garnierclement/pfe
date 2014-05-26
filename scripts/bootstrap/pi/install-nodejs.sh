@@ -24,3 +24,7 @@ npm -v
 
 # Clean up
 rm -rf node-v0.11.3-linux-arm-pi*
+
+
+#
+wget http://nodejs.org/dist/v0.10.28/node-v0.10.28.tar.gz
