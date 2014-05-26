@@ -11,7 +11,7 @@ localsock.connect(local);
 localsock.subscribe('');
 
 // Publisher
-publisher.bind(multicast, function(err) {
+publisher.bind(tcpport, function(err) {
   if(err)
     console.log(err);
   else
@@ -22,6 +22,7 @@ publisher.bind(multicast, function(err) {
 // it is sent to all subscribers
 localsock.on("message", function(data) {
 	publisher.send(data);
+	console.log("Publishing: "+data);
 });
 
 process.on('SIGINT', function() {
