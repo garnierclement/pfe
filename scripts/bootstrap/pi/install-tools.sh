@@ -3,7 +3,7 @@
 sudo apt-get update
 
 # Avahi daemon and tools
-sudo apt-get install avahi-daemon
+sudo apt-get install avahi-daemon libnss-mdns
 sudo apt-get install avahi-utils
 sudo apt-get install avahi-discover
 
