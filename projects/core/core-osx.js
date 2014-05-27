@@ -76,7 +76,7 @@ function filter_ipv4(addresses){
 function node (host, ip, port){
 	this.host = host;
 	this.ip = filter_ipv4(ip);
-	this.subscribe_socket = new subscribe_socket(ip);
+	this.subscribe_socket = new subscribe_socket(this.ip);
 };
 
 // publish socket object
@@ -106,7 +106,8 @@ function publish_socket(){
 // subscribe socket object
 function subscribe_socket (peer){
 	var subscriber = zmq.socket('sub');
-	var tcp_port = "tcp://"+peer+":" + service_port ;
+	var tcp_port = "tcp://"+peer+":" + service_port;
+	console.log(tcp_port);
 	subscriber.connect(tcp_port);
 	subscriber.subscribe('');
 
@@ -114,6 +115,10 @@ function subscribe_socket (peer){
 
 	subscriber.on("message", function(reply) {
   		console.log("InCh : Received <==: ", reply.toString());
+	});
+
+	subscriber.on('error', function(err) {
+		console.log(err);
 	});
 }
 
