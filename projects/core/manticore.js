@@ -83,8 +83,17 @@ function Core()
 }
 util.inherits(Core, EventEmitter);
 
+// return true if runs on Mac OS X
+function isDarwin() {
+	if (require('os').platform() == 'darwin') return true;
+	else return false;
+}
 
-
+// return true if runs on Linux
+function isLinux() {
+	if (require('os').platform() == 'linux') return true;
+	else return false;
+}
 
 /// Testing part
 
