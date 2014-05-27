@@ -54,7 +54,7 @@ function Core()
   		//console.log(network_cap);
 	});
 	this.browser.on('serviceDown', function(service) {
-		console.log('[INCH] Service down: '+service.name+' at '+service.addresses[1]+' ('+service.networkInterface+')');
+		console.log('[INCH] Service down: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
 	});
 
 	// initialisation
