@@ -1,3 +1,6 @@
+var mdns = require('mdns2');
+
+
 function createAdvertisement()  {
     try {
         var mdns_txt_record = {

@@ -1,5 +1,5 @@
 
-var mdns = require('./lib/mdns');
+var mdns = require('mdns2');
 
 try {
   var b = mdns.createBrowser(mdns.tcp('http'));
