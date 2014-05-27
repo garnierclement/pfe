@@ -23,6 +23,8 @@ console.log(os.release());
 var mdns = require('mdns');
 var zmq = require('zmq');
 
+// create a publishing socket
+var publisher = new publish_socket();
 
 // advertisement of a _node._tcp. service on this node, on port 32323
 var advertiser = mdns.createAdvertisement(mdns.tcp(service_name), service_port);
