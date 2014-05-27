@@ -1,6 +1,7 @@
-#N canvas 441 420 450 300 10;
-#X obj 88 105 udpreceive 34567;
-#X obj 57 48 loadbang;
-#X obj 86 174 print udppacket;
-#X connect 0 0 2 0;
+#N canvas 890 198 227 150 10;
+#X obj 16 109 print udppacket;
+#X obj 16 18 udpreceive 34567;
+#X text 36 48 Simple UDP receiver;
+#X text 36 65 Print UDP datagram to console;
+#X text 36 80 cmd-R to show the console;
 #X connect 1 0 0 0;
