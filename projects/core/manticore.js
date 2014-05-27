@@ -53,6 +53,7 @@ function Core()
 	// browser events
 	this.browser.on('serviceUp', function(service) {
 		console.log('[INCH] Service up: '+service.name+' at '+service.addresses[1]+' ('+service.networkInterface+')');
+		if (service.name = self.name) { console.log("[CORE] IT'S ME"); }
 		//network_cap.nodes.push(new node(service.host, service.addresses));
   		//console.log(network_cap);
 	});
