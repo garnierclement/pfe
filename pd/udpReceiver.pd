@@ -1,0 +1,6 @@
+#N canvas 441 420 450 300 10;
+#X obj 88 105 udpreceive 34567;
+#X obj 57 48 loadbang;
+#X obj 86 174 print udppacket;
+#X connect 0 0 2 0;
+#X connect 1 0 0 0;
