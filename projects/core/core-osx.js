@@ -56,14 +56,6 @@ browser.start();
 
 
 
-
-
-
-
-
-
-
-
 // network object
 function network_capabilities (){
 	this.nodes = [];
