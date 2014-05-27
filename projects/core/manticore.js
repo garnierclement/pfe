@@ -28,6 +28,10 @@ function Core()
 	// name
 	this.name = require('os').hostname();
 
+	// nodes
+	// store node objects { name: "", id: "", ip: "", ...}
+	this.nodes = [];
+
 	// toString()
 	this.toString = function() 
 	{
