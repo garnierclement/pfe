@@ -7,10 +7,19 @@ var hostname = os.hostname();
 console.log(hostname);
 console.log(os.release());
 
+
+
+
 /* mDNS info channel (inch) advertisement */
 
-// npm install mdns
+
+// npm install mdns 
 var mdns = require('mdns');
+// npm install zmq
+var zmq = require('zmq');
+
+
+
 // Info Channel advertisement in Zeroconf
 
 var txt_record = { id: 'clement', pp: false};
@@ -19,9 +28,11 @@ var inch = mdns.createAdvertisement(mdns.tcp('http'), 45678, {txtRecord: txt_rec
 
 inch.start();
 
+
+
 // _node._tcp. service browser
 
-var browser = mdns.createBrowser(mdns.tcp('airdrop'));
+var browser = mdns.createBrowser(mdns.tcp('node'));
 var network_cap = new network_capabilities();
 
 browser.on('serviceUp', function(service) {
@@ -38,16 +49,32 @@ browser.start();
 // function zeroconfAdvertisement() {}
 
 
-// Creation of new node object 
-
+// network object
 function network_capabilities (){
 	this.nodes = [];
 };
 
+
+// node object 
 function node (host, ip){
 	this.host = host;
 	this.ip = ip;
+	this.subscribe_socket = new subscribe_socket(ip[0]);
 };
+
+// subscribe socket object
+function subscribe_socket (peer){
+	var subscriber = zmq.socket('sub');
+	var tcp_port = "tcp://"+peer+":9999" ;
+	subscriber.connect(tcp_port);
+	subscriber.subscribe('');
+
+	subscriber.on("message", function(reply) {
+  		console.log('Received message: ', reply.toString());
+	});
+}
+
+
 
 
 
