@@ -8,6 +8,7 @@ const PUBLISH_PORT = 32323;
 
 // Zeroconf / mDNS / DNS-SD
 // npm install mdns2
+// switching to mdns2 because mdns does not seem to be maintain anymore
 var mdns = require('mdns2');
 
 // ZeroMQ
@@ -39,6 +40,19 @@ function Core()
 	// advertisement of a _node._tcp. service on this node, on port 32323
 	this.advertiser = mdns.createAdvertisement(mdns.tcp(NODE_SERVICE), PUBLISH_PORT);
 
+	// _node._tcp. service browser
+	this.browser = mdns.createBrowser(mdns.tcp(NODE_SERVICE));
+
+	// browser events
+	this.browser.on('serviceUp', function(service) {
+		console.log('[INCH] Service up: ', service.name);
+		//network_cap.nodes.push(new node(service.host, service.addresses));
+  		//console.log(network_cap);
+	});
+	this.browser.on('serviceDown', function(service) {
+		console.log('[INCH] Service down: ', service.name);
+	});
+
 	// initialisation
 	this.init = function() 
 	{
@@ -50,9 +64,15 @@ function Core()
 				console.log('[INCH] Publisher binding error: '+err);
 			}
 			else {
+				// bind ok
 				console.log('[INCH] Publisher socket listening on '+PUBLISH_PORT);
+				// start advertising
 				self.advertiser.start();
-				console.log('[CORE] Advertising '+NODE_SERVICE+' on '+PUBLISH_PORT);
+				console.log('[CORE] Advertising _'+NODE_SERVICE+'._tcp on '+PUBLISH_PORT);
+				// start browser
+				self.browser.start();
+				console.log('[INCH] Start browsing for _'+NODE_SERVICE+'._tcp services');
+
 			}
 		});
 	};
