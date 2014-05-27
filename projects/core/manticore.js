@@ -49,12 +49,12 @@ function Core()
 
 	// browser events
 	this.browser.on('serviceUp', function(service) {
-		console.log('[INCH] Service up: ', service.name);
+		console.log('[INCH] Service up: '+service.name+' at '+service.addresses[1]+' ('+service.networkInterface+')');
 		//network_cap.nodes.push(new node(service.host, service.addresses));
   		//console.log(network_cap);
 	});
 	this.browser.on('serviceDown', function(service) {
-		console.log('[INCH] Service down: ', service.name);
+		console.log('[INCH] Service down: '+service.name+' at '+service.addresses[1]+' ('+service.networkInterface+')');
 	});
 
 	// initialisation
