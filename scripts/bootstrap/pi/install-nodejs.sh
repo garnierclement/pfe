@@ -26,5 +26,9 @@ npm -v
 rm -rf node-v0.11.3-linux-arm-pi*
 
 
-#
-wget http://nodejs.org/dist/v0.10.28/node-v0.10.28.tar.gz
+# en recompilant
+# wget http://nodejs.org/dist/v0.10.28/node-v0.10.28.tar.gz
+# 
+# pour installer
+# ln -fs out/Release/node node
+# /usr/bin/python tools/install.py install
