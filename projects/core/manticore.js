@@ -41,6 +41,9 @@ function Core()
 	// publisher socket (inch)
 	this.publisher = zmq.socket('pub');
 
+	// subscriber sockets
+	this.subscriber = [];
+
 	// advertisement of a _node._tcp. service on this node, on port 32323
 	this.advertiser = mdns.createAdvertisement(mdns.tcp(NODE_SERVICE), PUBLISH_PORT);
 
