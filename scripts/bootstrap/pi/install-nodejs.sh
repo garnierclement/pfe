@@ -31,4 +31,6 @@ rm -rf node-v0.11.3-linux-arm-pi*
 # 
 # pour installer
 # ln -fs out/Release/node node
-# /usr/bin/python tools/install.py install
+# sudo /usr/bin/python tools/install.py install
+# node -v
+# npm -v
