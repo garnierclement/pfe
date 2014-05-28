@@ -3,6 +3,7 @@
 /* Constants */
 const NODE_SERVICE = 'node';
 const PUBLISH_PORT = 32323;
+const LOCAL_PORT = 42424;
 
 /* Dependencies */
 
@@ -19,6 +20,8 @@ var zmq = require('zmq');
 var util = require('util'),
 	EventEmitter = require('events').EventEmitter;
 
+// for UDP sockets
+var dgram = require("dgram");
 
 /* Core object */
 function Core() 
@@ -44,6 +47,9 @@ function Core()
 	// subscriber sockets
 	this.subscriber = [];
 
+	// local channel
+	this.loch = dgram.createSocket('udp4');
+
 	// advertisement of a _node._tcp. service on this node, on port 32323
 	this.advertiser = mdns.createAdvertisement(mdns.tcp(NODE_SERVICE), PUBLISH_PORT);
 
@@ -52,19 +58,23 @@ function Core()
 
 	// browser events
 	this.browser.on('serviceUp', function(service) {
-		console.log('[INCH] Service up: '+service.name+' at '+service.addresses[1]+' ('+service.networkInterface+')');
-		if (service.name = self.name) { console.log("[CORE] IT'S ME"); }
+		console.log('[INCH] Service up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
 		//network_cap.nodes.push(new node(service.host, service.addresses));
   		//console.log(network_cap);
 	});
 	this.browser.on('serviceDown', function(service) {
-		console.log('[INCH] Service down: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
+		console.log('[INCH] Service down: '+service.name+' ('+service.networkInterface+')');
 	});
 
 	// initialisation
-	this.init = function() 
-	{
+	this.init = function() {
+		// start init
 		console.log('[CORE] Core starting on '+self.name);
+		// bind local socket
+		self.loch.bind(LOCAL_PORT, '127.0.0.1', function() {
+			var address = self.loch.address();
+			console.log('[LOCH] Local UDP socket listening on '+address.address+':'+address.port);
+		});
 		// TODO for all theses initialization
 		// see if async and waterfall can simplify the code (callback hell ?)
 		self.publisher.bind('tcp://*:'+PUBLISH_PORT, function(err) {
@@ -84,6 +94,14 @@ function Core()
 			}
 		});
 	};
+
+	// closing, cleaning
+	this.close = function() {
+		self.browser.stop();
+		self.advertiser.stop();
+		console.log('[CORE] Closing');
+		process.exit();
+	};
 }
 util.inherits(Core, EventEmitter);
 
@@ -99,10 +117,16 @@ function isLinux() {
 	else return false;
 }
 
+
 /// Testing part
 
 var c = new Core();
 
+// gracefully exit on ctrl+C (SIGINT)
+process.on('SIGINT', function() {
+  //subscriber.close();
+  c.close();
+});
 
 // register callback on events before init
 c.init();
