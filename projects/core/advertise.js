@@ -1,13 +1,13 @@
-var mdns = require('mdns2');
+#!/usr/bin/env node
 
+var mdns = require('mdns2');
 
 function createAdvertisement()  {
     try {
         var mdns_txt_record = {
-            name: domoConfig.domoConf.svcName,
-            port: domoConfig.domoConf.svcPort
+            id: "none"
         };
-        var advert = mdns.createAdvertisement(mdns.tcp(domoConfig.domoConf.svcName) , domoConfig.domoConf.svcPort, {txtRecord: mdns_txt_record});
+        var advert = mdns.createAdvertisement(mdns.tcp("node"),32323, {txtRecord: mdns_txt_record});
         advert.on('error', function(error) {
             console.log("advert ERROR ", error);
             setTimeout(createAdvertisement, 30 * 1000);
@@ -16,6 +16,7 @@ function createAdvertisement()  {
     } catch (ex){
         console.log("advert creation ERROR ");
         setTimeout(createAdvertisement, 30 * 1000);
-    } 
-} 
+    }
 }
+
+createAdvertisement();
