@@ -2,19 +2,22 @@
 
 var mdns = require('mdns2');
 
+const NODE_SERVICE = 'node';
+const PUBLISH_PORT = 32323;
+
 function createAdvertisement()  {
     try {
         var mdns_txt_record = {
             id: "none"
         };
-        var advert = mdns.createAdvertisement(mdns.tcp("node"),32323, {txtRecord: mdns_txt_record});
-        advert.on('error', function(error) {
-            console.log("advert ERROR ", error);
+        var advertiser = mdns.createAdvertisement(mdns.tcp(NODE_SERVICE),PUBLISH_PORT, {txtRecord: mdns_txt_record});
+        advertiser.on('error', function(error) {
+            console.log("advertiser ERROR ", error);
             setTimeout(createAdvertisement, 30 * 1000);
         });
-        advert.start();
+        advertiser.start();
     } catch (ex){
-        console.log("advert creation ERROR ");
+        console.log("advertiser creation ERROR ");
         setTimeout(createAdvertisement, 30 * 1000);
     }
 }
