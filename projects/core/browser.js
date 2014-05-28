@@ -15,11 +15,11 @@ browser.on('error', function(error) {
 });
 
 browser.on('serviceUp', function(service) {
-	console.log('[UP] '+ service.host+' '+service.addresses+':'+service.port);
+	console.log('[UP] '+ service.host+' '+service.addresses+':'+service.port+' ('+service.networkInterface+')');
 });
 
 browser.on('serviceDown', function(service) {
-	console.log(service);
+	console.log('[DOWN] '+service.name+' ('+service.networkInterface+')');
 });
 
 browser.start();
