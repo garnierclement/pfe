@@ -19,7 +19,7 @@ browser.on('serviceUp', function(service) {
 });
 
 browser.on('serviceDown', function(service) {
-	console.log('[DOWN] '+service.hosts);
+	console.log('[DOWN] '+service);
 });
 
 browser.start();
