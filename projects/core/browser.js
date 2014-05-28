@@ -22,4 +22,8 @@ browser.on('serviceDown', function(service) {
 	console.log('[DOWN] '+service.name+' ('+service.networkInterface+')');
 });
 
+process.on('SIGINT', function() {
+	browser.exit();
+});
+
 browser.start();
