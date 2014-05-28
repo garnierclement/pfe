@@ -66,6 +66,10 @@ function Core()
 		console.log('[INCH] Service down: '+service.name+' ('+service.networkInterface+')');
 	});
 
+	this.browser.on('error', function(error) {
+		console.log('[INCH] Browser error: '+error)
+	});
+
 	// initialisation
 	this.init = function() {
 		// start init
