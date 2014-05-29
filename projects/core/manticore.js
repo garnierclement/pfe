@@ -6,6 +6,7 @@ const INCH_PORT = 32323;
 const LOCAL_PORT = 42424;
 
 /* Dependencies */
+var uuid = require('node-uuid');
 
 // Zeroconf / mDNS / DNS-SD
 // npm install mdns2
@@ -55,12 +56,12 @@ function filter_ipv4(addresses){
 }
 
 /* Node object */
-function Node (host, ip)
+function Node (host, ip, my_uuid, uuid)
 {
 	this.host = host;
 	this.ip = filter_ipv4(ip);
 	this.id = "";
-	if(host==(require('os').hostname()+'.') == 0){
+	if(my_uuid != uuid){
 		this.subscribe_socket = new SubSocket(this.ip, host);
 	}else{
 		this.subscribe_socket = null;
@@ -75,6 +76,8 @@ function Core()
 
 	// name
 	this.name = require('os').hostname();
+
+	this.uuid = uuid.v1();
 
 	// nodes
 	// store node objects { name: "", id: "", ip: "", ...}
@@ -93,7 +96,7 @@ function Core()
 	this.loch = dgram.createSocket('udp4');
 
 	// advertisement of a _node._tcp. service on this node, on port 32323
-	this.advertiser = mdns.createAdvertisement(mdns.tcp(NODE_SERVICE), INCH_PORT);
+	this.advertiser = createAdvertisement(this.uuid);
 
 	// _node._tcp. service browser
 	this.browser = mdns.createBrowser(mdns.tcp(NODE_SERVICE));
@@ -101,8 +104,8 @@ function Core()
 	// browser events
 	this.browser.on('serviceUp', function(service) {
 		console.log('[INCH] Service up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
-		self.nodes.push(new Node(service.host, service.addresses));
-		
+		self.nodes.push(new Node(service.host, service.addresses, self.uuid, service.txtRecord.id));
+
 	});
 	this.browser.on('serviceDown', function(service) {
 		console.log('[INCH] Service down: '+service.name+' ('+service.networkInterface+')');
@@ -163,6 +166,20 @@ function isLinux() {
 	else return false;
 }
 
+
+function createAdvertisement(uuid)  {
+
+    var mdns_txt_record = {
+        id: uuid
+    };
+    
+    var advertiser = mdns.createAdvertisement(mdns.tcp(NODE_SERVICE), INCH_PORT, {txtRecord: mdns_txt_record});
+    advertiser.on('error', function(error) {
+        console.log("advertiser ERROR ", error);
+        setTimeout(createAdvertisement, 30 * 1000);
+    });
+    return advertiser;
+}
 
 /// Testing part
 
