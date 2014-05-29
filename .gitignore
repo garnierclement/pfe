@@ -10,6 +10,7 @@ node_modules
 
 # libraries
 libs/oscpack/bin
+libs/oscpack/liboscpack.so.1.1.0
 
 # Compiled Object files
 *.slo
