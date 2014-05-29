@@ -8,6 +8,9 @@ node_modules
 *.sublime-project
 *.sublime-workspace
 
+# libraries
+libs/oscpack/bin
+
 # Compiled Object files
 *.slo
 *.lo
