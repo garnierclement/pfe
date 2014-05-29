@@ -106,10 +106,10 @@ function Core()
 		console.log('[INCH] Service up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
 		if(!findIdNodes(self.nodes,service.txtRecord.id)){
 			self.nodes.push(new Node(service.host, service.name, service.addresses, self.uuid, service.txtRecord.id));
-			console.log('[INCH] adding id '+service.txtRecord.id);
+			console.log('[INCH] Adding node id '+service.txtRecord.id);
 		}
 		else {
-			console.log('[INCH] id '+service.txtRecord.id+' is already present');
+			console.log('[INCH] Node id '+service.txtRecord.id+' is already present');
 		}
 	});
 	this.browser.on('serviceDown', function(service) {
