@@ -20,6 +20,10 @@ Install Node.js v0.10.28
 
 ## Installation on Raspbian (Raspberry Pi)
 
+Clone this repository
+
+	$ git clone https://github.com/garnierclement/pfe
+
 Update package manager database
 
 	$ sudo apt-get update
