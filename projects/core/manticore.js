@@ -106,10 +106,9 @@ function Core()
 	this.browser.on('serviceUp', function(service) {
 		console.log('[INCH] Service up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
 		if(!findIdNodes(self.nodes,service.txtRecord.id)){
-			console.log(service.txtRecord.id);
-			console.log(findIdNodes(self.nodes,service.txtRecord.id));
 			self.nodes.push(new Node(service.host, service.name, service.addresses, self.uuid, service.txtRecord.id));
 		}
+		console.log(self.nodes);
 	});
 	this.browser.on('serviceDown', function(service) {
 		deleteDeadNode(self.nodes,service.name);
