@@ -110,8 +110,6 @@ function Core()
 			console.log(findIdNodes(self.nodes,service.txtRecord.id));
 			self.nodes.push(new Node(service.host, service.name, service.addresses, self.uuid, service.txtRecord.id));
 		}
-		console.log(self.nodes);
-
 	});
 	this.browser.on('serviceDown', function(service) {
 		deleteDeadNode(self.nodes,service.name);
@@ -185,7 +183,8 @@ function deleteDeadNode(nodes, node_name){
 function findIdNodes(nodes, uuid){
 	var res = false;
 	for(k in nodes){
-		if (nodes[k].uuid == uuid)  res = true;
+		if (nodes[k].id == uuid)  
+			res = true;
 	}
 	return res;
 }
