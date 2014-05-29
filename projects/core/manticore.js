@@ -56,9 +56,10 @@ function filter_ipv4(addresses){
 }
 
 /* Node object */
-function Node (host, ip, my_uuid, uuid)
+function Node (host, name, ip, my_uuid, uuid)
 {
 	this.host = host;
+	this.name = name;
 	this.ip = filter_ipv4(ip);
 	this.id = uuid;
 	if(my_uuid != uuid){
@@ -104,12 +105,16 @@ function Core()
 	// browser events
 	this.browser.on('serviceUp', function(service) {
 		console.log('[INCH] Service up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
-		self.nodes.push(new Node(service.host, service.addresses, self.uuid, service.txtRecord.id));
+		if(!findIdNodes(self.nodes,service.txtRecord.id)){
+			self.nodes.push(new Node(service.host, service.name, service.addresses, self.uuid, service.txtRecord.id));
+		}
 		console.log(self.nodes);
 
 	});
 	this.browser.on('serviceDown', function(service) {
+		deleteDeadNode(self.nodes,service.name);
 		console.log('[INCH] Service down: '+service.name+' ('+service.networkInterface+')');
+		console.log(self.nodes);
 	});
 
 	this.browser.on('error', function(error) {
@@ -167,6 +172,21 @@ function isLinux() {
 	else return false;
 }
 
+function deleteDeadNode(nodes, node_name){
+	var index = null;
+	for(k in nodes){
+		if (nodes[k].name == node_name)  index = k;
+	}
+	if(index != null) nodes.splice(index,1);
+}
+
+function findIdNodes(nodes, uuid){
+	var res = false;
+	for(k in nodes){
+		if (nodes[k].uuid == uuid)  res = true;
+	}
+	return res;
+}
 
 function createAdvertisement(uuid)  {
 
