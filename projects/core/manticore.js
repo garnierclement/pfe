@@ -107,12 +107,10 @@ function Core()
 		if(!findIdNodes(self.nodes,service.txtRecord.id)){
 			self.nodes.push(new Node(service.host, service.name, service.addresses, self.uuid, service.txtRecord.id));
 		}
-		console.log(self.nodes);
 	});
 	this.browser.on('serviceDown', function(service) {
 		deleteDeadNode(self.nodes,service.name);
 		console.log('[INCH] Service down: '+service.name+' ('+service.networkInterface+')');
-		console.log(self.nodes);
 	});
 
 	this.browser.on('error', function(error) {
