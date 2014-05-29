@@ -3,7 +3,6 @@
 var exec = require('child_process').exec;
 var child;
 
-child = exec('cmd',
-	function(error, stdout, stderr) {
-
-	});
+child = exec('ls -la', function(error, stdout, stderr) {
+	console.log(stdout);
+});
