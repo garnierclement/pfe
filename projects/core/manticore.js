@@ -106,11 +106,16 @@ function Core()
 		console.log('[INCH] Service up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
 		if(!findIdNodes(self.nodes,service.txtRecord.id)){
 			self.nodes.push(new Node(service.host, service.name, service.addresses, self.uuid, service.txtRecord.id));
+			console.log('[INCH] adding id '+service.txtRecord.id);
+		}
+		else {
+			console.log('[INCH] id '+service.txtRecord.id+' is already present');
 		}
 	});
 	this.browser.on('serviceDown', function(service) {
-		deleteDeadNode(self.nodes,service.name);
 		console.log('[INCH] Service down: '+service.name+' ('+service.networkInterface+')');
+		deleteDeadNode(self.nodes,service.name);
+
 	});
 
 	this.browser.on('error', function(error) {
@@ -173,7 +178,13 @@ function deleteDeadNode(nodes, node_name){
 	for(k in nodes){
 		if (nodes[k].name == node_name)  index = k;
 	}
-	if(index != null) nodes.splice(index,1);
+	if(index != null) {
+		nodes.splice(index,1);
+		console.log('[INCH] Deleting node '+node_name);
+	}
+	else {
+		console.log('[INCH] Error cannot delete node '+node_name+', not found');
+	}
 }
 
 function findIdNodes(nodes, uuid){
