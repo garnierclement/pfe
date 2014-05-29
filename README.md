@@ -1,7 +1,7 @@
-wpfe
-===
+# PFE (Projet de Fin d'Études)
 
-Projet de fin d'études - WSN Lab SJTU
+Projet de fin d'études - INSA Lyon - Filière Chine
+Wireless Sensor Network Laboratory - Shanghai JiaoTong University
 
 ## Installation on Mac OS X
 
@@ -17,6 +17,10 @@ Install the package manager [Homebrew]
 Install Node.js v0.10.28
 
 	$ brew install nodejs
+
+Install ZeroMQ 4.0.4
+
+	$ brew install zeromq
 
 ## Installation on Raspbian (Raspberry Pi)
 
