@@ -9,7 +9,9 @@
   "author": "Clément Garnier",
   "license": "ISC",
   "dependencies": {
+    "mdns": "^2.2.0",
     "mdns2": "^2.1.4",
+    "uuid": "^1.4.1",
     "zmq": "^2.7.0"
   }
 }
