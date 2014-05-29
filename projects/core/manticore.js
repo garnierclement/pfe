@@ -6,7 +6,7 @@ const INCH_PORT = 32323;
 const LOCAL_PORT = 42424;
 
 /* Dependencies */
-var uuid = require('node-uuid');
+var uuid = require('uuid');
 
 // Zeroconf / mDNS / DNS-SD
 // npm install mdns2
