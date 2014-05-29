@@ -9,9 +9,8 @@ const LOCAL_PORT = 42424;
 var uuid = require('uuid');
 
 // Zeroconf / mDNS / DNS-SD
-// npm install mdns2
-// switching to mdns2 because mdns does not seem to be maintain anymore
-var mdns = require('mdns2');
+// npm install mdns
+var mdns = require('mdns');
 
 // ZeroMQ
 // npm install zmq
