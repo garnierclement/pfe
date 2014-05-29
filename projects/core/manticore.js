@@ -25,7 +25,7 @@ var dgram = require('dgram');
 
 /* SubSocket object */
 function SubSocket (peer){
-	this.subscriber = zmq.socket('sub');
+	var subscriber = zmq.socket('sub');
 	subscriber.connect('tcp://'+peer+':'+INCH_PORT);
 	subscriber.subscribe('');
 
@@ -48,7 +48,6 @@ function filter_ipv4(addresses){
 		if (/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(addresses[k])) 
 			res = addresses[k];
 	}
-	console.log(res);
 	return res;
 }
 
@@ -168,5 +167,16 @@ process.on('SIGINT', function() {
   c.close();
 });
 
+
+
+process.stdin.setEncoding('utf8');
+
+process.stdin.on('readable', function() {
+  	var chunk = process.stdin.read();
+  	if (chunk !== null) {
+   		c.publisher.send(chunk);
+   		console.log("Inch : Published ==>: "+chunk);
+  	}
+});
 // register callback on events before init
 c.init();
