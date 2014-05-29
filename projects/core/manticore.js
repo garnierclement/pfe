@@ -24,20 +24,23 @@ var util = require('util'),
 var dgram = require('dgram');
 
 /* SubSocket object */
-function SubSocket (peer){
+function SubSocket (peer, host){
 	var subscriber = zmq.socket('sub');
 	subscriber.connect('tcp://'+peer+':'+INCH_PORT);
 	subscriber.subscribe('');
+	subscriber.identity = host ;
 
 	console.log('[INCH] Subscribe to '+peer);
 
 	subscriber.on("message", function(msg) {
-  		console.log('[INCH] Received s' , msg.toString());
+  		console.log('[INCH] ' + subscriber.identity +':' + msg.toString());
 	});
 
 	subscriber.on('error', function(err) {
 		console.log('[INCH] Subscriber error'+err);
 	});
+
+
 }
 
 // function filtering ipv6 addresses in the "addresses" field of the object return by the mdns browse
@@ -57,7 +60,11 @@ function Node (host, ip)
 	this.host = host;
 	this.ip = filter_ipv4(ip);
 	this.id = "";
-	this.subscribe_socket = new SubSocket(this.ip);
+	if(host==(require('os').hostname()+'.') == 0){
+		this.subscribe_socket = new SubSocket(this.ip, host);
+	}else{
+		this.subscribe_socket = null;
+	}
 }
 
 
@@ -94,7 +101,7 @@ function Core()
 	// browser events
 	this.browser.on('serviceUp', function(service) {
 		console.log('[INCH] Service up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
-		self.nodes.push(new Node(service.name, service.addresses));
+		self.nodes.push(new Node(service.host, service.addresses));
 		
 	});
 	this.browser.on('serviceDown', function(service) {
@@ -175,7 +182,7 @@ process.stdin.on('readable', function() {
   	var chunk = process.stdin.read();
   	if (chunk !== null) {
    		c.publisher.send(chunk);
-   		console.log("Inch : Published ==>: "+chunk);
+   		console.log("[INCH] Published: "+chunk);
   	}
 });
 // register callback on events before init
