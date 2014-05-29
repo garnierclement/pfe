@@ -1,6 +1,6 @@
 # PFE (Projet de Fin d'Études)
 
-Projet de fin d'études - INSA Lyon - Filière Chine
+Projet de fin d'études - INSA Lyon - Filière Chine  
 Wireless Sensor Network Laboratory - Shanghai JiaoTong University
 
 ## Installation on Mac OS X
