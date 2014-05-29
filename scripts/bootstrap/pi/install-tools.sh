@@ -15,3 +15,6 @@ sudo apt-get install nodejs
 
 # for mDNS module in Node.js 
 sudo apt-get install libavahi-compat-libdnssd-dev
+
+# Pure Data
+sudo apt-get install puredata
