@@ -60,7 +60,7 @@ function Node (host, ip, my_uuid, uuid)
 {
 	this.host = host;
 	this.ip = filter_ipv4(ip);
-	this.id = "";
+	this.id = uuid;
 	if(my_uuid != uuid){
 		this.subscribe_socket = new SubSocket(this.ip, host);
 	}else{
@@ -105,6 +105,7 @@ function Core()
 	this.browser.on('serviceUp', function(service) {
 		console.log('[INCH] Service up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
 		self.nodes.push(new Node(service.host, service.addresses, self.uuid, service.txtRecord.id));
+		console.log(self.nodes);
 
 	});
 	this.browser.on('serviceDown', function(service) {
