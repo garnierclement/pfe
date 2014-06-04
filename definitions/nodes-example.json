@@ -1,25 +1,25 @@
 {
   "nodes": [
     {
+      "id": "bcb5f560-ebbb-11e3-a80f-dbc444c60ed2",
       "host": "clementpi.local.",
       "name": "clementpi",
       "ip": "192.168.1.171",
-      "id": "bcb5f560-ebbb-11e3-a80f-dbc444c60ed2",
       "subscribe_socket": {}
     },
     {
-      "host": "macbook-cgarnier.local.",
-      "name": "macbook-cgarnier",
-      "ip": "192.168.1.120",
-      "id": "7945a400-ebb2-11e3-9735-f5623f2964c7",
-      "subscribe_socket": null
-    },
-    {
+      "id": "66622390-ebc1-11e3-8851-016c9bc4b777",
       "host": "Homeres-MacBook-Pro.local.",
       "name": "Hom\u00e8re\u2019s MacBook Pro",
       "ip": "192.168.1.154",
-      "id": "66622390-ebc1-11e3-8851-016c9bc4b777",
       "subscribe_socket": {}
+    },
+    {
+      "id": "ca2b1580-ebc6-11e3-b619-8fd30f97c7c6",
+      "host": "macbook-cgarnier.local.",
+      "name": "macbook-cgarnier",
+      "ip": "192.168.1.120",
+      "subscribe_socket": null
     }
   ]
 }
