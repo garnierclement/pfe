@@ -149,6 +149,7 @@ function Core()
 
 			}
 		});
+		self.emit('ready');
 	};
 
 	// closing, cleaning
@@ -210,26 +211,5 @@ function createAdvertisement(uuid)  {
     return advertiser;
 }
 
-/// Testing part
 
-var c = new Core();
-
-// gracefully exit on ctrl+C (SIGINT)
-process.on('SIGINT', function() {
-  //subscriber.close();
-  c.close();
-});
-
-
-
-process.stdin.setEncoding('utf8');
-
-process.stdin.on('readable', function() {
-  	var chunk = process.stdin.read();
-  	if (chunk !== null) {
-   		c.publisher.send(chunk);
-   		console.log("[INCH] Published: "+chunk);
-  	}
-});
-// register callback on events before init
-c.init();
+module.exports = new Core();
