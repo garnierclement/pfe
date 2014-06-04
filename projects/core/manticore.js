@@ -57,10 +57,10 @@ function filter_ipv4(addresses){
 /* Node object */
 function Node (host, name, ip, my_uuid, uuid)
 {
+	this.id = uuid;
 	this.host = host;
 	this.name = name;
 	this.ip = filter_ipv4(ip);
-	this.id = uuid;
 	if(my_uuid != uuid){
 		this.subscribe_socket = new SubSocket(this.ip, host);
 	}else{
