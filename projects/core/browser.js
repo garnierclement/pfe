@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var mdns = require('mdns2');
+var mdns = require('mdns');
 
 const NODE_SERVICE = 'node';
 
