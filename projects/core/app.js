@@ -26,9 +26,28 @@ process.stdin.on('readable', function() {
 		if (chunk == "debug\n") {
 			console.log(core.nodes);
 		}
+		else if (/^eval/.test(chunk)) {
+			var command = chunk.slice(5);
+			try {
+				eval(command);
+			}
+			catch(e) {
+				console.log("![EVAL] "+e+"\nUsage: 'eval [javascript code]'");
+			}
+		}
+		else if (/^log/.test(chunk)) {
+			var obj = chunk.slice(4);
+			try {
+				console.log(eval(obj));
+			}
+			catch(e) {
+				console.log("![LOG] "+e+"\nUsage: 'log [javascript object]'");
+			}
+			
+		}
 		else {
 			core.publisher.send(chunk);
-			console.log("[INCH] Published: "+chunk);
+			console.log("+[INCH] Published: "+chunk);
 		}
 	}
 });
