@@ -181,10 +181,10 @@ function deleteDeadNode(nodes, node_name){
 	}
 	if(index != null) {
 		nodes.splice(index,1);
-		console.log('[INCH] Deleting node '+node_name);
+		console.log('-[INCH] Deleting node '+node_name);
 	}
 	else {
-		console.log('[INCH] Error cannot delete node '+node_name+', not found');
+		console.log('![INCH] Error cannot delete node '+node_name+', not found');
 	}
 }
 
@@ -205,7 +205,7 @@ function createAdvertisement(uuid)  {
     
     var advertiser = mdns.createAdvertisement(mdns.tcp(NODE_SERVICE), INCH_PORT, {txtRecord: mdns_txt_record});
     advertiser.on('error', function(error) {
-        console.log("advertiser ERROR ", error);
+        console.log("![CORE] ", error);
         setTimeout(createAdvertisement, 30 * 1000);
     });
     return advertiser;
