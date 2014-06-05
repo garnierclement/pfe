@@ -54,7 +54,7 @@ Compile and install [Node.js] v0.10.28 from source tarball (**on the Pi, it take
 	$ rm zeromq-node-v0.10.28.tar.gz
 	$ rm -rf node-v0.10.28
 
-Alternatively, if you have already compiled (i.e. `make`) it once on one [Raspberry Pi], you can directly do
+Alternatively, if you have already compiled it once (i.e. `make`) on a [Raspberry Pi], you can directly do the following
 
 	$ cd node-v0.10.28
 	$ ln -fs out/Release/node node
@@ -62,7 +62,7 @@ Alternatively, if you have already compiled (i.e. `make`) it once on one [Raspbe
 	$ node -v 				# must display v.0.10.28
 	$ npm -v 				# must display v1.4.9	
 
-Compile and install [ZeroMQ] v4.0.4 from source tarball (also requires libtool, autoconf and automake, but they are built-in Rapsbian)
+Compile and install [ZeroMQ] v4.0.4 from source tarball (it also requires libtool, autoconf and automake, but they are provided by Rapsbian)
 
 	$ sudo apt-get install uuid-dev
 	$ wget http://download.zeromq.org/zeromq-4.0.4.tar.gz
