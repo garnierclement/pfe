@@ -30,14 +30,14 @@ function SubSocket (peer, host){
 	subscriber.subscribe('');
 	subscriber.identity = host ;
 
-	console.log('[INCH] Subscribe to '+peer);
+	console.log('+[INCH] Subscribe to '+peer);
 
 	subscriber.on("message", function(msg) {
-  		console.log('[INCH] ' + subscriber.identity +':' + msg.toString());
+  		console.log('>[INCH] From ' + subscriber.identity +' : ' + msg.toString());
 	});
 
 	subscriber.on('error', function(err) {
-		console.log('[INCH] Subscriber error'+err);
+		console.log('![INCH] Subscriber error'+err);
 	});
 
 
@@ -103,49 +103,49 @@ function Core()
 
 	// browser events
 	this.browser.on('serviceUp', function(service) {
-		console.log('[INCH] Service up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
+		console.log('+[INCH] Service up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
 		if(!findIdNodes(self.nodes,service.txtRecord.id)){
 			self.nodes.push(new Node(service.host, service.name, service.addresses, self.uuid, service.txtRecord.id));
-			console.log('[INCH] Adding node id '+service.txtRecord.id);
+			console.log('+[INCH] Adding node id '+service.txtRecord.id);
 		}
 		else {
-			console.log('[INCH] Node id '+service.txtRecord.id+' is already present');
+			console.log('![INCH] Node id '+service.txtRecord.id+' is already present');
 		}
 	});
 	this.browser.on('serviceDown', function(service) {
-		console.log('[INCH] Service down: '+service.name+' ('+service.networkInterface+')');
+		console.log('-[INCH] Service down: '+service.name+' ('+service.networkInterface+')');
 		deleteDeadNode(self.nodes,service.name);
 
 	});
 
 	this.browser.on('error', function(error) {
-		console.log('[INCH] Browser error: '+error)
+		console.log('![INCH] Browser error: '+error)
 	});
 
 	// initialisation
 	this.init = function() {
 		// start init
-		console.log('[CORE] Core starting on '+self.name);
+		console.log('+[CORE] Core starting on '+self.name);
 		// bind local socket
 		self.loch.bind(LOCAL_PORT, '127.0.0.1', function() {
 			var address = self.loch.address();
-			console.log('[LOCH] Local UDP socket listening on '+address.address+':'+address.port);
+			console.log('+[LOCH] Local UDP socket listening on '+address.address+':'+address.port);
 		});
 		// TODO for all theses initialization
 		// see if async and waterfall can simplify the code (callback hell ?)
 		self.publisher.bind('tcp://*:'+INCH_PORT, function(err) {
 			if (err) {
-				console.log('[INCH] Publisher binding error: '+err);
+				console.log('![INCH] Publisher binding error: '+err);
 			}
 			else {
 				// bind ok
-				console.log('[INCH] Publisher socket listening on '+INCH_PORT);
+				console.log('+[INCH] Publisher socket listening on '+INCH_PORT);
 				// start advertising
 				self.advertiser.start();
-				console.log('[CORE] Advertising _'+NODE_SERVICE+'._tcp on '+INCH_PORT);
+				console.log('+[CORE] Advertising _'+NODE_SERVICE+'._tcp on '+INCH_PORT);
 				// start browser
 				self.browser.start();
-				console.log('[INCH] Start browsing for _'+NODE_SERVICE+'._tcp services');
+				console.log('+[INCH] Start browsing for _'+NODE_SERVICE+'._tcp services');
 
 			}
 		});
