@@ -45,6 +45,15 @@ process.stdin.on('readable', function() {
 			}
 			
 		}
+		else if (/^emit/.test(chunk)) {
+			var evt = chunk.slice(5,chunk.length-1);
+			try {
+				core.emit(evt);
+			}
+			catch(e) {
+				console.log("![EMIT] "+e+"\nUsage: 'emit [javascript event on core]'");
+			}
+		}
 		else {
 			core.publisher.send(chunk);
 			console.log("+[INCH] Published: "+chunk);
@@ -57,6 +66,10 @@ core.on('ready', function() {
 		res.set({'Content-Type': 'application/json'});
 		res.send({nodes: core.nodes });
 	});
+});
+
+core.on('test', function(){
+	console.log('test');
 });
 
 // register callback on events before init
