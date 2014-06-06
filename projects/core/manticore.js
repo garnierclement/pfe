@@ -1,29 +1,26 @@
-#!/usr/bin/env node
-
-/* Constants */
+/**
+ * Constants
+ */
 const NODE_SERVICE = 'node';
 const INCH_PORT = 32323;
 const LOCAL_PORT = 42424;
 
-/* Dependencies */
+/** 
+ * Module dependencies
+ */
 var uuid = require('uuid');
-
-// Zeroconf / mDNS / DNS-SD
-// npm install mdns
-var mdns = require('mdns');
-
-// ZeroMQ
-// npm install zmq
-var zmq = require('zmq');
-
-// In order to extend the Core class to be an EventEmitter
-var util = require('util'),
+var mdns = require('mdns');		// Zeroconf / mDNS / DNS-SD
+var zmq = require('zmq');		// ZeroMQ
+var dgram = require('dgram');	// for UDP sockets
+var util = require('util'),		// extend the Core to be an EventEmitter
 	EventEmitter = require('events').EventEmitter;
 
-// for UDP sockets
-var dgram = require('dgram');
-
-/* SubSocket object */
+/**
+ * SubSocket object
+ * 
+ * @param {String} peer IP address of the peer
+ * @param {String} host hostname of the peer
+ */
 function SubSocket (peer, host){
 	var subscriber = zmq.socket('sub');
 	subscriber.connect('tcp://'+peer+':'+INCH_PORT);
@@ -39,12 +36,13 @@ function SubSocket (peer, host){
 	subscriber.on('error', function(err) {
 		console.log('![INCH] Subscriber error'+err);
 	});
-
-
 }
 
-// function filtering ipv6 addresses in the "addresses" field of the object return by the mdns browse
-// need testing
+/**
+ * filter_ipv4 filtering ipv6 addresses in the "addresses" field of the object return by the mdns browse]
+ * @param  {[type]} addresses [description]
+ * @return {String}           [first IPv4 address found]
+ */
 function filter_ipv4(addresses){
 	var res = "undefined";
 	for (k in addresses){
@@ -54,7 +52,14 @@ function filter_ipv4(addresses){
 	return res;
 }
 
-/* Node object */
+/**
+ * Node object
+ * @param {String} host    node hostname
+ * @param {String} name    node canonical name
+ * @param {String} ip      node IP address
+ * @param {String} my_uuid current uuid
+ * @param {String} uuid    node uuid
+ */
 function Node (host, name, ip, my_uuid, uuid)
 {
 	this.id = uuid;
@@ -68,8 +73,9 @@ function Node (host, name, ip, my_uuid, uuid)
 	}
 }
 
-
-/* Core object */
+/**
+ * Core object
+ */
 function Core() 
 {
 	var self = this;
@@ -162,18 +168,29 @@ function Core()
 }
 util.inherits(Core, EventEmitter);
 
-// return true if runs on Mac OS X
+/**
+ * Check if running on Mac OS X
+ * @return {Boolean} true if OS X
+ */
 function isDarwin() {
 	if (require('os').platform() == 'darwin') return true;
 	else return false;
 }
 
-// return true if runs on Linux
+/**
+ * Check if running on Linux
+ * @return {Boolean} true if Linux
+ */
 function isLinux() {
 	if (require('os').platform() == 'linux') return true;
 	else return false;
 }
 
+/**
+ * Delete node when service down
+ * @param  {Node[]}	nodes      list of nodes
+ * @param  {String} node_name  node canonical name to be deleted
+ */
 function deleteDeadNode(nodes, node_name){
 	var index = null;
 	for(k in nodes){
@@ -188,6 +205,14 @@ function deleteDeadNode(nodes, node_name){
 	}
 }
 
+/**
+ * Check if a particular node is present within a list of node
+ * Using uuid to distinguish nodes
+ * 
+ * @param  {Node[]} nodes list of nodes
+ * @param  {String} uuid  uuid of the sought node
+ * @return {Boolean}      return true if found
+ */
 function findIdNodes(nodes, uuid){
 	var res = false;
 	for(k in nodes){
@@ -197,6 +222,11 @@ function findIdNodes(nodes, uuid){
 	return res;
 }
 
+/**
+ * Wrapper for creating mDNS advertiser
+ * @param  {String} uuid identifier of the node
+ * @return {Advertiser}
+ */
 function createAdvertisement(uuid)  {
 
     var mdns_txt_record = {
@@ -211,5 +241,7 @@ function createAdvertisement(uuid)  {
     return advertiser;
 }
 
-
+/*
+ * Expose the Core object
+ */
 module.exports = new Core();
