@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
-var core = require('./manticore.js');
 var express = require('express');
 var api = express();
+var exec = require('child_process').exec;
+
+var core = require('./manticore.js');
 
 process.stdin.setEncoding('utf8');
 
@@ -42,9 +44,13 @@ process.stdin.on('readable', function() {
 			}
 		}
 		else if (/^exec/.test(chunk)) {
+			var cmd = chunk.slice(5,chunk.length-1);
 			try {
 				// remote execution with child_process ?
-				throw "NOT IMPLEMENTED YET"; 
+				//throw "NOT IMPLEMENTED YET";
+				exec(cmd, function(err, stdout, stderr){
+					console.log("+[EXEC] \n"+stdout+stderr);
+				});
 			}
 			catch(e) {
 				console.log("![EXEC] "+e);

