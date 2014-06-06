@@ -79,35 +79,17 @@ function Node (host, name, ip, my_uuid, uuid)
 function Core() 
 {
 	var self = this;
-
-	// name
 	this.name = require('os').hostname();
-
 	this.uuid = uuid.v1();
-
-	// nodes
-	// store node objects { name: "", id: "", ip: "", ...}
-	this.nodes = [];
-
-	// toString()
-	this.toString = function() 
-	{
-		return this.name;
-	};
-
-	// publisher socket (inch)
-	this.publisher = zmq.socket('pub');
-
-	// local channel
-	this.loch = dgram.createSocket('udp4');
-
+	this.nodes = [];	// store node objects { name: "", id: "", ip: "", ...}
+	this.publisher = zmq.socket('pub');	// publisher socket (inch)
+	this.loch = dgram.createSocket('udp4');	// local channel
 	// advertisement of a _node._tcp. service on this node, on port 32323
 	this.advertiser = createAdvertisement(this.uuid);
-
 	// _node._tcp. service browser
 	this.browser = mdns.createBrowser(mdns.tcp(NODE_SERVICE));
 
-	// browser events
+	// register browser events
 	this.browser.on('serviceUp', function(service) {
 		console.log('+[INCH] Service up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
 		if(!findIdNodes(self.nodes,service.txtRecord.id)){
@@ -123,7 +105,6 @@ function Core()
 		deleteDeadNode(self.nodes,service.name);
 
 	});
-
 	this.browser.on('error', function(error) {
 		console.log('![INCH] Browser error: '+error)
 	});
@@ -156,6 +137,12 @@ function Core()
 			}
 		});
 		self.emit('ready');
+	};
+
+	// toString()
+	this.toString = function() 
+	{
+		return this.name;
 	};
 
 	// closing, cleaning
@@ -224,11 +211,12 @@ function findIdNodes(nodes, uuid){
 
 /**
  * Wrapper for creating mDNS advertiser
+ * Using DNS TXT records to publish additional information of the node 
+ * 
  * @param  {String} uuid identifier of the node
- * @return {Advertiser}
+ * @return {mdns.Advertisement}
  */
 function createAdvertisement(uuid)  {
-
     var mdns_txt_record = {
         id: uuid
     };
