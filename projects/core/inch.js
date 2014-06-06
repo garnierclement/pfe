@@ -39,8 +39,8 @@ function handleMessage(peer, msg) {
  */
 function sendReply(dst, data) {
 	var socket = zmq.socket('req');
-	socket.connect('tcp://'+peer+':'+MACH_PORT);
-	socket.identity = peer;
+	socket.connect('tcp://'+dst+':'+MACH_PORT);
+	socket.identity = dst;
 	socket.send(data);
 
 	socket.on('message', function(data) {
