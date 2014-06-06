@@ -4,6 +4,8 @@
 const NODE_SERVICE = 'node';
 const INCH_PORT = 32323;
 const LOCAL_PORT = 42424;
+const MACH_PORT = 45454;
+
 
 /** 
  * Module dependencies
@@ -14,7 +16,9 @@ var zmq = require('zmq');		// ZeroMQ
 var dgram = require('dgram');	// for UDP sockets
 var util = require('util'),		// extend the Core to be an EventEmitter
 	EventEmitter = require('events').EventEmitter;
-var exec = require('child_process').exec;
+
+
+var inch = require('./inch.js');
 
 
 /**
@@ -33,17 +37,7 @@ function SubSocket (peer, host){
 
 	subscriber.on("message", function(msg) {
 		console.log('>[INCH] From ' + subscriber.identity +' : ' + msg.toString());
-		if (/^exec/.test(msg)) {
-			var cmd = chunk.slice(5,msg.length-1);
-			try {
-				exec(cmd, function(err, stdout, stderr){
-					console.log("+[EXEC] \n"+stdout+stderr);
-				});
-			}
-			catch(e) {
-				console.log("![EXEC] "+e);
-			}
-		}
+		
 	});
 
 	subscriber.on('error', function(err) {
@@ -55,7 +49,7 @@ function SubSocket (peer, host){
 
 /**
  * filter_ipv4 filtering ipv6 addresses in the "addresses" field of the object return by the mdns browse]
- * @param  {[type]} addresses [description]
+ * @param  {String[]} addresses [description]
  * @return {String}           [first IPv4 address found]
  */
 function filter_ipv4(addresses){
@@ -103,6 +97,7 @@ function Core()
 	this.advertiser = createAdvertisement(this.uuid);
 	// _node._tcp. service browser
 	this.browser = mdns.createBrowser(mdns.tcp(NODE_SERVICE));
+	this.mach = zmq.socket('rep');
 
 	// register browser events
 	this.browser.on('serviceUp', function(service) {
@@ -149,6 +144,14 @@ function Core()
 				self.browser.start();
 				console.log('+[INCH] Start browsing for _'+NODE_SERVICE+'._tcp services');
 
+			}
+		});
+		self.mach.bind('tcp://*:'+MACH_PORT, function(err) {
+			if (err) {
+				console.log('![MACH] Socket binding error: '+err);
+			}
+			else {
+				console.log('+[MACH] Publisher socket listening on '+MACH_PORT);
 			}
 		});
 		self.emit('ready');
