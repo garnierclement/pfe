@@ -54,9 +54,18 @@ process.stdin.on('readable', function() {
 				console.log("![EMIT] "+e+"\nUsage: 'emit [javascript event on core]'");
 			}
 		}
+		else if (/^send/.test(chunk)) {
+			var msg = chunk.slice(5,chunk.length-1);
+			try {
+				console.log("+[INCH] Published: "+msg);
+				core.publisher.send(msg);
+			}
+			catch(e) {
+				console.log("![SEND] "+e);
+			}
+		}
 		else {
-			core.publisher.send(chunk);
-			console.log("+[INCH] Published: "+chunk);
+			console.log("![CORE] available commands : debug|eval|log|send");
 		}
 	}
 });
