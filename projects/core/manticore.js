@@ -37,6 +37,7 @@ function SubSocket (peer, host){
 
 	subscriber.on("message", function(msg) {
 		console.log('>[INCH] From ' + subscriber.identity +' : ' + msg.toString());
+		inch.handleMessage(peer, msg);
 		
 	});
 
