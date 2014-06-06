@@ -1,25 +1,12 @@
 #!/usr/bin/env node
 
 var core = require('./manticore.js');
-
 var express = require('express');
-
-var loch_api = express();
-
-loch_api.listen(3000, function() {
-	console.log('Listening');
-});
-
-// gracefully exit on ctrl+C (SIGINT)
-process.on('SIGINT', function() {
-  //subscriber.close();
-  core.close();
-});
-
-
+var api = express();
 
 process.stdin.setEncoding('utf8');
 
+// Interactive commands within the terminal
 process.stdin.on('readable', function() {
 	var chunk = process.stdin.read();
 	if (chunk !== null) {
@@ -54,6 +41,15 @@ process.stdin.on('readable', function() {
 				console.log("![EMIT] "+e+"\nUsage: 'emit [javascript event on core]'");
 			}
 		}
+		else if (/^exec/.test(chunk)) {
+			try {
+				// remote execution with child_process ?
+				throw "NOT IMPLEMENTED YET"; 
+			}
+			catch(e) {
+				console.log("![EXEC] "+e);
+			}
+		}
 		else if (/^send/.test(chunk)) {
 			var msg = chunk.slice(5,chunk.length-1);
 			try {
@@ -69,19 +65,32 @@ process.stdin.on('readable', function() {
 		}
 	}
 });
-core.on('ready', function() {
 
-	loch_api.get('/', function(req, res) {
+// Gracefully exit on SIGINT (Ctrl+C)
+process.on('SIGINT', function() {
+	core.close();
+});
+
+// Start HTTP server to serve JSON API
+api.listen(3000, function() {
+	console.log('+[API] Listening on 3000');
+});
+
+// Upon core initialization
+core.on('ready', function() {
+	api.get('/', function(req, res) {
 		res.set({'Content-Type': 'application/json'});
 		res.send({nodes: core.nodes });
 	});
 });
 
+// Test core event
 core.on('test', function(){
 	console.log('test');
 });
 
-// register callback on events before init
+// Initialize core, everything starts from here
+// Note : in order to avoid asunc issues, register callbacks event before calling init()
 core.init();
 
 
