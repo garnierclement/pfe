@@ -42,9 +42,10 @@ function sendReply(dst, data) {
 	socket.connect('tcp://'+dst+':'+MACH_PORT);
 	socket.identity = dst;
 	socket.send(data);
+	console.log("+[MACH] Sending data to "+socket.identity);
 
 	socket.on('message', function(data) {
-        console.log("[MACH] Sending data to "+socket.identity);
+        console.log("[MACH] Answer "+socket.identity);
     });
 }
 
