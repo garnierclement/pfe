@@ -16,12 +16,12 @@ var MACH_PORT = 45454;
  * @param  {String} peer [IP address of the peer]
  * @param  {String} msg  [content of the message]
  */
-function handleMessage(peer, msg) {
+function handleMessage(peer, msg, callback) {
 	if (/^exec/.test(msg)) {
 		var cmd = msg.slice(5);
 		try {
 			exec(cmd, function(err, stdout, stderr){
-				console.log("+[EXEC] \n"+stdout+stderr);
+				console.log("+[EXEC] Executing "+cmd+"\n"+stdout+stderr);
 				sendReply(peer, stdout);
 			});
 		}
@@ -41,11 +41,12 @@ function sendReply(dst, data) {
 	var socket = zmq.socket('req');
 	socket.connect('tcp://'+dst+':'+MACH_PORT);
 	socket.identity = dst;
-	socket.send(data);
+	socket.send("+[MACH] Remote execution on \n"+data);
 	console.log("+[MACH] Sending data to "+socket.identity);
 
 	socket.on('message', function(data) {
-        console.log("[MACH] Answer "+socket.identity);
+        console.log("+[MACH] Answer from"+socket.identity+":"+data);
+        socket.close();
     });
 }
 
