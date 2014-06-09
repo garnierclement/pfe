@@ -32,7 +32,7 @@ function Node (host, name, ip, my_uuid, uuid)
 
 Node.prototype.disconnect = function() {
 	if (this.subscribe_socket != null) {
-		subscribe_socket.disconnect('tcp://'+this.ip+':'+INCH_PORT);
+		this.subscribe_socket.disconnect('tcp://'+this.ip+':'+INCH_PORT);
 	}
 };
 
