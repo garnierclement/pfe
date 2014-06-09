@@ -154,6 +154,7 @@ function deleteDeadNode(nodes, node_name){
 		if (nodes[k].name == node_name)  index = k;
 	}
 	if(index != null) {
+		nodes[index].disconnect();
 		nodes.splice(index,1);
 		console.log('-[INCH] Deleting node '+node_name);
 	}
