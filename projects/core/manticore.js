@@ -19,13 +19,21 @@ var Node = require('./node.js');// Node object
 
 /**
  * Core object
+ *
+ * @name		hostname of the current computer
+ * @uuid		unique identifier of the current core process
+ * @nodes		array of Node objects 
+ * @publisher	publisher socket (ZeroMQ) for information channel (InCh)
+ * @loch		local udp socket (unused)
+ * @advertiser	mDNS advertiser of service _node._tcp
+ * @browser		DNS-SD browser of _node._tcp services		
+ * @mach		tcp socket for direct communication between node's core (MaCh)
  */
-function Core() 
+function Core()
 {
-	var self = this;
 	this.name = require('os').hostname();
 	this.uuid = uuid.v1();
-	this.nodes = [];	// store node objects { name: "", id: "", ip: "", ...}
+	this.nodes = [];
 	this.publisher = zmq.socket('pub');	// publisher socket (inch)
 	this.loch = dgram.createSocket('udp4');	// local channel
 	// advertisement of a _node._tcp. service on this node, on port 32323
