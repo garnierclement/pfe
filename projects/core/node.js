@@ -17,7 +17,7 @@ var inch = require('./inch.js');
  * @param {String} my_uuid current uuid
  * @param {String} uuid    node uuid
  */
-module.exports = function Node (host, name, ip, my_uuid, uuid)
+function Node (host, name, ip, my_uuid, uuid)
 {
 	this.id = uuid;
 	this.host = host;
@@ -28,7 +28,15 @@ module.exports = function Node (host, name, ip, my_uuid, uuid)
 	}else{
 		this.subscribe_socket = null;
 	}
+}
+
+Node.prototype.disconnect = function() {
+	if (this.subscribe_socket != null) {
+		subscribe_socket.disconnect('tcp://'+this.ip+':'+INCH_PORT);
+	}
 };
+
+module.exports = Node;
 
 /**
  * SubSocket object
