@@ -39,6 +39,7 @@ function Core()
 	this.publisher = zmq.socket('pub');	// publisher socket (inch)
 	this.subscriber = zmq.socket('sub');
 	this.loch = dgram.createSocket('udp4');	// local channel
+	this.requester = zmq.socket('req');
 	// advertisement of a _node._tcp. service on this node, on port 32323
 	this.advertiser = createAdvertisement(this.uuid);
 	// _node._tcp. service browser
@@ -267,6 +268,11 @@ Core.prototype.getNodeIpById = function(uuid){
  */
 Core.prototype.createMessage = function(cmd, data) {
 	return {src: this.uuid, name: this.name, type: cmd, payload: data};
+};
+
+Core.prototype.send = function(dst, cmd, data) {
+	this.requester.connect('tcp://'+dst+':'+MACH_PORT);
+	this.requester.send(this.createMessage(cmd, data));
 };
 
 /**

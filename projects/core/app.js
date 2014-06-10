@@ -43,10 +43,10 @@ core.on('inch', function(data) {
 			break;
 		case 'exec': 
 			trigger.execute(data.payload, function(stdout, stderr){
-				var reply = zmq.socket('req');
-				var dst = core.getNodeIpById(data.src);
-				reply.connect('tcp://'+dst+':'+MACH_PORT);
-				reply.send(core.createMessage('raw', stdout));
+				console.log('+[CORE] Sending result of execution to '+data.name);
+				var dst = core.getNodeIpById(data.src)
+				if (dst != null)
+					core.send(dst, 'raw', {out: String(stdout)});
 			});
 			break;
 
