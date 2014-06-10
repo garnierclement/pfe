@@ -58,6 +58,16 @@ process.stdin.on('readable', function() {
 				console.log("![SEND] "+e);
 			}
 		}
+		else if (/^pub /.test(chunk)) {
+			var msg = chunk.slice(4,chunk.length-1);
+			try {
+				console.log("+[INCH] Published: "+msg);
+				core.publisher.send(msg);
+			}
+			catch(e) {
+				console.log("![SEND] "+e);
+			}
+		}
 		else {
 			console.log("![CORE] available commands : debug|eval|log|send");
 		}
