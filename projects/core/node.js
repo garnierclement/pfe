@@ -7,7 +7,7 @@ const INCH_PORT = 32323;
  * Module dependencies
  */
 var zmq = require('zmq');
-var inch = require('./inch.js');
+// var inch = require('./inch.js');
 
 /**
  * Node object
@@ -23,11 +23,11 @@ function Node (host, name, ip, my_uuid, uuid)
 	this.host = host;
 	this.name = name;
 	this.ip = filter_ipv4(ip);
-	if(my_uuid != uuid){
-		this.subscribe_socket = new SubSocket(this.ip, host);
-	}else{
-		this.subscribe_socket = null;
-	}
+	// if(my_uuid != uuid){
+	// 	this.subscribe_socket = new SubSocket(this.ip, host);
+	// }else{
+	// 	this.subscribe_socket = null;
+	// }
 }
 
 Node.prototype.disconnect = function() {

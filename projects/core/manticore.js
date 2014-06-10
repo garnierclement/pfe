@@ -15,7 +15,9 @@ var zmq = require('zmq');		// ZeroMQ
 var dgram = require('dgram');	// for UDP sockets
 var util = require('util'),		// extend the Core to be an EventEmitter
 	EventEmitter = require('events').EventEmitter;
+
 var Node = require('./node.js');// Node object
+var inch = require('./inch.js');
 
 /**
  * Core object
@@ -35,6 +37,7 @@ function Core()
 	this.uuid = uuid.v1();
 	this.nodes = [];
 	this.publisher = zmq.socket('pub');	// publisher socket (inch)
+	this.subscriber = zmq.socket('sub');
 	this.loch = dgram.createSocket('udp4');	// local channel
 	// advertisement of a _node._tcp. service on this node, on port 32323
 	this.advertiser = createAdvertisement(this.uuid);
@@ -73,13 +76,15 @@ Core.prototype.init = function() {
 		}
 	});
 	// bind mach channel
-	self.mach.bind('tcp://*:'+MACH_PORT, function(err) {
+	this.mach.bind('tcp://*:'+MACH_PORT, function(err) {
 		if (err)
 			console.log('![MACH] Socket binding error: '+err);
 		else
 			console.log('+[MACH] Publisher socket listening on '+MACH_PORT);
 	});
-	self.emit('ready');
+	// subscribe socket
+	this.subscriber.identity = this.name;
+	this.emit('ready');
 };
 
 /**
@@ -95,6 +100,21 @@ Core.prototype.browse = function() {
 	console.log('+[INCH] Start browsing for _'+NODE_SERVICE+'._tcp services');
 };
 
+Core.prototype.newSubscribe = function(peer) {
+	this.subscriber.connect('tcp://'+peer+':'+INCH_PORT);
+	this.subscriber.subscribe('');
+	console.log('+[INCH] Subscribe to '+peer);
+};
+
+self.subscriber.on('message', function(msg) {
+	console.log('>[INCH] From ' + subscriber.identity +' : ' + msg.toString());
+	inch.handleMessage(peer, msg);
+});
+
+self.subscriber.on('error', function(err) {
+	console.log('![INCH] Subscriber error'+err);
+});
+
 /**
  * Handle the discovery of new _node._tcp service
  * (mDNS browser event)
@@ -102,8 +122,13 @@ Core.prototype.browse = function() {
 self.browser.on('serviceUp', function(service) {
 	console.log('+[INCH] Service up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
 
-	if(!findNodeById(self.nodes,service.txtRecord.id)){
-		self.nodes.push(new Node(service.host, service.name, service.addresses, self.uuid, service.txtRecord.id));
+	if(!findNodeById(self.nodes,service.txtRecord.id))
+	{
+		var new_node = new Node(service.host, service.name, service.addresses, self.uuid, service.txtRecord.id);
+		self.nodes.push(new_node);
+		if (self.uuid != service.txtRecord.id) {
+			self.newSubscribe(new_node.ip);
+		}
 		console.log('+[INCH] Adding node id '+service.txtRecord.id);
 	}
 	else {
