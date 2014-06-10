@@ -17,7 +17,6 @@ var util = require('util'),		// extend the Core to be an EventEmitter
 	EventEmitter = require('events').EventEmitter;
 
 var Node = require('./node.js');// Node object
-var inch = require('./inch.js');
 
 /**
  * Core object
