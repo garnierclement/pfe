@@ -13,6 +13,16 @@ process.stdin.on('readable', function() {
 		else if (chunk == "exit\n") {
 			core.close();
 		}
+		else if (chunk == "help\n") {
+			console.log("[HELP] Usage: cmd [param], see examples below");
+			console.log("\tdebug");
+			console.log("\teval core.nodes");
+			console.log("\tlog core.nodes");
+			console.log("\tsend hello");
+			console.log("\texec hostname");
+			console.log("\tremote hostname");
+			console.log("\temit test");
+		}
 		else if (/^eval/.test(chunk)) {
 			var command = chunk.slice(5);
 			try {
@@ -82,8 +92,18 @@ process.stdin.on('readable', function() {
 				console.log("![SEND] "+e);
 			}
 		}
+		else if (/^pub /.test(chunk)) {
+			var msg = chunk.slice(4,chunk.length-1);
+			try {
+				console.log("+[INCH] Published: "+msg);
+				core.publisher.send(msg);
+			}
+			catch(e) {
+				console.log("![SEND] "+e);
+			}
+		}
 		else {
-			console.log("![CORE] Available commands : debug|eval|log|send|remote|emit");
+			console.log("![CORE] Available commands : help|debug|eval|log|exec|send|remote|emit");
 		}
 	}
 });

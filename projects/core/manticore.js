@@ -104,17 +104,6 @@ Core.prototype.browse = function() {
 };
 
 /**
- * Subscribe to new discovered node
- * 
- * @param  {String} peer [IP address of the new discovered node]
- */
-Core.prototype.newSubscribe = function(peer) {
-	this.subscriber.connect('tcp://'+peer+':'+INCH_PORT);
-	this.subscriber.subscribe('');
-	console.log('+[SUB] Subscribing to '+peer);
-};
-
-/**
  * Handle the reception of messages on the subscriber socket (inch)
  * Emits 'inch' event on core
  * 
@@ -167,6 +156,17 @@ self.browser.on('serviceUp', function(service) {
 });
 
 /**
+ * Subscribe to new discovered node
+ * 
+ * @param  {String} peer [IP address of the new discovered node]
+ */
+Core.prototype.newSubscribe = function(peer) {
+	this.subscriber.connect('tcp://'+peer+':'+INCH_PORT);
+	this.subscriber.subscribe('');
+	console.log('+[SUB] Subscribing to '+peer);
+};
+
+/**
  * Delete dead node from local node list
  */
 self.browser.on('serviceDown', function(service) {
@@ -198,6 +198,8 @@ Core.prototype.close = function(exit) {
 	this.advertiser.stop();
 	this.publisher.close();
 	this.subscriber.close();
+	this.requester.close();
+	this.loch.close();
 	if (typeof exit === "undefined")
 		process.exit();
 };
@@ -231,26 +233,27 @@ Core.prototype.send = function(dst, cmd, data) {
 Core.prototype.reply = function(cmd, data) {
 	var msg = this.createMessage(cmd, data);
 	this.mach.send(JSON.stringify(msg));
-}
+};
 
 /**
  * Delete node when service down
  * @param  {Node[]}	nodes      list of Node objects
  * @param  {String} node_name  node canonical name to be deleted
  */
-function deleteDeadNode(nodes, node_name){
+Core.prototype.deleteDeadNode = function(node_name){
 	var index = null;
-	for(k in nodes){
-		if (nodes[k].name == node_name)  index = k;
+	for(k in this.nodes){
+		if (this.nodes[k].name == node_name)  index = k;
 	}
 	if(index != null) {
-		nodes.splice(index,1);
+		this.subscriber.disconnect('tcp://'+nodes[index].ip+':'+INCH_PORT);
+		this.nodes.splice(index,1);
 		console.log('-[CORE] Deleting node '+node_name);
 	}
 	else {
 		console.log('![CORE] Error cannot delete node '+node_name+', not found ; no harm, maybe just a duplicate serviceDown');
 	}
-}
+};
 
 /**
  * Check if a particular node is present within a list of node
