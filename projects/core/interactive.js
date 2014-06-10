@@ -56,7 +56,7 @@ process.stdin.on('readable', function() {
 			var msg = chunk.slice(5,chunk.length-1);
 			try {
 				console.log("+[INCH] Published: "+msg);
-				core.publish(core.createMessage('send',msg));
+				core.publish(core.createMessage('raw',msg));
 			}
 			catch(e) {
 				console.log("![SEND] "+e);
