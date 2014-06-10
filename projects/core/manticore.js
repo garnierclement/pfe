@@ -124,6 +124,10 @@ self.mach.on('message', function(data) {
 	self.emit('mach', JSON.parse(data));
 });
 
+self.requester.on('message', function(data) {
+	self.emit('reply', JSON.parse(data));
+});
+
 /**
  * Display errors with sub socket
  */
@@ -131,9 +135,13 @@ self.subscriber.on('error', function(err) {
 	console.log('![SUB] Subscriber '+err);
 });
 
-self.requester.on('message', function(data) {
-	self.emit('reply', JSON.parse(data));
-})
+self.mach.on('error', function(err) {
+	console.log('![REP] Error:'+err);
+});
+
+self.requester.on('error', function(err) {
+	console.log('![REQ] Error:'+err);
+});
 
 /**
  * Handle the discovery of new _node._tcp service
