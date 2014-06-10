@@ -48,11 +48,21 @@ process.stdin.on('readable', function() {
 				console.log("![EXEC] "+e);
 			}
 		}
-		else if (/^send/.test(chunk)) {
+		else if (/^send /.test(chunk)) {
 			var msg = chunk.slice(5,chunk.length-1);
 			try {
 				console.log("+[INCH] Published: "+msg);
-				core.publisher.send(msg);
+				core.publisher.send(core.createMessage('send',msg));
+			}
+			catch(e) {
+				console.log("![SEND] "+e);
+			}
+		}
+		else if (/^remote /.test(chunk)) {
+			var cmd = chunk.slice(7,chunk.length-1);
+			try {
+				console.log("+[INCH] Remote execution of '"+cmd+"'");
+				core.publisher.send(core.createMessage('exec',cmd));
 			}
 			catch(e) {
 				console.log("![SEND] "+e);
@@ -69,7 +79,7 @@ process.stdin.on('readable', function() {
 			}
 		}
 		else {
-			console.log("![CORE] available commands : debug|eval|log|send");
+			console.log("![CORE] Available commands : debug|eval|log|send|remote|emit");
 		}
 	}
 });
