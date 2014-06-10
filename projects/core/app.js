@@ -14,7 +14,7 @@ process.on('SIGINT', function() {
 
 // Start HTTP server to serve JSON API
 api.listen(3000, function() {
-	console.log('+[API] Listening on 3000');
+	console.log('+[HTTP] Listening on 3000');
 });
 
 // Upon core initialization
@@ -22,6 +22,15 @@ core.on('ready', function() {
 	api.get('/', function(req, res) {
 		res.set({'Content-Type': 'application/json'});
 		res.send({nodes: core.nodes });
+	});
+	api.get('/request/:id', function(req, res) {
+		console.log('+[HTTP] Request id '+req.param('id'));
+		if (core.findNodeById(req.param('id')))
+			res.send(true);
+		else {
+			res.send(false);
+			console.log('![HTTP] id not found');
+		}
 	});
 });
 

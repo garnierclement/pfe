@@ -122,7 +122,7 @@ self.subscriber.on('error', function(err) {
 self.browser.on('serviceUp', function(service) {
 	console.log('+[INCH] Service up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
 
-	if(!findNodeById(self.nodes,service.txtRecord.id))
+	if(!self.findNodeById(service.txtRecord.id))
 	{
 		var new_node = new Node(service);
 		self.nodes.push(new_node);
@@ -210,23 +210,21 @@ function deleteDeadNode(nodes, node_name){
  * @param  {String} uuid  uuid of the sought node
  * @return {Boolean}      return true if found
  */
-function findNodeById(nodes, uuid){
-	var res = false;
-	for(k in nodes){
-		if (nodes[k].id == uuid)  
-			res = true;
+Core.prototype.findNodeById = function (uuid){
+	for(k in this.nodes){
+		if (this.nodes[k].id == uuid)  
+			return true;
 	}
-	return res;
-}
+	return false;
+};
 
 Core.prototype.getNodeById = function(uuid){
 	for(idx in this.nodes){
-		if (this.nodes[idx].id == uuid) {
+		if (this.nodes[idx].id == uuid)
 			return this.nodes[idx];
-		}	
 	}
 	return null;
-}
+};
 
 /**
  * Wrapper for creating mDNS advertiser
