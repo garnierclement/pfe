@@ -43,10 +43,12 @@ core.on('inch', function(data) {
 			break;
 		case 'exec': 
 			trigger.execute(data.payload, function(stdout, stderr){
-				console.log('+[CORE] Sending result of execution to '+data.name);
 				var dst = core.getNodeIpById(data.src)
+				console.log('+[CORE] Sending result of execution to '+data.name+'('+dst+')');
 				if (dst != null)
 					core.send(dst, 'raw', stdout);
+				else
+					console.log('-[CORE] Cannot send reply to '+data.src);
 			});
 			break;
 
