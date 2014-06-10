@@ -1,3 +1,4 @@
+var exec = require('child_process').exec;
 var core = require('./manticore.js');
 
 process.stdin.setEncoding('utf8');

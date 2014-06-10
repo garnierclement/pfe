@@ -2,7 +2,6 @@
 
 var express = require('express');
 var api = express();
-var exec = require('child_process').exec;
 
 var core = require('./manticore.js');
 var interactive = require('./interactive.js');
