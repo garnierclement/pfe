@@ -38,16 +38,33 @@ The following commands are available
 * `publish()`
 * `close()`
 
+### Source files
+
+* `app.js` is the main entry point of the program
+* `manticore.js` is the module containing the core singleton
+* `node.js` is the Node class
+* `interactive.js` contains code for interactive commands in the shell
+* `trigger.js` contains code for generating and executing processes
+
 ## Installation
 
 Install dependencies ([mdns] and [zmq])  
-See `package.json` for more information
+See `package.json` for more information about versions
 
 	$ npm install
 
+Manually
+
+	$ npm install mdns
+	$ npm install zmq
+	$ npm install express
+	$ npm install uuid
+
+Note: zmq and mdns have other requirements, see the main README at the root of this repository
+
 ## Warning
 
-On linux distribution, we can see the following warning
+On Linux distributions, we can see the following warning when executing the program
 
 	*** WARNING *** The program 'node' uses the Apple Bonjour compatibility layer of Avahi.
 	*** WARNING *** Please fix your application to use the native API of Avahi!
