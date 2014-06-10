@@ -74,6 +74,14 @@ core.on('mach', function(data) {
 
 });
 
+core.on('reply', function(data) {
+	console.log('>[MACH] '+data.name+' replied with '+data.type);
+	switch(data.type) {
+		default:
+			console.log(data.payload);
+	}
+});
+
 // Test core event
 core.on('test', function(){
 	console.log('test');

@@ -29,7 +29,8 @@ The following commands are available
 
 * `ready`
 * `inch`
-* `mach` 
+* `mach`
+* `reply`
 * `test` (for testing purpose only)
 
 ### Core commands

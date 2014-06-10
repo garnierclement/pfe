@@ -142,6 +142,10 @@ self.subscriber.on('error', function(err) {
 	console.log('![SUB] Subscriber '+err);
 });
 
+self.requester.on('message', function(data) {
+	self.emit('reply', JSON.parse(data));
+})
+
 /**
  * Handle the discovery of new _node._tcp service
  * (mDNS browser event)
