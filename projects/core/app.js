@@ -46,7 +46,7 @@ core.on('inch', function(data) {
 				console.log('+[CORE] Sending result of execution to '+data.name);
 				var dst = core.getNodeIpById(data.src)
 				if (dst != null)
-					core.send(dst, 'raw', {out: String(stdout)});
+					core.send(dst, 'raw', stdout);
 			});
 			break;
 
