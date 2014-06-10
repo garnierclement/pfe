@@ -1,19 +1,22 @@
-#!/usr/bin/env node
 
 /** 
  * Module dependencies
  */
 var exec = require('child_process').exec;
-var child;
 
-child = exec('ls -la', function(error, stdout, stderr) {
-	console.log(stdout);
-});
+exports.execute = function(cmd, callback) {
+	try {
+		exec(cmd, function(err, stdout, stderr){
+		console.log("+[EXEC] Executing "+cmd+"\n"+stdout+stderr);
+			});
+			callback(stdout, stderr);
+		}
+		catch(e) {
+			console.log("![EXEC] "+e);
+		}
+};
 
-function generate() {
+exports.generate = function() {
 
-}
+};
 
-function execute(cmd) {
-
-}

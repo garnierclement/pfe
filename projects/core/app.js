@@ -5,6 +5,7 @@ var api = express();
 
 var core = require('./manticore.js');
 var interactive = require('./interactive.js');
+var trigger = require('./trigger.js');
 
 // Gracefully exit on SIGINT (Ctrl+C)
 process.on('SIGINT', function() {
@@ -35,13 +36,35 @@ core.on('ready', function() {
 
 // Upon receiving a message on Inch
 core.on('inch', function(data) {
-	console.log('>[INCH]\n'+ data);
+	console.log('>[INCH] '+data.type+' from '+data.name);
+	switch(data.type) {
+		case 'raw':
+			console.log(data.payload);
+			break;
+		case 'exec': 
+			trigger.execute(data.payload, function(stdout, stderr){
+				var reply = zmq.socket('req');
+				var dst = core.getNodeIpById(data.src);
+				reply.connect('tcp://'+dst+':'+MACH_PORT);
+				reply.send(core.createMessage('raw', stdout));
+			});
+			break;
+
+		default:
+			console.log('![INCH] No message type');
+	}
 });
 
 // Upon receiving a message on MaCh
 core.on('mach', function(data) {
-	console.log(">[MACH] "+data);
-	this.send('ACK');
+	console.log('>[MACH] '+data.type+' from '+data.name);
+	switch(data.type) {
+		case 'raw':
+			console.log(data.payload);
+			break;
+		default:
+			console.log('![INCH] No message type');
+	}
 });
 
 // Test core event
