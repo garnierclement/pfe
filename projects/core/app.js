@@ -52,6 +52,7 @@ core.on('inch', function(data) {
 
 		default:
 			console.log('![INCH] No message type');
+			console.log(data.payload);
 	}
 });
 
@@ -61,10 +62,16 @@ core.on('mach', function(data) {
 	switch(data.type) {
 		case 'raw':
 			console.log(data.payload);
+			core.reply('ack',"Bien reçu !");
+			break;
+		case 'ack':
+			console.log(data.payload);
 			break;
 		default:
 			console.log('![INCH] No message type');
+			console.log(data.payload);
 	}
+
 });
 
 // Test core event

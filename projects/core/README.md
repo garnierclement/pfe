@@ -36,6 +36,8 @@ The following commands are available
 
 * `init()`
 * `publish()`
+* `send()`
+* `reply()`
 * `close()`
 
 ### Source files

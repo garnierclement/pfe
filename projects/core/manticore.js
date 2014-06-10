@@ -208,6 +208,29 @@ Core.prototype.publish = function(data) {
 };
 
 /**
+ * Create an object representing the structure of message
+ * used between cores
+ * always adding name and uuid
+ * 
+ * @param  {String} cmd  [type of the message]
+ * @param  {?}		data [payload of the message]
+ * @return {Object}      [message sent on the socket]
+ */
+Core.prototype.createMessage = function(cmd, data) {
+	return {src: this.uuid, name: this.name, type: cmd, payload: data};
+};
+
+Core.prototype.send = function(dst, cmd, data) {
+	this.requester.connect('tcp://'+dst+':'+MACH_PORT);
+	this.requester.send(JSON.stringify(this.createMessage(cmd, data)));
+};
+
+Core.prototype.reply = function(cmd, data) {
+	var msg = this.createMessage(cmd, data);
+	this.mach.send(JSON.stringify(msg));
+}
+
+/**
  * Delete node when service down
  * @param  {Node[]}	nodes      list of Node objects
  * @param  {String} node_name  node canonical name to be deleted
@@ -255,24 +278,6 @@ Core.prototype.getNodeIpById = function(uuid){
 			return this.nodes[idx].ip;
 	}
 	return null;
-};
-
-/**
- * Create an object representing the structure of message
- * used between cores
- * always adding name and uuid
- * 
- * @param  {String} cmd  [type of the message]
- * @param  {?}		data [payload of the message]
- * @return {Object}      [message sent on the socket]
- */
-Core.prototype.createMessage = function(cmd, data) {
-	return {src: this.uuid, name: this.name, type: cmd, payload: data};
-};
-
-Core.prototype.send = function(dst, cmd, data) {
-	this.requester.connect('tcp://'+dst+':'+MACH_PORT);
-	this.requester.send(JSON.stringify(this.createMessage(cmd, data)));
 };
 
 /**
