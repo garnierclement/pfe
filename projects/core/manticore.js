@@ -120,7 +120,8 @@ Core.prototype.newSubscribe = function(peer) {
  * @param  {[type]} data [description]
  */
 self.subscriber.on('message', function(data) {
-	self.emit('inch', data);
+	console.log(data);
+	self.emit('inch', JSON.parse(data));
 });
 
 /**
@@ -129,7 +130,7 @@ self.subscriber.on('message', function(data) {
  * @return {[type]}      [description]
  */
 self.mach.on('message', function(data) {
-	self.emit('mach', data);
+	self.emit('mach', JSON.parse(data));
 });
 
 /**
@@ -203,7 +204,7 @@ Core.prototype.close = function(exit) {
  * @param  {[type]} data [description]
  */
 Core.prototype.publish = function(data) {
-	this.publisher.send(data);
+	this.publisher.send(JSON.stringify(data));
 };
 
 /**

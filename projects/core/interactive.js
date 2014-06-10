@@ -52,7 +52,7 @@ process.stdin.on('readable', function() {
 			var msg = chunk.slice(5,chunk.length-1);
 			try {
 				console.log("+[INCH] Published: "+msg);
-				core.publisher.send(core.createMessage('send',msg));
+				core.publish(core.createMessage('send',msg));
 			}
 			catch(e) {
 				console.log("![SEND] "+e);
@@ -62,7 +62,7 @@ process.stdin.on('readable', function() {
 			var cmd = chunk.slice(7,chunk.length-1);
 			try {
 				console.log("+[INCH] Remote execution of '"+cmd+"'");
-				core.publisher.send(core.createMessage('exec',cmd));
+				core.publish(core.createMessage('exec',cmd));
 			}
 			catch(e) {
 				console.log("![SEND] "+e);
