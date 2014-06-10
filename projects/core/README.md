@@ -1,4 +1,41 @@
-# Core
+# Manticore
+
+## Start
+
+To start manticore, you can either use node
+
+	$ node app.js
+
+or with npm
+
+	$ npm start
+
+## Guide
+
+### Interactive commands
+
+The following commands are available
+
+* `debug` show core.nodes
+* `eval [js]` use eval() javascript function to imitate REPL mechanism
+* `log [js]` same as eval but will also show the result on stdout using console.log()
+* `send [msg]` send a the string `msg` to publish socket
+* `remote [cmd]` ask remote execution of `cmd` command
+* `emit [event]` is equivalent to core.emit('event'), used for debug purpose only
+* `exec [cmd]` execute a command in the shell (no need to quit the program or to open a new ssh session)  
+
+### Events
+
+* `ready`
+* `inch`
+* `mach` 
+* `test` (for testing purpose only)
+
+### Core commands
+
+* `init()`
+* `publish()`
+* `close()`
 
 ## Installation
 
