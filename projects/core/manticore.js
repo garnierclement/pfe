@@ -35,6 +35,7 @@ function Core()
 	this.name = require('os').hostname();
 	this.uuid = uuid.v1();
 	this.nodes = [];
+	this.sensors = [];
 	this.publisher = zmq.socket('pub');	// publisher socket (inch)
 	this.subscriber = zmq.socket('sub');
 	this.loch = dgram.createSocket('udp4');	// local channel
@@ -246,7 +247,7 @@ Core.prototype.deleteDeadNode = function(node_name){
 		if (this.nodes[k].name == node_name)  index = k;
 	}
 	if(index != null) {
-		this.subscriber.disconnect('tcp://'+nodes[index].ip+':'+INCH_PORT);
+		this.subscriber.disconnect('tcp://'+this.nodes[index].ip+':'+INCH_PORT);
 		this.nodes.splice(index,1);
 		console.log('-[CORE] Deleting node '+node_name);
 	}
