@@ -23,6 +23,7 @@ The following commands are available
 * `remote [cmd]` ask remote execution of `cmd` command
 * `emit [event]` is equivalent to core.emit('event'), used for debug purpose only
 * `exec [cmd]` execute a command in the shell (no need to quit the program or to open a new ssh session)  
+* `exit` gracefully close sockets and exit (equivalent to Ctrl+C)
 
 ### Events
 

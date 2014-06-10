@@ -10,6 +10,9 @@ process.stdin.on('readable', function() {
 		if (chunk == "debug\n") {
 			console.log(core.nodes);
 		}
+		else if (chunk == "exit\n") {
+			core.close();
+		}
 		else if (/^eval/.test(chunk)) {
 			var command = chunk.slice(5);
 			try {
