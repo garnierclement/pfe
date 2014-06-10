@@ -272,7 +272,7 @@ Core.prototype.createMessage = function(cmd, data) {
 
 Core.prototype.send = function(dst, cmd, data) {
 	this.requester.connect('tcp://'+dst+':'+MACH_PORT);
-	this.requester.send(this.createMessage(cmd, data));
+	this.requester.send(JSON.stringify(this.createMessage(cmd, data)));
 };
 
 /**
