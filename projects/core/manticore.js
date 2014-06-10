@@ -107,7 +107,7 @@ Core.prototype.newSubscribe = function(peer) {
 };
 
 self.subscriber.on('message', function(msg) {
-	console.log('>[INCH] From ' + subscriber.identity +' : ' + msg.toString());
+	console.log('>[INCH] From  : ' + msg.toString());
 	inch.handleMessage(peer, msg);
 });
 
@@ -124,7 +124,7 @@ self.browser.on('serviceUp', function(service) {
 
 	if(!findNodeById(self.nodes,service.txtRecord.id))
 	{
-		var new_node = new Node(service.host, service.name, service.addresses, self.uuid, service.txtRecord.id);
+		var new_node = new Node(service);
 		self.nodes.push(new_node);
 		if (self.uuid != service.txtRecord.id) {
 			self.newSubscribe(new_node.ip);
@@ -161,12 +161,27 @@ Core.prototype.toString = function() {
 /**
  * Stopping mDNS advertising/browsing and exiting
  */
-Core.prototype.close = function() {
-	console.log('[CORE] Closing');
+Core.prototype.close = function(exit) {
+	
 	this.browser.stop();
 	this.advertiser.stop();
-	process.exit();
+	this.publisher.close();
+	this.subscriber.close();
+	if (typeof exit === "undefined") {
+		process.exit();
+		console.log('[CORE] Closing');
+	}
 };
+
+Core.prototype.publish = function(data) {
+	this.publisher.send(data);
+}
+
+// not working
+// Core.prototype.restart = function() {
+// 	this.close(false);
+// 	this.init();
+// };
 
 /**
  * Delete node when service down
@@ -179,7 +194,6 @@ function deleteDeadNode(nodes, node_name){
 		if (nodes[k].name == node_name)  index = k;
 	}
 	if(index != null) {
-		nodes[index].disconnect();
 		nodes.splice(index,1);
 		console.log('-[INCH] Deleting node '+node_name);
 	}
@@ -203,6 +217,15 @@ function findNodeById(nodes, uuid){
 			res = true;
 	}
 	return res;
+}
+
+Core.prototype.getNodeById = function(uuid){
+	for(idx in this.nodes){
+		if (this.nodes[idx].id == uuid) {
+			return this.nodes[idx];
+		}	
+	}
+	return null;
 }
 
 /**
