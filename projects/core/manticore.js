@@ -3,7 +3,7 @@
  */
 const NODE_SERVICE = 'node'; // _node._tcp
 const INCH_PORT = 32323;
-const LOCAL_PORT = 42424;
+const UDP_PORT = 42424;
 const MACH_PORT = 45454;
 
 /** 
@@ -60,7 +60,7 @@ var self = module.exports = new Core();
 Core.prototype.init = function() {
 	console.log('+[CORE] Core starting on '+this.name);
 	// bind local socket
-	this.loch.bind(LOCAL_PORT, function() {
+	this.loch.bind(UDP_PORT, function() {
 		var address = self.loch.address();
 		console.log('+[LOCH] UDP socket listening on '+address.address+':'+address.port);
 	});
