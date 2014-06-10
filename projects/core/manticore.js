@@ -60,17 +60,17 @@ var self = module.exports = new Core();
 Core.prototype.init = function() {
 	console.log('+[CORE] Core starting on '+this.name);
 	// bind local socket
-	this.loch.bind(LOCAL_PORT, '127.0.0.1', function() {
+	this.loch.bind(LOCAL_PORT, function() {
 		var address = self.loch.address();
-		console.log('+[LOCH] Local UDP socket listening on '+address.address+':'+address.port);
+		console.log('+[LOCH] UDP socket listening on '+address.address+':'+address.port);
 	});
 	// bind publish socket and start advertising and browsing
 	this.publisher.bind('tcp://*:'+INCH_PORT, function(err) {
 		if (err) {
-			console.log('![INCH] Publisher binding error: '+err);
+			console.log('![PUB] Publisher binding error: '+err);
 		}
 		else {
-			console.log('+[INCH] Publisher socket listening on '+INCH_PORT);
+			console.log('+[PUB] Publisher socket listening on '+INCH_PORT);
 			self.advertise();
 			self.browse();
 		}
@@ -97,22 +97,22 @@ Core.prototype.advertise = function() {
 
 Core.prototype.browse = function() {
 	this.browser.start();
-	console.log('+[INCH] Start browsing for _'+NODE_SERVICE+'._tcp services');
+	console.log('+[mDNS] Start browsing for _'+NODE_SERVICE+'._tcp services');
 };
 
 Core.prototype.newSubscribe = function(peer) {
 	this.subscriber.connect('tcp://'+peer+':'+INCH_PORT);
 	this.subscriber.subscribe('');
-	console.log('+[INCH] Subscribe to '+peer);
+	console.log('+[SUB] Subscribing to '+peer);
 };
 
-self.subscriber.on('message', function(msg) {
-	console.log('>[INCH] From  : ' + msg.toString());
-	inch.handleMessage(peer, msg);
+self.subscriber.on('message', function(data) {
+	console.log('>[INCH] From  : ' + data.toString());
+	self.emit('inch', data);
 });
 
 self.subscriber.on('error', function(err) {
-	console.log('![INCH] Subscriber error'+err);
+	console.log('![SUB] Subscriber '+err);
 });
 
 /**
@@ -120,7 +120,7 @@ self.subscriber.on('error', function(err) {
  * (mDNS browser event)
  */
 self.browser.on('serviceUp', function(service) {
-	console.log('+[INCH] Service up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
+	console.log('+[mDNS] Service up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
 
 	if(!self.findNodeById(service.txtRecord.id))
 	{
@@ -129,10 +129,10 @@ self.browser.on('serviceUp', function(service) {
 		if (self.uuid != service.txtRecord.id) {
 			self.newSubscribe(new_node.ip);
 		}
-		console.log('+[INCH] Adding node id '+service.txtRecord.id);
+		console.log('+[CORE] Adding node id '+service.txtRecord.id);
 	}
 	else {
-		console.log('![INCH] Node id '+service.txtRecord.id+' is already present');
+		console.log('![CORE] Node id '+service.txtRecord.id+' is already present');
 	}
 });
 
@@ -140,7 +140,7 @@ self.browser.on('serviceUp', function(service) {
  * Delete dead node from local node list
  */
 self.browser.on('serviceDown', function(service) {
-	console.log('-[INCH] Service down: '+service.name+' ('+service.networkInterface+')');
+	console.log('-[mDNS] Service down: '+service.name+' ('+service.networkInterface+')');
 	deleteDeadNode(self.nodes,service.name);
 });
 
@@ -148,7 +148,7 @@ self.browser.on('serviceDown', function(service) {
  * Handle mDNS browser errors
  */
 self.browser.on('error', function(error) {
-	console.log('![INCH] Browser error: '+error);
+	console.log('![mDNS] Browser error: '+error);
 });
 
 /**
@@ -195,10 +195,10 @@ function deleteDeadNode(nodes, node_name){
 	}
 	if(index != null) {
 		nodes.splice(index,1);
-		console.log('-[INCH] Deleting node '+node_name);
+		console.log('-[CORE] Deleting node '+node_name);
 	}
 	else {
-		console.log('![INCH] Error cannot delete node '+node_name+', not found ; no harm, maybe just a duplicate serviceDown');
+		console.log('![CORE] Error cannot delete node '+node_name+', not found ; no harm, maybe just a duplicate serviceDown');
 	}
 }
 
@@ -224,6 +224,10 @@ Core.prototype.getNodeById = function(uuid){
 			return this.nodes[idx];
 	}
 	return null;
+};
+
+Core.prototype.createMessage = function(cmd, data) {
+	return {src: this.uuid, name: this.name, type: cmd, payload: data};
 };
 
 /**
