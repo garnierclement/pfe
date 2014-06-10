@@ -27,7 +27,7 @@ core.on('ready', function() {
 
 // Upon receiving a message on MaCh
 core.mach.on('message', function(data) {
-	console.log("+[MACH]"+data);
+	console.log("+[MACH] "+data);
 	this.send('ACK');
 });
 

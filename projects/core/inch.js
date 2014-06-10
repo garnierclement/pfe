@@ -41,7 +41,7 @@ function sendReply(dst, data) {
 	var socket = zmq.socket('req');
 	socket.connect('tcp://'+dst+':'+MACH_PORT);
 	socket.identity = dst;
-	socket.send("+[MACH] Remote execution on \n"+data);
+	socket.send(data);
 	console.log("+[MACH] Sending data to "+socket.identity);
 
 	socket.on('message', function(data) {
