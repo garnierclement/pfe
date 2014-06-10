@@ -81,7 +81,7 @@ Core.prototype.init = function() {
 		if (err)
 			console.log('![MACH] Socket binding error: '+err);
 		else
-			console.log('+[MACH] Publisher socket listening on '+MACH_PORT);
+			console.log('+[MACH] Socket listening on '+MACH_PORT);
 	});
 	// subscribe socket
 	this.subscriber.identity = this.name;
