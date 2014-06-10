@@ -104,8 +104,9 @@ Core.prototype.browse = function() {
 };
 
 /**
- * [newSubscribe description]
- * @param  {[type]} peer [description]
+ * Subscribe to new discovered node
+ * 
+ * @param  {String} peer [IP address of the new discovered node]
  */
 Core.prototype.newSubscribe = function(peer) {
 	this.subscriber.connect('tcp://'+peer+':'+INCH_PORT);
@@ -117,26 +118,24 @@ Core.prototype.newSubscribe = function(peer) {
  * Handle the reception of messages on the subscriber socket (inch)
  * Emits 'inch' event on core
  * 
- * @param  {[type]} data [description]
+ * @param  {blob} data [blob of data (JSON)]
  */
 self.subscriber.on('message', function(data) {
-	console.log(data);
 	self.emit('inch', JSON.parse(data));
 });
 
 /**
- * [description]
- * @param  {[type]} data [description]
- * @return {[type]}      [description]
+ * Wrappers arount socket reception of message
+ * Emits 'mach' event on core
+ * 
+ * @param  {blob} data [blob of data (JSON)]
  */
 self.mach.on('message', function(data) {
 	self.emit('mach', JSON.parse(data));
 });
 
 /**
- * [description]
- * @param  {[type]} err [description]
- * @return {[type]}     [description]
+ * Display errors with sub socket
  */
 self.subscriber.on('error', function(err) {
 	console.log('![SUB] Subscriber '+err);
@@ -230,8 +229,8 @@ function deleteDeadNode(nodes, node_name){
  * Check if a particular node is present within a list of node
  * Using UUID to disambiguate nodes
  * 
- * @param  {String} uuid  uuid of the sought node
- * @return {Boolean}      return true if found
+ * @param  {String} uuid  [uuid of the sought node]
+ * @return {Boolean}      [return true if found}
  */
 Core.prototype.findNodeById = function (uuid){
 	for(k in this.nodes){
@@ -249,6 +248,23 @@ Core.prototype.getNodeById = function(uuid){
 	return null;
 };
 
+Core.prototype.getNodeIpById = function(uuid){
+	for(idx in this.nodes){
+		if (this.nodes[idx].id == uuid)
+			return this.nodes[idx].ip;
+	}
+	return null;
+};
+
+/**
+ * Create an object representing the structure of message
+ * used between cores
+ * always adding name and uuid
+ * 
+ * @param  {String} cmd  [type of the message]
+ * @param  {?}		data [payload of the message]
+ * @return {Object}      [message sent on the socket]
+ */
 Core.prototype.createMessage = function(cmd, data) {
 	return {src: this.uuid, name: this.name, type: cmd, payload: data};
 };
