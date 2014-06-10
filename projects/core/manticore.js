@@ -95,22 +95,48 @@ Core.prototype.advertise = function() {
 	console.log('+[CORE] Advertising _'+NODE_SERVICE+'._tcp on '+INCH_PORT);
 };
 
+/**
+ * Start discovery of _node._tcp services
+ */
 Core.prototype.browse = function() {
 	this.browser.start();
 	console.log('+[mDNS] Start browsing for _'+NODE_SERVICE+'._tcp services');
 };
 
+/**
+ * [newSubscribe description]
+ * @param  {[type]} peer [description]
+ */
 Core.prototype.newSubscribe = function(peer) {
 	this.subscriber.connect('tcp://'+peer+':'+INCH_PORT);
 	this.subscriber.subscribe('');
 	console.log('+[SUB] Subscribing to '+peer);
 };
 
+/**
+ * Handle the reception of messages on the subscriber socket (inch)
+ * Emits 'inch' event on core
+ * 
+ * @param  {[type]} data [description]
+ */
 self.subscriber.on('message', function(data) {
-	console.log('>[INCH] From  : ' + data.toString());
 	self.emit('inch', data);
 });
 
+/**
+ * [description]
+ * @param  {[type]} data [description]
+ * @return {[type]}      [description]
+ */
+self.mach.on('message', function(data) {
+	self.emit('mach', data);
+});
+
+/**
+ * [description]
+ * @param  {[type]} err [description]
+ * @return {[type]}     [description]
+ */
 self.subscriber.on('error', function(err) {
 	console.log('![SUB] Subscriber '+err);
 });
@@ -159,29 +185,26 @@ Core.prototype.toString = function() {
 };
 
 /**
- * Stopping mDNS advertising/browsing and exiting
+ * Stopping mDNS advertising/browsing,
+ * closing sockets and exiting
  */
 Core.prototype.close = function(exit) {
-	
+	console.log('[CORE] Closing');
 	this.browser.stop();
 	this.advertiser.stop();
 	this.publisher.close();
 	this.subscriber.close();
-	if (typeof exit === "undefined") {
+	if (typeof exit === "undefined")
 		process.exit();
-		console.log('[CORE] Closing');
-	}
 };
 
+/**
+ * [publish description]
+ * @param  {[type]} data [description]
+ */
 Core.prototype.publish = function(data) {
 	this.publisher.send(data);
-}
-
-// not working
-// Core.prototype.restart = function() {
-// 	this.close(false);
-// 	this.init();
-// };
+};
 
 /**
  * Delete node when service down
@@ -206,7 +229,6 @@ function deleteDeadNode(nodes, node_name){
  * Check if a particular node is present within a list of node
  * Using UUID to disambiguate nodes
  * 
- * @param  {Node[]} nodes list of nodes
  * @param  {String} uuid  uuid of the sought node
  * @return {Boolean}      return true if found
  */
