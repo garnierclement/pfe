@@ -121,16 +121,33 @@ self.subscriber.on('message', function(data) {
  * 
  * @param  {blob} data [blob of data (JSON)]
  */
-// self.mach.on('message', function(envelope, data) {
-// 	self.emit('mach', envelope, JSON.parse(data));
-// });
 
 self.mach.on('message', function() {
-	console.log('là');
-	console.log(arguments);
+	console.log(':[DBUG] Router: '+arguments.length);
+	for (k in arguments)
+		console.log(arguments[k].toString());
+	
+	if (arguments.length)
+		switch (arguments.length) {
+			case 2:
+				var envelope = arguments[0];
+				var data = arguments[1];
+				break;
+			case 3:
+				var envelope = arguments[0];
+				var data = arguments[2];
+				break;
+			default:
+				return;
+		}
+	
+	self.emit('mach', envelope, JSON.parse(data));
 });
 
 self.requester.on('message', function(data) {
+	console.log(':[DBUG] Dealer: '+arguments.length);
+	for (k in arguments)
+		console.log(arguments[k].toString());
 	self.emit('reply', JSON.parse(data));
 });
 
@@ -247,7 +264,7 @@ Core.prototype.createMessage = function(cmd, data) {
 Core.prototype.send = function(dst, cmd, data) {
 	if (dst != null) {
 		this.requester.connect('tcp://'+dst+':'+MACH_PORT);
-		this.requester.send(JSON.stringify(this.createMessage(cmd, data)));
+		this.requester.send([null, JSON.stringify(this.createMessage(cmd, data))]);
 	}
 };
 
@@ -267,7 +284,7 @@ Core.prototype.syncSend = function(dst_id, cmd, data, callback) {
 
 Core.prototype.reply = function(cmd, envelope, data) {
 	var msg = this.createMessage(cmd, data);
-	this.mach.send([envelope, JSON.stringify(msg)]);
+	this.mach.send([envelope, '', JSON.stringify(msg)]);
 };
 
 /**

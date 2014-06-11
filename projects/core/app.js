@@ -123,7 +123,7 @@ core.on('reply', function(data) {
  */
 core.on('test', function(){
 	console.log('test');
-	this.syncRequester.connect('tcp://192.168.1.171:45454');
+	this.syncRequester.connect('tcp://192.168.0.20:45454');
 	this.syncRequester.send(JSON.stringify(this.createMessage('request', 'hi')));
 
 		// this.syncRequester.on('message', function(data) {
