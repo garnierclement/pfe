@@ -26,14 +26,18 @@ core.on('ready', function() {
 
 	api.get('/request/:id', function(req, res) {
 		console.log('+[HTTP] Request id '+req.param('id'));
-		if (core.findNodeById(req.param('id')))
-			core.syncSend(req.param('id'), 'request', req.param('id'),function(reply) {
-				console.log('reply:'+reply.toString());
-				if (reply.status)
-					res.send(true);
-				else
+		if (core.findNodeById(req.param('id'))) {
+			var resource = req.param('id');
+			core.syncSend(resource, 'request', resource, function(reply) {
+				console.log(reply);
+				if (reply.payload.status) {
+					res.send(resource);
+				}
+				else {
 					res.send(false);
+				}	
 			});
+		}
 		else {
 			res.send(false);
 			console.log('![HTTP] id not found');

@@ -96,7 +96,7 @@ process.stdin.on('readable', function() {
 			}
 		}
 		else {
-			console.log("![CORE] Available commands : help|debug|eval|log|exec|send|remote|emit");
+			console.log("![CORE] Available commands : help|debug|eval|log|exec|send|remote|emit|request");
 		}
 	}
 });
