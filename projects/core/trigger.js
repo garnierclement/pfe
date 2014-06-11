@@ -15,8 +15,8 @@ exports.execute = function(cmd, callback) {
 	}
 };
 
-exports.generate = function() {
-
+exports.generate = function(ip, port) {
+	return filename;
 };
 
 exports.check = function() {
