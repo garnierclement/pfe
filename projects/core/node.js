@@ -33,7 +33,7 @@ module.exports = Node;
  * @return {String}             [first IPv4 address found]
  */
 function filter_ipv4(addresses){
-	var res = "undefined";
+	var res = null;
 	for (k in addresses){
 		if (/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(addresses[k])) 
 			res = addresses[k];

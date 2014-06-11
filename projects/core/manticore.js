@@ -235,8 +235,10 @@ Core.prototype.createMessage = function(cmd, data) {
 };
 
 Core.prototype.send = function(dst, cmd, data) {
-	this.requester.connect('tcp://'+dst+':'+MACH_PORT);
-	this.requester.send(JSON.stringify(this.createMessage(cmd, data)));
+	if (dst != null) {
+		this.requester.connect('tcp://'+dst+':'+MACH_PORT);
+		this.requester.send(JSON.stringify(this.createMessage(cmd, data)));
+	}
 };
 
 Core.prototype.reply = function(cmd, data) {
@@ -255,7 +257,9 @@ Core.prototype.deleteDeadNode = function(node_name){
 		if (this.nodes[k].name == node_name)  index = k;
 	}
 	if(index != null) {
-		this.subscriber.disconnect('tcp://'+this.nodes[index].ip+':'+INCH_PORT);
+		if (node_name != this.name && this.nodes[index].ip != null) {
+			this.subscriber.disconnect('tcp://'+this.nodes[index].ip+':'+INCH_PORT);
+		}
 		this.nodes.splice(index,1);
 		console.log('-[CORE] Deleting node '+node_name);
 	}
