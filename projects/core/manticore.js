@@ -129,18 +129,22 @@ self.requester.on('message', function(data) {
 });
 
 /**
- * Display errors with sub socket
+ * Display errors with sockets
  */
 self.subscriber.on('error', function(err) {
-	console.log('![SUB] Subscriber '+err);
+	console.log('![SUB] Socket error: '+err);
 });
 
 self.mach.on('error', function(err) {
-	console.log('![REP] Error:'+err);
+	console.log('![REP] Socket error: '+err);
 });
 
 self.requester.on('error', function(err) {
-	console.log('![REQ] Error:'+err);
+	console.log('![REQ] Socket error: '+err);
+});
+
+self.publisher.on('error', function(err) {
+	console.log('![PUB] Socket error: '+err);
 });
 
 /**
@@ -176,7 +180,7 @@ Core.prototype.newSubscribe = function(peer) {
 };
 
 /**
- * Delete dead node from local node list
+ * Delete dead node from local node list when 'serviceDown'
  */
 self.browser.on('serviceDown', function(service) {
 	console.log('-[mDNS] Service down: '+service.name+' ('+service.networkInterface+')');
@@ -265,6 +269,20 @@ Core.prototype.deleteDeadNode = function(node_name){
 	}
 	else {
 		console.log('![CORE] Error cannot delete node '+node_name+', not found ; no harm, maybe just a duplicate serviceDown');
+	}
+};
+
+Core.prototype.syncReqToNode = function(node_id, msg, callback) {
+	var socket = zmq.socket('req');
+	var dst = this.getNodeIpById(node_id);
+	if (dst != null) {
+		socket.connect('tcp://'+dst+':'+MACH_PORT);
+		socket.send(JSON.stringify(msg));
+
+		socket.on('message', function(data) {
+			callback(JSON.parse(data));
+			socket.close();
+		});
 	}
 };
 

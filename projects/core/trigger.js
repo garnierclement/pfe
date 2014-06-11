@@ -19,3 +19,11 @@ exports.generate = function() {
 
 };
 
+exports.check = function() {
+
+};
+
+exports.kill = function() {
+
+};
+

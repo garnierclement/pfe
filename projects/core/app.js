@@ -18,14 +18,21 @@ api.listen(3000, function() {
  * and that all the communication channels have been set up
  */
 core.on('ready', function() {
+
 	api.get('/', function(req, res) {
 		res.set({'Content-Type': 'application/json'});
 		res.send({nodes: core.nodes });
 	});
+
 	api.get('/request/:id', function(req, res) {
 		console.log('+[HTTP] Request id '+req.param('id'));
 		if (core.findNodeById(req.param('id')))
-			res.send(true);
+			core.syncReqToNode(req.param('id'), function(reply) {
+				if (reply)
+					res.send(true);
+				else
+					res.send(false);
+			});
 		else {
 			res.send(false);
 			console.log('![HTTP] id not found');
@@ -53,7 +60,6 @@ core.on('inch', function(data) {
 					console.log('![CORE] Cannot send reply to '+data.name);
 			});
 			break;
-
 		default:
 			console.log('![INCH] No message type');
 			console.log(data.payload);
@@ -77,6 +83,22 @@ core.on('mach', function(envelope, data) {
 			break;
 		case 'ack':
 			console.log(data.payload);
+			break;
+		case 'request':
+			console.log(data.payload);
+			core.reply('ack', envelope, true);
+			// NOT YET IMPLEMENTED
+			// To request a resource
+			// Need to trigger.check() (resource availability)
+			// Need to send a response true/false according to availability
+			// May need to trigger.generate()
+			// Need to trigger.execute()
+			break;
+		case 'release':
+			console.log(data.payload);
+			// NOT YET IMPLEMENTED
+			// To release a resource
+			// Need to trigger.kill()
 			break;
 		default:
 			console.log('![INCH] No message type');
