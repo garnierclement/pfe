@@ -4,6 +4,10 @@
 # Node.js
 node_modules
 
+# Temporary files
+/var/run/*.pd
+/var/run/*.pid
+
 # Sublime Text
 *.sublime-project
 *.sublime-workspace
