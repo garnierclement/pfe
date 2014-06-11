@@ -39,12 +39,12 @@ function Core()
 	this.publisher = zmq.socket('pub');	// publisher socket (inch)
 	this.subscriber = zmq.socket('sub');
 	this.loch = dgram.createSocket('udp4');	// local channel
-	this.requester = zmq.socket('req');
+	this.requester = zmq.socket('dealer');
 	// advertisement of a _node._tcp. service on this node, on port 32323
 	this.advertiser = createAdvertisement(this.uuid);
 	// _node._tcp. service browser
 	this.browser = mdns.createBrowser(mdns.tcp(NODE_SERVICE));
-	this.mach = zmq.socket('rep');
+	this.mach = zmq.socket('router');
 }
 // Inherit from `EventEmitter.prototype`.
 util.inherits(Core, EventEmitter);
