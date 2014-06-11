@@ -1,4 +1,4 @@
-#N canvas 103 105 412 427 10;
+#N canvas 196 127 412 427 10;
 #X declare -lib mrpeach;
 #X obj -6 105 MouseState;
 #X floatatom -6 158 5 0 0 0 - - -;
@@ -17,8 +17,12 @@
 #X obj 277 38 import mrpeach;
 #X obj 116 271 packOSC;
 #X obj 171 300 udpsend;
+#X obj 92 129 print y;
+#X obj 7 190 print x;
 #X connect 0 1 1 0;
+#X connect 0 1 17 0;
 #X connect 0 2 2 0;
+#X connect 0 2 16 0;
 #X connect 1 0 7 0;
 #X connect 2 0 8 0;
 #X connect 3 0 0 0;
