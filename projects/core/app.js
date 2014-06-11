@@ -48,7 +48,7 @@ core.on('inch', function(data) {
 				if (dst != null)
 					core.send(dst, 'raw', stdout);
 				else
-					console.log('-[CORE] Cannot send reply to '+data.src);
+					console.log('-[CORE] Cannot send reply to '+data.name);
 			});
 			break;
 
