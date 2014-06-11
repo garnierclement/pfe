@@ -2,16 +2,18 @@ inlets=1;
 outlets=1;
 autowatch = 1; 
 
+var Patcher = null;
+
 
 var nodes_interfaces = new Array(128);
 var num_nodes = 0;
 
-var Patcher = this.patcher.parentpatcher;
 
 
 var tsk = new Task(mytask, this);
 
 function bang(){
+  Patcher = this.patcher.parentpatcher;
   tsk.cancel();
   tsk.interval = 100000;
   tsk.repeat();
@@ -174,7 +176,7 @@ function InfoMsg(x_pos, y_pos, node_info){
 function ResourceRequestor(x_pos, y_pos, node_info){
  this.res_req = Patcher.newdefault(x_pos,y_pos,"resource_requestor");
  this.res_req.varname = "resource_requestor " + node_info;
- this.res_req.hidden = 1;
+ //this.res_req.hidden = 1;
  this.res_req.message("title", node_info + "resource_req");
  this.res_req.background = 1;
 
