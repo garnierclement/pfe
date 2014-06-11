@@ -93,7 +93,10 @@ core.on('mach', function(envelope, data) {
 			console.log(data.payload);
 			core.reply('ack', envelope, {status: true});
 			var dst = core.getNodeIpById(data.src);
-			var outputfile = trigger.generate(dst, data.payload.port,'../../pd/mousePosition.pd','../../var/run/output.pd');
+			var outputfile = trigger.generate(dst, 16161,'../../pd/mousePosition.pd','../../var/run/output.pd');
+			trigger.execute('pd-extended -nogui '+outputfile, function(err, stdout,stderr) {
+				console.log(stdout+stderr);
+			});
 			// NOT YET IMPLEMENTED
 			// To request a resource
 			// Need to trigger.check() (resource availability)
