@@ -120,7 +120,8 @@ self.subscriber.on('message', function(data) {
  * 
  * @param  {blob} data [blob of data (JSON)]
  */
-self.mach.on('message', function(data) {
+self.mach.on('message', function(envelope, data) {
+	console.log(':[MACH] Envelope '+envelope);
 	self.emit('mach', JSON.parse(data));
 });
 
