@@ -93,8 +93,15 @@ core.on('mach', function(envelope, data) {
 			console.log(data.payload);
 			core.reply('ack', envelope, {status: true});
 			var dst = core.getNodeIpById(data.src);
-			var outputfile = trigger.generate(dst, 16161,'../../pd/mousePosition.pd','../../var/run/output.pd');
-			trigger.execute('pd-extended -nogui '+outputfile, function(err, stdout,stderr) {
+			var outputfile = trigger.generate(dst, 42424,'../../pd/mousePosition.pd','../../var/run/output.pd');
+			var pd = "";
+			if(isDarwin()) {
+				pd = "/Applications/Pd-extended.app/Contents/MacOS/Pd-extended";
+			}
+			else if (isLinux()) {
+				pd = "pd-extended";
+			}
+			trigger.execute(pd+' '+outputfile, function(err, stdout,stderr) {
 				console.log(stdout+stderr);
 			});
 			// NOT YET IMPLEMENTED
@@ -148,3 +155,22 @@ process.on('SIGINT', function() {
  * Note : in order to avoid asunc issues, register callbacks event before calling init()
  */
 core.init();
+
+
+/**
+ * Check if running on Mac OS X
+ * @return {Boolean} true if OS X
+ */
+function isDarwin() {
+	if (require('os').platform() == 'darwin') return true;
+	else return false;
+}
+
+/**
+ * Check if running on Linux
+ * @return {Boolean} true if Linux
+ */
+function isLinux() {
+	if (require('os').platform() == 'linux') return true;
+	else return false;
+}

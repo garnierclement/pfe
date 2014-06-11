@@ -179,6 +179,11 @@ self.publisher.on('error', function(err) {
 	console.log('![PUB] Socket error: '+err);
 });
 
+self.udp.on('message', function(buffer, rinfo) {
+	console.log('>[UDP] from '+rinfo);
+	console.log(buffer.toString());
+});
+
 /**
  * Handle the discovery of new _node._tcp service
  * (mDNS browser event)
@@ -372,22 +377,4 @@ function createAdvertisement(uuid)  {
         setTimeout(createAdvertisement, 30 * 1000);
     });
     return advertiser;
-}
-
-/**
- * Check if running on Mac OS X
- * @return {Boolean} true if OS X
- */
-function isDarwin() {
-	if (require('os').platform() == 'darwin') return true;
-	else return false;
-}
-
-/**
- * Check if running on Linux
- * @return {Boolean} true if Linux
- */
-function isLinux() {
-	if (require('os').platform() == 'linux') return true;
-	else return false;
 }
