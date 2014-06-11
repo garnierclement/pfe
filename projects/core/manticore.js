@@ -126,20 +126,18 @@ self.mach.on('message', function() {
 	console.log(':[DBUG] Router: '+arguments.length);
 	for (k in arguments)
 		console.log(arguments[k].toString());
-	
-	if (arguments.length)
-		switch (arguments.length) {
-			case 2:
-				var envelope = arguments[0];
-				var data = arguments[1];
-				break;
-			case 3:
-				var envelope = arguments[0];
-				var data = arguments[2];
-				break;
-			default:
-				return;
-		}
+	switch (arguments.length) {
+		case 2:
+			var envelope = arguments[0];
+			var data = arguments[1];
+			break;
+		case 3:
+			var envelope = arguments[0];
+			var data = arguments[2];
+			break;
+		default:
+			return;
+	}
 	
 	self.emit('mach', envelope, JSON.parse(data));
 });
@@ -148,6 +146,16 @@ self.requester.on('message', function(data) {
 	console.log(':[DBUG] Dealer: '+arguments.length);
 	for (k in arguments)
 		console.log(arguments[k].toString());
+	switch (arguments.length) {
+		case 2:
+			var data = arguments[1];
+			break;
+		case 3:
+			var data = arguments[2];
+			break;
+		default:
+			return;
+	}
 	self.emit('reply', JSON.parse(data));
 });
 
