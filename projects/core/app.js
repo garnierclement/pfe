@@ -27,7 +27,7 @@ core.on('ready', function() {
 	api.get('/request/:id', function(req, res) {
 		console.log('+[HTTP] Request id '+req.param('id'));
 		if (core.findNodeById(req.param('id')))
-			core.syncReqToNode(req.param('id'), function(reply) {
+			core.syncSend(req.param('id'), 'request', "hi",function(reply) {
 				if (reply)
 					res.send(true);
 				else
@@ -107,12 +107,7 @@ core.on('mach', function(envelope, data) {
 });
 
 /**
- * Handles the 'mach' event on the core
- * This event corresponds to the reception of a msg of the router (aka mach or replier) socket
- * Depending on the type of message received :
- *		- an action is triggered
- *		- nothing is done
- *		- we use the core.reply() command to send a response
+ * Handles the 'reply' event on the core
  */
 core.on('reply', function(data) {
 	console.log('>[MACH] '+data.name+' replied with '+data.type);
@@ -128,6 +123,16 @@ core.on('reply', function(data) {
  */
 core.on('test', function(){
 	console.log('test');
+	this.syncRequester.connect('tcp://192.168.1.171:45454');
+	this.syncRequester.send(JSON.stringify(this.createMessage('request', 'hi')));
+
+		// this.syncRequester.on('message', function(data) {
+
+		// });
+	//this.syncRequester.close();
+	// var dealer = require('zmq').socket('dealer');
+	// dealer.connect('tcp://192.168.1.171:45454');
+	// dealer.send(JSON.stringify(this.createMessage('request', 'hi')));
 });
 
 /**

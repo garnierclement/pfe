@@ -41,6 +41,7 @@ function Core()
 	this.udp = dgram.createSocket('udp4');	// local channel
 	this.requester = zmq.socket('dealer');
 	this.mach = zmq.socket('router');
+	this.syncRequester = zmq.socket('req');
 	// advertisement of a _node._tcp. service on this node, on port 32323
 	this.advertiser = createAdvertisement(this.uuid);
 	// _node._tcp. service browser
@@ -120,8 +121,13 @@ self.subscriber.on('message', function(data) {
  * 
  * @param  {blob} data [blob of data (JSON)]
  */
-self.mach.on('message', function(envelope, data) {
-	self.emit('mach', envelope, JSON.parse(data));
+// self.mach.on('message', function(envelope, data) {
+// 	self.emit('mach', envelope, JSON.parse(data));
+// });
+
+self.mach.on('message', function() {
+	console.log('là');
+	console.log(arguments);
 });
 
 self.requester.on('message', function(data) {
@@ -245,6 +251,20 @@ Core.prototype.send = function(dst, cmd, data) {
 	}
 };
 
+Core.prototype.syncSend = function(dst_id, cmd, data, callback) {
+	var socket = zmq.socket('req');
+	var dst = this.getNodeIpById(dst_id);
+	if (dst != null) {
+		socket.connect('tcp://'+dst+':'+MACH_PORT);
+		socket.send(JSON.stringify(this.createMessage(cmd, data)));
+
+		socket.on('message', function(data) {
+			callback(JSON.parse(data));
+			socket.close();
+		});
+	}
+};
+
 Core.prototype.reply = function(cmd, envelope, data) {
 	var msg = this.createMessage(cmd, data);
 	this.mach.send([envelope, JSON.stringify(msg)]);
@@ -269,20 +289,6 @@ Core.prototype.deleteDeadNode = function(node_name){
 	}
 	else {
 		console.log('![CORE] Error cannot delete node '+node_name+', not found ; no harm, maybe just a duplicate serviceDown');
-	}
-};
-
-Core.prototype.syncReqToNode = function(node_id, msg, callback) {
-	var socket = zmq.socket('req');
-	var dst = this.getNodeIpById(node_id);
-	if (dst != null) {
-		socket.connect('tcp://'+dst+':'+MACH_PORT);
-		socket.send(JSON.stringify(msg));
-
-		socket.on('message', function(data) {
-			callback(JSON.parse(data));
-			socket.close();
-		});
 	}
 };
 
