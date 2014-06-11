@@ -28,6 +28,7 @@ core.on('ready', function() {
 		console.log('+[HTTP] Request id '+req.param('id'));
 		if (core.findNodeById(req.param('id')))
 			core.syncSend(req.param('id'), 'request', "hi",function(reply) {
+				console.log('reply:'+reply.toString());
 				if (reply)
 					res.send(true);
 				else

@@ -282,8 +282,10 @@ Core.prototype.syncSend = function(dst_id, cmd, data, callback) {
 	if (dst != null) {
 		socket.connect('tcp://'+dst+':'+MACH_PORT);
 		socket.send(JSON.stringify(this.createMessage(cmd, data)));
+		console.log('+[SYNC] Sending '+data+' to '+dst);
 
 		socket.on('message', function(data) {
+			console.log('>[SYNC] Received '+data.toString());
 			callback(JSON.parse(data));
 			socket.close();
 		});
