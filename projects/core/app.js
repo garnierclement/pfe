@@ -28,7 +28,7 @@ core.on('ready', function() {
 		console.log('+[HTTP] Request id '+req.param('id'));
 		if (core.findNodeById(req.param('id'))) {
 			var resource = req.param('id');
-			core.syncSend(resource, 'request', resource, function(reply) {
+			core.syncSend(resource, 'request', {data: resource, port: 16161}, function(reply) {
 				console.log(reply);
 				if (reply.payload.status) {
 					res.send(resource);
@@ -92,6 +92,8 @@ core.on('mach', function(envelope, data) {
 		case 'request':
 			console.log(data.payload);
 			core.reply('ack', envelope, {status: true});
+			var dst = core.getNodeIpById(data.src);
+			var outputfile = trigger.generate(dst, data.payload.port,'../../pd/mousePosition.pd','../../var/run/output.pd');
 			// NOT YET IMPLEMENTED
 			// To request a resource
 			// Need to trigger.check() (resource availability)
@@ -127,17 +129,7 @@ core.on('reply', function(data) {
  * Used for debug purpose only
  */
 core.on('test', function(){
-	console.log('test');
-	this.syncRequester.connect('tcp://192.168.0.20:45454');
-	this.syncRequester.send(JSON.stringify(this.createMessage('request', 'hi')));
-
-		// this.syncRequester.on('message', function(data) {
-
-		// });
-	//this.syncRequester.close();
-	// var dealer = require('zmq').socket('dealer');
-	// dealer.connect('tcp://192.168.1.171:45454');
-	// dealer.send(JSON.stringify(this.createMessage('request', 'hi')));
+	trigger.generate('192.168.0.1',1234,'../../pd/mousePosition.pd','../../var/run/output.pd');
 });
 
 /**

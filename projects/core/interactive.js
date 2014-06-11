@@ -86,7 +86,7 @@ process.stdin.on('readable', function() {
 			var res = chunk.slice(8,chunk.length-1);
 			try {
 				console.log("+[REQR] Request resource: "+res);
-				core.syncSend(res, 'request', res, function(reply) {
+				core.syncSend(res, 'request', {data: res, port: 42424}, function(reply) {
 					console.log('>[SYNC] Resource status');
 					console.log(reply);
 				});
