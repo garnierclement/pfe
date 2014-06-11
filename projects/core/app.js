@@ -93,7 +93,7 @@ core.on('mach', function(envelope, data) {
 			console.log(data.payload);
 			core.reply('ack', envelope, {status: true});
 			var dst = core.getNodeIpById(data.src);
-			var outputfile = trigger.generate(dst, 42424,'../../pd/mousePosition.pd','../../var/run/output.pd');
+			var outputfile = trigger.generate(dst, 16161,'../../pd/mousePosition.pd','../../var/run/output.pd');
 			var pd = "";
 			if(isDarwin()) {
 				pd = "/Applications/Pd-extended.app/Contents/MacOS/Pd-extended";
