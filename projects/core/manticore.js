@@ -121,8 +121,7 @@ self.subscriber.on('message', function(data) {
  * @param  {blob} data [blob of data (JSON)]
  */
 self.mach.on('message', function(envelope, data) {
-	console.log(':[MACH] Envelope '+envelope);
-	self.emit('mach', JSON.parse(data));
+	self.emit('mach', envelope, JSON.parse(data));
 });
 
 self.requester.on('message', function(data) {
@@ -242,9 +241,9 @@ Core.prototype.send = function(dst, cmd, data) {
 	}
 };
 
-Core.prototype.reply = function(cmd, data) {
+Core.prototype.reply = function(cmd, envelope, data) {
 	var msg = this.createMessage(cmd, data);
-	this.mach.send(JSON.stringify(msg));
+	this.mach.send([envelope, JSON.stringify(msg)]);
 };
 
 /**

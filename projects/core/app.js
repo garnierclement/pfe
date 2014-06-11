@@ -59,12 +59,12 @@ core.on('inch', function(data) {
 });
 
 // Upon receiving a message on MaCh
-core.on('mach', function(data) {
+core.on('mach', function(envelope, data) {
 	console.log('>[MACH] '+data.type+' from '+data.name);
 	switch(data.type) {
 		case 'raw':
 			console.log(data.payload);
-			core.reply('ack',"Bien reçu !");
+			core.reply('ack', envelope, "Bien reçu !");
 			break;
 		case 'ack':
 			console.log(data.payload);
