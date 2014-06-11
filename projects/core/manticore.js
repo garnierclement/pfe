@@ -25,7 +25,7 @@ var Node = require('./node.js');// Node object
  * @uuid		unique identifier of the current core process
  * @nodes		array of Node objects 
  * @publisher	publisher socket (ZeroMQ) for information channel (InCh)
- * @loch		local udp socket (unused)
+ * @udp		local udp socket (unused)
  * @advertiser	mDNS advertiser of service _node._tcp
  * @browser		DNS-SD browser of _node._tcp services		
  * @mach		tcp socket for direct communication between node's core (MaCh)
@@ -38,7 +38,7 @@ function Core()
 	this.sensors = [];
 	this.publisher = zmq.socket('pub');	// publisher socket (inch)
 	this.subscriber = zmq.socket('sub');
-	this.loch = dgram.createSocket('udp4');	// local channel
+	this.udp = dgram.createSocket('udp4');	// local channel
 	this.requester = zmq.socket('dealer');
 	// advertisement of a _node._tcp. service on this node, on port 32323
 	this.advertiser = createAdvertisement(this.uuid);
@@ -61,9 +61,9 @@ var self = module.exports = new Core();
 Core.prototype.init = function() {
 	console.log('+[CORE] Core starting on '+this.name);
 	// bind local socket
-	this.loch.bind(UDP_PORT, function() {
-		var address = self.loch.address();
-		console.log('+[LOCH] UDP socket listening on '+address.address+':'+address.port);
+	this.udp.bind(UDP_PORT, function() {
+		var address = self.udp.address();
+		console.log('+[UDP] UDP socket listening on '+address.address+':'+address.port);
 	});
 	// bind publish socket and start advertising and browsing
 	this.publisher.bind('tcp://*:'+INCH_PORT, function(err) {
@@ -208,7 +208,7 @@ Core.prototype.close = function(exit) {
 	this.publisher.close();
 	this.subscriber.close();
 	this.requester.close();
-	this.loch.close();
+	this.udp.close();
 	if (typeof exit === "undefined")
 		process.exit();
 };
