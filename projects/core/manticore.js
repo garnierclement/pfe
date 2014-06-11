@@ -291,6 +291,9 @@ Core.prototype.syncSend = function(dst_id, cmd, data, callback) {
 			socket.close();
 		});
 	}
+	else {
+		console.log('![SYNC] error no dst found')
+	}
 };
 
 Core.prototype.reply = function(cmd, envelope, data) {

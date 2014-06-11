@@ -27,9 +27,9 @@ core.on('ready', function() {
 	api.get('/request/:id', function(req, res) {
 		console.log('+[HTTP] Request id '+req.param('id'));
 		if (core.findNodeById(req.param('id')))
-			core.syncSend(req.param('id'), 'request', "hi",function(reply) {
+			core.syncSend(req.param('id'), 'request', req.param('id'),function(reply) {
 				console.log('reply:'+reply.toString());
-				if (reply)
+				if (reply.status)
 					res.send(true);
 				else
 					res.send(false);
