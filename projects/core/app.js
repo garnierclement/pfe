@@ -87,7 +87,7 @@ core.on('mach', function(envelope, data) {
 			break;
 		case 'request':
 			console.log(data.payload);
-			core.reply('ack', envelope, true);
+			core.reply('ack', envelope, {status: true});
 			// NOT YET IMPLEMENTED
 			// To request a resource
 			// Need to trigger.check() (resource availability)

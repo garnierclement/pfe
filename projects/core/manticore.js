@@ -36,6 +36,7 @@ function Core()
 	this.uuid = uuid.v1();
 	this.nodes = [];
 	this.sensors = [];
+	this.resources = [];
 	this.publisher = zmq.socket('pub');	// publisher socket (inch)
 	this.subscriber = zmq.socket('sub');
 	this.udp = dgram.createSocket('udp4');	// local channel

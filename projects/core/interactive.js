@@ -82,21 +82,14 @@ process.stdin.on('readable', function() {
 				console.log("![SEND] "+e);
 			}
 		}
-		else if (/^pub /.test(chunk)) {
-			var msg = chunk.slice(4,chunk.length-1);
+		else if (/^request /.test(chunk)) {
+			var res = chunk.slice(8,chunk.length-1);
 			try {
-				console.log("+[INCH] Published: "+msg);
-				core.publisher.send(msg);
-			}
-			catch(e) {
-				console.log("![SEND] "+e);
-			}
-		}
-		else if (/^pub /.test(chunk)) {
-			var msg = chunk.slice(4,chunk.length-1);
-			try {
-				console.log("+[INCH] Published: "+msg);
-				core.publisher.send(msg);
+				console.log("+[REQR] Request resource: "+res);
+				core.syncSend(chunk, 'request', chunk, function(reply) {
+					console.log('>[SYNC] Resource status');
+					console.log(reply);
+				});
 			}
 			catch(e) {
 				console.log("![SEND] "+e);
