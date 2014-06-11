@@ -73,9 +73,8 @@ function reply(val){
 }
 
 function UdpReceive(offset, ip){
-  this.receiver = Patcher.parentpatcher.newdefault(122 + offset * 302, 270 , "udpreceive", ip);
+  this.receiver = Patcher.parentpatcher.newdefault(122 + offset * 302, 270 , "udpreceive", "16161");
   this.receiver.varname = "receiver " + ip;
-  this.receiver.message("port", 32323);
   return Patcher.parentpatcher.getnamed(this.receiver.varname);
 
 }
