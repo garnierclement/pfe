@@ -48,9 +48,9 @@ core.on('inch', function(data) {
 				var dst = core.getNodeIpById(data.src)
 				console.log('+[CORE] Sending result of execution to '+data.name+'('+dst+')');
 				if (dst != null)
-					core.send(dst, 'raw', stdout);
+					core.send(dst, 'raw', stdout+stderr);
 				else
-					console.log('-[CORE] Cannot send reply to '+data.name);
+					console.log('![CORE] Cannot send reply to '+data.name);
 			});
 			break;
 
@@ -82,7 +82,6 @@ core.on('mach', function(envelope, data) {
 			console.log('![INCH] No message type');
 			console.log(data.payload);
 	}
-
 });
 
 /**
