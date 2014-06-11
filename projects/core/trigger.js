@@ -15,8 +15,11 @@ exports.execute = function(cmd, callback) {
 	}
 };
 
-exports.generate = function(ip, port) {
-	return filename;
+exports.generate = function(ip, port, file, output) {
+	var sed = "sed -e '/^#X msg [0-9]* [0-9]* connect/s/connect [0-9a-z_.\-]* [0-9]*/connect "+ip+" "+port+"/' "+file+" > "+ output;
+	console.log(sed);
+	exec(sed, function(err,stdout, stderr) {});
+	return output;
 };
 
 exports.check = function() {
