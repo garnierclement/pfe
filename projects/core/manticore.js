@@ -25,7 +25,7 @@ var Node = require('./node.js');// Node object
  * @uuid		unique identifier of the current core process
  * @nodes		array of Node objects 
  * @publisher	publisher socket (ZeroMQ) for information channel (InCh)
- * @udp		local udp socket (unused)
+ * @udp			udp socket (unused)
  * @advertiser	mDNS advertiser of service _node._tcp
  * @browser		DNS-SD browser of _node._tcp services		
  * @mach		tcp socket for direct communication between node's core (MaCh)
@@ -40,11 +40,11 @@ function Core()
 	this.subscriber = zmq.socket('sub');
 	this.udp = dgram.createSocket('udp4');	// local channel
 	this.requester = zmq.socket('dealer');
+	this.mach = zmq.socket('router');
 	// advertisement of a _node._tcp. service on this node, on port 32323
 	this.advertiser = createAdvertisement(this.uuid);
 	// _node._tcp. service browser
 	this.browser = mdns.createBrowser(mdns.tcp(NODE_SERVICE));
-	this.mach = zmq.socket('router');
 }
 // Inherit from `EventEmitter.prototype`.
 util.inherits(Core, EventEmitter);

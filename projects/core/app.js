@@ -7,17 +7,16 @@ var core = require('./manticore.js');
 var interactive = require('./interactive.js');
 var trigger = require('./trigger.js');
 
-// Gracefully exit on SIGINT (Ctrl+C)
-process.on('SIGINT', function() {
-	core.close();
-});
-
 // Start HTTP server to serve JSON API
 api.listen(3000, function() {
 	console.log('+[HTTP] Listening on 3000');
 });
 
-// Upon core initialization, we can respond to http request
+/**
+ * Handles the 'ready' event on the core
+ * This implies that the core has started
+ * and that all the communication channels have been set up
+ */
 core.on('ready', function() {
 	api.get('/', function(req, res) {
 		res.set({'Content-Type': 'application/json'});
@@ -34,7 +33,10 @@ core.on('ready', function() {
 	});
 });
 
-// Upon receiving a message on Inch
+/**
+ * Handles the 'inch' event on the core
+ * This event corresponds to the reception of a message on the subscriber socket
+ */
 core.on('inch', function(data) {
 	console.log('>[INCH] '+data.type+' from '+data.name);
 	switch(data.type) {
@@ -58,7 +60,14 @@ core.on('inch', function(data) {
 	}
 });
 
-// Upon receiving a message on MaCh
+/**
+ * Handles the 'mach' event on the core
+ * This event corresponds to the reception of a msg of the router (aka mach or replier) socket
+ * Depending on the type of message received :
+ *		- an action is triggered
+ *		- nothing is done
+ *		- we use the core.reply() command to send a response
+ */
 core.on('mach', function(envelope, data) {
 	console.log('>[MACH] '+data.type+' from '+data.name);
 	switch(data.type) {
@@ -76,6 +85,14 @@ core.on('mach', function(envelope, data) {
 
 });
 
+/**
+ * Handles the 'mach' event on the core
+ * This event corresponds to the reception of a msg of the router (aka mach or replier) socket
+ * Depending on the type of message received :
+ *		- an action is triggered
+ *		- nothing is done
+ *		- we use the core.reply() command to send a response
+ */
 core.on('reply', function(data) {
 	console.log('>[MACH] '+data.name+' replied with '+data.type);
 	switch(data.type) {
@@ -84,14 +101,24 @@ core.on('reply', function(data) {
 	}
 });
 
-// Test core event
+/**
+ * Handles the 'test' event on the core
+ * Used for debug purpose only
+ */
 core.on('test', function(){
 	console.log('test');
 });
 
-// Initialize core, everything starts from here
-// Note : in order to avoid asunc issues, register callbacks event before calling init()
+/**
+ * Gracefully exit on SIGINT (Ctrl+C)
+ * Clean up and exit
+ */
+process.on('SIGINT', function() {
+	core.close();
+});
+
+/**
+ * Eventually initialize the core, everything starts from here
+ * Note : in order to avoid asunc issues, register callbacks event before calling init()
+ */
 core.init();
-
-
-
