@@ -402,7 +402,7 @@ function createAdvertisement(uuid)  {
 
 /******* message *********/
 Core.prototype.payloadRequest = function (res, port) {
-	var _p = port || MACH_PORT;
+	var _p = port || UDP_PORT;
 	return {data: res, port: _p};
 };
 

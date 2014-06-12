@@ -41,7 +41,7 @@ or npm
 
 ### Introduction
 
-// TODO : simply detail use case and present the associated objectives
+> // TODO : simply detail use case and present the associated objectives
 
 ### Objectives
 
@@ -94,7 +94,7 @@ or npm
 * ROUTER to issue asynchronous requests
 * DEALER to issue asynchronous replies
 
-//TODO: write about 0MQ sockets and pattern
+> //TODO: write about 0MQ sockets and pattern
 
 
 #### Use cases
@@ -104,7 +104,7 @@ or npm
 * 	`REQ[1] --request--> ROUTER[2] --ack|noack--> REQ[1]`
 	(using MaCh to request a resource)
 	
-// TODO : detail the procedure
+> // TODO : detail the procedure
 
 ### Interactive commands
 
@@ -139,7 +139,7 @@ These are the methods used by the Core singleton to interact with its state and 
 * `reply()`
 * `close()`
 
-// TODO : add commented examples
+> // TODO : add commented examples
 
 
 ### Source files
@@ -171,7 +171,7 @@ It is simply a Javascript object with 2 main parts :
 * `header` contains the type of message and some information about the sender (uuid, hostname and IP address)
 * `payload` is a object or any other Javascript compliant type, its structure will depend on the type of the message
 
-// TODO : need to write about ZeroMQ Frame and envelope
+> // TODO : need to write about ZeroMQ Frame and envelope
 
 #### Message types and associated payload
 
