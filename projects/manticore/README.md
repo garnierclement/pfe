@@ -6,24 +6,27 @@ In the following, the words *core* and *manticore* with/without a capital letter
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
 
-- [Manticore](#manticore)
-  - [Getting started](#getting-started)
-  - [Guide](#guide)
-    - [Introduction](#introduction)
-    - [Objectives](#objectives)
-      - [What we want to achieve ?](#what-we-want-to-achieve-)
-      - [How does it work ?](#how-does-it-work-)
-      - [Note about the use of ZeroMQ Sockets](#note-about-the-use-of-zeromq-sockets)
-      - [Use cases](#use-cases)
-    - [Interactive commands](#interactive-commands)
-    - [Events](#events)
-    - [Core commands](#core-commands)
-    - [Source files](#source-files)
-  - [Prerequisites](#prerequisites)
-    - [Prerequisites on Mac OS X](#prerequisites-on-mac-os-x)
-    - [Prerequisites on Raspbian (Raspberry Pi)](#prerequisites-on-raspbian-raspberry-pi)
-  - [Installation](#installation)
-  - [Warning](#warning)
+- [Getting started](#getting-started)
+- [Guide](#guide)
+  - [Introduction](#introduction)
+  - [Objectives](#objectives)
+    - [What we want to achieve ?](#what-we-want-to-achieve-)
+    - [How does it work ?](#how-does-it-work-)
+    - [Note about the use of ZeroMQ Sockets](#note-about-the-use-of-zeromq-sockets)
+    - [Use cases](#use-cases)
+  - [Interactive commands](#interactive-commands)
+  - [Events](#events)
+  - [Core commands](#core-commands)
+  - [Source files](#source-files)
+  - [Inter-core messaging](#inter-core-messaging)
+    - [Message structure](#message-structure)
+    - [Message types and associated payload](#message-types-and-associated-payload)
+  - [External messaging](#external-messaging)
+- [Prerequisites](#prerequisites)
+  - [Prerequisites on Mac OS X](#prerequisites-on-mac-os-x)
+  - [Prerequisites on Raspbian (Raspberry Pi)](#prerequisites-on-raspbian-raspberry-pi)
+- [Installation](#installation)
+- [Warning](#warning)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -178,6 +181,11 @@ It is simply a Javascript object with 2 main parts :
 * 	`raw`
 * 	`request`
 * 	`ack`
+
+### External messaging
+
+Inspired by REST API
+Using GET HTTP request
 
 ## Prerequisites
 
