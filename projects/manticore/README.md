@@ -150,6 +150,35 @@ These are the methods used by the Core singleton to interact with its state and 
 * `interactive.js` contains code for interactive commands in the shell
 * `trigger.js` contains code for generating and executing processes
 
+### Inter-core messaging
+
+#### Message structure
+
+The message exchanged on the communication channels (InCh and MaCh) are JSON files and have the following structure :
+
+	{
+	  "header": {
+	    "src": "4626ca80-f211-11e3-8ad9-4df458080716",
+	    "name": "clementpi",
+	    "ip": "192.168.1.171",
+	    "type": "raw"
+	  },
+	  "payload": {}
+	}
+
+It is simply a Javascript object with 2 main parts :
+
+* `header` contains the type of message and some information about the sender (uuid, hostname and IP address)
+* `payload` is a object or any other Javascript compliant type, its structure will depend on the type of the message
+
+// TODO : need to write about ZeroMQ Frame and envelope
+
+#### Message types and associated payload
+
+* 	`raw`
+* 	`request`
+* 	`ack`
+
 ## Prerequisites
 
 ### Prerequisites on Mac OS X
