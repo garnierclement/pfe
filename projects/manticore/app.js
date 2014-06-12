@@ -9,7 +9,7 @@ var trigger = require('./trigger.js');
 
 // Start HTTP server to serve JSON API
 api.listen(3000, function() {
-	console.log('+[HTTP] Listening on 3000');
+	console.log('+[HTTP]\tListening on 3000');
 });
 
 /**
@@ -19,16 +19,20 @@ api.listen(3000, function() {
  */
 core.on('ready', function() {
 
-	api.get('/', function(req, res) {
+	api.get('/nodes/', function(req, res) {
 		res.set({'Content-Type': 'application/json'});
 		res.send({nodes: core.nodes });
 	});
 
 	api.get('/request/:id', function(req, res) {
-		console.log('+[HTTP] Request id '+req.param('id'));
+		console.log('+[HTTP]\tRequest id '+req.param('id'));
 		if (core.findNodeById(req.param('id'))) {
 			var resource = req.param('id');
-			core.syncSend(resource, 'request', {data: resource, port: 16161}, function(header, payload) {
+			// WARNING on request a resource but use node uuid
+			// need to be changed when sensor is set up
+			var dst = core.getNodeIpById(resource);
+			if (dst != null) 
+			core.syncSend(dst, 'request', {data: resource, port: 16161}, function(header, payload) {
 				console.log(reply);
 				console.log(payload);
 				if (payload.status) {
@@ -41,7 +45,7 @@ core.on('ready', function() {
 		}
 		else {
 			res.send(false);
-			console.log('![HTTP] id not found');
+			console.log('![HTTP]\tid not found');
 		}
 	});
 });
@@ -51,7 +55,7 @@ core.on('ready', function() {
  * This event corresponds to the reception of a message on the subscriber socket
  */
 core.on('inch', function(header, payload) {
-	console.log('>[INCH] '+header.type+' from '+header.name+' ('+header.ip+')');
+	console.log('>[INCH]\t'+header.type+' from '+header.name+' ('+header.ip+')');
 	switch(header.type) {
 		case 'raw':
 			console.log(payload);
@@ -59,15 +63,15 @@ core.on('inch', function(header, payload) {
 		case 'exec': 
 			trigger.execute(payload, function(stdout, stderr){
 				var dst = header.ip;
-				console.log('+[CORE] Sending result of execution to '+header.name+'('+dst+')');
+				console.log('+[CORE]\tSending result of execution to '+header.name+'('+dst+')');
 				if (dst != null)
 					core.send(dst, 'raw', stdout+stderr);
 				else
-					console.log('![CORE] Cannot send reply to '+header.name);
+					console.log('![CORE]\tCannot send reply to '+header.name);
 			});
 			break;
 		default:
-			console.log('![INCH] Message type not imlemented'+header.type);
+			console.log('![INCH]\tMessage type not imlemented'+header.type);
 			console.log(payload);
 	}
 });
@@ -81,7 +85,7 @@ core.on('inch', function(header, payload) {
  *		- we use the core.reply() command to send a response
  */
 core.on('mach', function(envelope, header, payload) {
-	console.log('>[MACH] '+header.type+' from '+header.name+' ('+header.ip+')');
+	console.log('>[MACH]\t'+header.type+' from '+header.name+' ('+header.ip+')');
 	switch(header.type) {
 		case 'raw':
 			console.log(payload);
@@ -95,7 +99,7 @@ core.on('mach', function(envelope, header, payload) {
 			core.reply('ack', envelope, {status: true});
 			var dst = header.ip;
 			if (dst != null) {
-				var outputfile = trigger.generate(dst, 16161,'../../pd/mousePosition.pd','../../var/run/output.pd');
+				var outputfile = trigger.generate(dst, 16161,'mousePosition.pd','output.pd');
 				var pd = "";
 				if(isDarwin()) {
 					pd = "/Applications/Pd-extended.app/Contents/MacOS/Pd-extended";
@@ -103,12 +107,12 @@ core.on('mach', function(envelope, header, payload) {
 				else if (isLinux()) {
 					pd = "pd-extended";
 				}
-				trigger.execute(pd+' '+outputfile, function(err, stdout,stderr) {
+				var pid = trigger.execute(pd+' '+outputfile, function(err, stdout,stderr) {
 					console.log(stdout+stderr);
 				});
 			}
 			else
-				console.log('![ERR] cannot find ip for '+header);
+				console.log('![ERR]\tcannot find ip for '+header);
 			
 			// NOT YET IMPLEMENTED
 			// To request a resource
@@ -124,7 +128,7 @@ core.on('mach', function(envelope, header, payload) {
 			// Need to trigger.kill()
 			break;
 		default:
-			console.log('![INCH] No message type');
+			console.log('![INCH]\tNo message type');
 			console.log(payload);
 	}
 });
@@ -133,7 +137,7 @@ core.on('mach', function(envelope, header, payload) {
  * Handles the 'reply' event on the core
  */
 core.on('reply', function(header, payload) {
-	console.log('>[MACH] '+header.name+' replied with '+header.type);
+	console.log('>[MACH]\t'+header.name+' replied with '+header.type);
 	switch(header.type) {
 		default:
 			console.log(payload);

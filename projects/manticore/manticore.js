@@ -62,19 +62,19 @@ var self = module.exports = new Core();
  * Emit 'ready' event when initialized
  */
 Core.prototype.init = function() {
-	console.log('+[CORE] Core starting on '+this.name);
+	console.log('+[CORE]\tCore starting on '+this.name);
 	// bind local socket
 	this.udp.bind(UDP_PORT, function() {
 		var address = self.udp.address();
-		console.log('+[UDP] UDP socket listening on '+address.address+':'+address.port);
+		console.log('+[UDP]\tUDP socket listening on '+address.address+':'+address.port);
 	});
 	// bind publish socket and start advertising and browsing
 	this.publisher.bind('tcp://*:'+INCH_PORT, function(err) {
 		if (err) {
-			console.log('![PUB] Publisher binding error: '+err);
+			console.log('![PUB]\tPublisher binding error: '+err);
 		}
 		else {
-			console.log('+[PUB] Publisher socket listening on '+INCH_PORT);
+			console.log('+[PUB]\tPublisher socket listening on '+INCH_PORT);
 			self.advertise();
 			self.browse();
 		}
@@ -82,9 +82,9 @@ Core.prototype.init = function() {
 	// bind mach channel
 	this.mach.bind('tcp://*:'+MACH_PORT, function(err) {
 		if (err)
-			console.log('![MACH] Socket binding error: '+err);
+			console.log('![MACH]\tSocket binding error: '+err);
 		else
-			console.log('+[MACH] Socket listening on '+MACH_PORT);
+			console.log('+[MACH]\tSocket listening on '+MACH_PORT);
 	});
 	// subscribe socket
 	this.emit('ready');
@@ -95,7 +95,7 @@ Core.prototype.init = function() {
  */
 Core.prototype.advertise = function() {
 	this.advertiser.start();
-	console.log('+[CORE] Advertising _'+NODE_SERVICE+'._tcp on '+INCH_PORT);
+	console.log('+[CORE]\tAdvertising _'+NODE_SERVICE+'._tcp on '+INCH_PORT);
 };
 
 /**
@@ -103,7 +103,7 @@ Core.prototype.advertise = function() {
  */
 Core.prototype.browse = function() {
 	this.browser.start();
-	console.log('+[mDNS] Start browsing for _'+NODE_SERVICE+'._tcp services');
+	console.log('+[mDNS]\tStart browsing for _'+NODE_SERVICE+'._tcp services');
 };
 
 /**
@@ -125,7 +125,7 @@ self.subscriber.on('message', function(data) {
  */
 
 self.mach.on('message', function() {
-	console.log(':[DBUG] Router: '+arguments.length);
+	console.log(':[DBUG]\tRouter: '+arguments.length);
 	for (k in arguments)
 		console.log(arguments[k].toString());
 	switch (arguments.length) {
@@ -145,7 +145,7 @@ self.mach.on('message', function() {
 });
 
 self.requester.on('message', function(data) {
-	console.log(':[DBUG] Dealer: '+arguments.length);
+	console.log(':[DBUG]\tDealer: '+arguments.length);
 	for (k in arguments)
 		console.log(arguments[k].toString());
 	switch (arguments.length) {
@@ -165,23 +165,23 @@ self.requester.on('message', function(data) {
  * Display errors with sockets
  */
 self.subscriber.on('error', function(err) {
-	console.log('![SUB] Socket error: '+err);
+	console.log('![SUB]\tSocket error: '+err);
 });
 
 self.mach.on('error', function(err) {
-	console.log('![REP] Socket error: '+err);
+	console.log('![REP]\tSocket error: '+err);
 });
 
 self.requester.on('error', function(err) {
-	console.log('![REQ] Socket error: '+err);
+	console.log('![REQ]\tSocket error: '+err);
 });
 
 self.publisher.on('error', function(err) {
-	console.log('![PUB] Socket error: '+err);
+	console.log('![PUB]\tSocket error: '+err);
 });
 
 self.udp.on('message', function(buffer, rinfo) {
-	console.log('>[UDP] from '+rinfo);
+	console.log('>[UDP]\tfrom '+rinfo);
 	console.log(buffer.toString());
 });
 
@@ -190,7 +190,7 @@ self.udp.on('message', function(buffer, rinfo) {
  * (mDNS browser event)
  */
 self.browser.on('serviceUp', function(service) {
-	console.log('+[mDNS] Service up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
+	console.log('+[mDNS]\tService up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
 
 	if(!self.findNodeById(service.txtRecord.id))
 	{
@@ -205,10 +205,10 @@ self.browser.on('serviceUp', function(service) {
 			self.ip = new_node.ip;
 		}
 		self.nodes.push(new_node);
-		console.log('+[CORE] Adding node id '+service.txtRecord.id);
+		console.log('+[CORE]\tAdding node id '+service.txtRecord.id);
 	}
 	else {
-		console.log('![CORE] Node id '+service.txtRecord.id+' is already present');
+		console.log('![CORE]\tNode id '+service.txtRecord.id+' is already present');
 	}
 });
 
@@ -220,14 +220,14 @@ self.browser.on('serviceUp', function(service) {
 Core.prototype.newSubscribe = function(peer) {
 	this.subscriber.connect('tcp://'+peer+':'+INCH_PORT);
 	this.subscriber.subscribe('');
-	console.log('+[SUB] Subscribing to '+peer);
+	console.log('+[SUB]\tSubscribing to '+peer);
 };
 
 /**
  * Delete dead node from local node list when 'serviceDown'
  */
 self.browser.on('serviceDown', function(service) {
-	console.log('-[mDNS] Service down: '+service.name+' ('+service.networkInterface+')');
+	console.log('-[mDNS]\tService down: '+service.name+' ('+service.networkInterface+')');
 	self.deleteDeadNode(service.name);
 });
 
@@ -235,7 +235,7 @@ self.browser.on('serviceDown', function(service) {
  * Handle mDNS browser errors
  */
 self.browser.on('error', function(error) {
-	console.log('![mDNS] Browser error: '+error);
+	console.log('![mDNS]\tBrowser error: '+error);
 });
 
 /**
@@ -250,7 +250,7 @@ Core.prototype.toString = function() {
  * closing sockets and exiting
  */
 Core.prototype.close = function(exit) {
-	console.log('[CORE] Closing');
+	console.log('[CORE]\tClosing');
 	this.browser.stop();
 	this.advertiser.stop();
 	this.publisher.close();
@@ -305,10 +305,10 @@ Core.prototype.syncSend = function(dst, cmd, data, callback) {
 	if (dst != null) {
 		socket.connect('tcp://'+dst+':'+MACH_PORT);
 		socket.send(JSON.stringify(this.createMessage(cmd, data)));
-		console.log('+[SYNC] Sending '+data+' to '+dst);
+		console.log('+[SYNC]\tSending '+data+' to '+dst);
 
 		socket.on('message', function(data) {
-			console.log('>[SYNC] Received '+data.toString());
+			console.log('>[SYNC]\tReceived '+data.toString());
 			var msg = JSON.parse(data);
 			callback(msg.header, msg.payload);
 			socket.close();
@@ -339,10 +339,10 @@ Core.prototype.deleteDeadNode = function(node_name){
 			this.subscriber.disconnect('tcp://'+this.nodes[index].ip+':'+INCH_PORT);
 		}
 		this.nodes.splice(index,1);
-		console.log('-[CORE] Deleting node '+node_name);
+		console.log('-[CORE]\tDeleting node '+node_name);
 	}
 	else {
-		console.log('![CORE] Error cannot delete node '+node_name+', not found ; no harm, maybe just a duplicate serviceDown');
+		console.log('![CORE]\tError cannot delete node '+node_name+', not found ; no harm, maybe just a duplicate serviceDown');
 	}
 };
 
@@ -391,8 +391,21 @@ function createAdvertisement(uuid)  {
     
     var advertiser = mdns.createAdvertisement(mdns.tcp(NODE_SERVICE), INCH_PORT, {txtRecord: mdns_txt_record});
     advertiser.on('error', function(error) {
-        console.log("![CORE] ", error);
+        console.log("![CORE]\t", error);
         setTimeout(createAdvertisement, 30 * 1000);
     });
     return advertiser;
 }
+
+
+/******* protocol *********/
+
+/******* message *********/
+Core.prototype.payloadRequest = function (res, port) {
+	var _p = port || MACH_PORT;
+	return {data: res, port: _p};
+};
+
+Core.prototype.payloadAck = function (s) {
+	return {status: s};
+};

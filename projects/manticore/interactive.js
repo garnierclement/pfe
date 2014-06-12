@@ -14,7 +14,7 @@ process.stdin.on('readable', function() {
 			core.close();
 		}
 		else if (chunk == "help\n") {
-			console.log("[HELP] Usage: cmd [param], see examples below");
+			console.log("[HELP]\tUsage: cmd [param], see examples below");
 			console.log("\tdebug");
 			console.log("\teval core.nodes");
 			console.log("\tlog core.nodes");
@@ -29,7 +29,7 @@ process.stdin.on('readable', function() {
 				eval(command);
 			}
 			catch(e) {
-				console.log("![EVAL] "+e+"\nUsage: 'eval [javascript code]'");
+				console.log("![EVAL]\t"+e+"\nUsage: 'eval [javascript code]'");
 			}
 		}
 		else if (/^log/.test(chunk)) {
@@ -38,7 +38,7 @@ process.stdin.on('readable', function() {
 				console.log(eval(obj));
 			}
 			catch(e) {
-				console.log("![LOG] "+e+"\nUsage: 'log [javascript object]'");
+				console.log("![LOG]\t"+e+"\nUsage: 'log [javascript object]'");
 			}
 			
 		}
@@ -48,55 +48,57 @@ process.stdin.on('readable', function() {
 				core.emit(evt);
 			}
 			catch(e) {
-				console.log("![EMIT] "+e+"\nUsage: 'emit [javascript event on core]'");
+				console.log("![EMIT]\t"+e+"\nUsage: 'emit [javascript event on core]'");
 			}
 		}
 		else if (/^exec/.test(chunk)) {
 			var cmd = chunk.slice(5,chunk.length-1);
 			try {
 				exec(cmd, function(err, stdout, stderr){
-					console.log("+[EXEC] \n"+stdout+stderr);
+					console.log("+[EXEC]\t\n"+stdout+stderr);
 				});
 			}
 			catch(e) {
-				console.log("![EXEC] "+e);
+				console.log("![EXEC]\t"+e);
 			}
 		}
 		else if (/^send /.test(chunk)) {
 			var msg = chunk.slice(5,chunk.length-1);
 			try {
-				console.log("+[INCH] Published: "+msg);
+				console.log("+[INCH]\tPublished: "+msg);
 				core.publish('raw', msg);
 			}
 			catch(e) {
-				console.log("![SEND] "+e);
+				console.log("![SEND]\t"+e);
 			}
 		}
 		else if (/^remote /.test(chunk)) {
 			var cmd = chunk.slice(7,chunk.length-1);
 			try {
-				console.log("+[INCH] Remote execution of '"+cmd+"'");
+				console.log("+[INCH]\tRemote execution of '"+cmd+"'");
 				core.publish('exec', cmd);
 			}
 			catch(e) {
-				console.log("![SEND] "+e);
+				console.log("![SEND]\t"+e);
 			}
 		}
 		else if (/^request /.test(chunk)) {
 			var res = chunk.slice(8,chunk.length-1);
 			try {
-				console.log("+[REQR] Request resource: "+res);
-				core.syncSend(res, 'request', {data: res, port: 42424}, function(header, payload) {
-					console.log('>[SYNC] Resource status from '+header);
+				console.log("+[REQR]\tRequest resource: "+res);
+				var dst = core.getNodeIpById(res);
+				if (dst != null) 
+				core.syncSend(dst, 'request', {data: res, port: 42424}, function(header, payload) {
+					console.log('>[SYNC]\tResource status from '+header);
 					console.log(payload);
 				});
 			}
 			catch(e) {
-				console.log("![SEND] "+e);
+				console.log("![SEND]\t"+e);
 			}
 		}
 		else {
-			console.log("![CORE] Available commands : help|debug|eval|log|exec|send|remote|emit|request");
+			console.log("![CORE]\tAvailable commands : help|debug|eval|log|exec|send|remote|emit|request");
 		}
 	}
 });
