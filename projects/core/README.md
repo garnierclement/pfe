@@ -1,16 +1,85 @@
 # Manticore
 
-## Start
+In the following, the words *core* and *manticore* with/without a capital letter are used indistinctly and refer to the same program.
 
-To start manticore, you can either use node
+## Getting started
+
+To start Manticore, you can either use node
 
 	$ node app.js
 
-or with npm
+or npm
 
 	$ npm start
 
 ## Guide
+
+### Introduction
+
+// TODO : simply detail use case and present the associated objectives
+
+### Objectives
+
+#### What we want to achieve ?
+
+* 	**Discovery**  
+	How do we learn about other nodes on the network ?
+* 	**Presence**  
+	How do we track when others nodes come and go ?
+* 	**Connectivity**  
+	How do we connect one node to another ?
+* 	**Group messaging** (aka multicast)  
+	How do we send a message from one node to a group of other nodes ?
+* 	**Point-to-point messaging**  
+	How do we send a message from one node to another ?
+*	**External communication**  
+	How does a node communicate with process that are not *network nodes* ?
+* 	**Content distribution**  
+	How do we provide the requested resource data ? How do we send the data ?
+
+#### How does it work ?
+
+* 	At startup, a node advertise its presence by broadcasting a `_node._tcp` service on Zeroconf. Doing so, other nodes can simply browse this service to dynamically discover its presence.
+* 	We assume that all the nodes are on the same network segment (i.e in the same subnet). Thus we can infer that they can directly address other nodes using the recipient IP address.
+* 	Each node provides different communication channels relying on a specific pattern : uni- or bidirectional, synchronous or asynchronous.
+* 	The group messaging is achieved by a communication channel called **Information Channel (InCh)** implementing the publisher/subscriber network pattern. Hence, each node has 2 sockets : 
+	+ the publisher socket solely used to send information to all its subscribers.
+	+ the subscriber socket solely used to receive information from all other nodes.
+*	The point-to-point messaging is achieved by another communication channel called **Main Channel (MaCh)** implementing the request/reply network pattern. According to the situation, this request/reply can either be synchronous (an immediate reply is requested and thus will block the execution) or asynchronous (we expect a response but not urgently).
+*	To communicate with external processes, a HTTP server is embedded in each node and can provide a web API, accepting GET request and serving JSON file or raw status.
+*	The distribution of the resource data is made using OSC packets on UDP datagrams. The main use case is a client that desire a resource provided on a specific node of the network. To achieve a proper delivery of the dynamic OSC data stream to this client, we use the information collected on both InCh and MaCh and execute the following procedure :
+	1. A client issue a request on a local core to know the network status and resources available
+	2. The server sends back a list of network nodes with its capabilities (this list is known by the core through 1. Browsing of `_node._tcp` service and 2. Listening on any published event on InCh)
+	3. The client issue a request on a resource, binds an UDP reception socket and wait for the core's response
+	4. The local core knows which node to ask and issue in turn a synchronous request using MaCh. This is a synchronous request, meaning that it will waits for a reply.
+	5. The recipient core handles this request, check the availability of the requested resource, if so it sends a positive reply to the requester core. At the same time, it may generate a file and execute a program/driver that will send the data to the requester client.
+	6. The local core receives the response, process it and can now answer the client.
+	7. A OSC stream over UDP must now be flowing between from the node with the requested to resource to the client
+
+**Note**: Both *MaCh* and *Inch* need to be reliable communication channels and thus use TCP as transport protocol.  
+**Note 2**: These channels are solely used to inter-core communication. That is to say that any external communication with a core must use the built-in HTTP server.
+
+
+#### Note about the use of ZeroMQ Sockets
+
+* PUB to publish data
+* SUB to subscribe to a PUB socket
+* REQ to issue a synchronous request
+* REP to issue a synchronous reply (not used actually, see DEALER)
+* ROUTER to issue asynchronous requests
+* DEALER to issue asynchronous replies
+
+//TODO: write about 0MQ sockets and pattern
+
+
+#### Use cases
+
+*   `PUB[1] --remote--> SUB[N] | ROUTER[N] --output--> DEALER[1] --ack--> ROUTER[N]` 
+	(mixing InCh + MaCh and used for remote command execution)
+* 	`REQ[1] --request--> ROUTER[2] --ack|noack--> REQ[1]`
+	(using MaCh to request a resource)
+	
+// TODO : detail the procedure
 
 ### Interactive commands
 
@@ -24,22 +93,29 @@ The following commands are available
 * `emit [event]` is equivalent to core.emit('event'), used for debug purpose only
 * `exec [cmd]` execute a command in the shell (no need to quit the program or to open a new ssh session)  
 * `exit` gracefully close sockets and exit (equivalent to Ctrl+C)
+* `request`
 
 ### Events
 
-* `ready`
-* `inch`
-* `mach`
-* `reply`
+* `ready` is triggered when **initialization finishes**
+* `inch` is triggered when the **subscriber** socket **receives** some data (meaning *I've just received some data on the information channel* or *Another node just published some information*)
+* `mach` is triggered when a **request** is **received** on MaCh (meaning *I've just received *)
+* `reply` is triggered when a **response** to **previous request** is received
 * `test` (for testing purpose only)
 
 ### Core commands
 
-* `init()`
-* `publish()`
-* `send()`
+These are the methods used by the Core singleton to interact with its state and its communication channels.
+
+* `init()` will start mDNS advertising and browsing of `_node.tcp` service, bind sockets
+* `publish()` will trigger a `inch` event on all subscribers
+* `send()` will trigger a `mach` event on the recipient
+* `syncSend()` will also trigger a `mach`
 * `reply()`
 * `close()`
+
+// TODO : add commented examples
+
 
 ### Source files
 
@@ -51,8 +127,8 @@ The following commands are available
 
 ## Installation
 
-Install dependencies ([mdns] and [zmq])  
-See `package.json` for more information about versions
+Install dependencies ([mdns] and [zmq]) with  
+(see `package.json` for more information about versions)
 
 	$ npm install
 
@@ -63,7 +139,7 @@ Manually
 	$ npm install express
 	$ npm install uuid
 
-Note: zmq and mdns have other requirements, see the main README at the root of this repository
+**Note**: [zmq] and [mdns] have other requirements, see the main README at the root of this repository
 
 ## Warning
 
@@ -80,7 +156,7 @@ This must not be harmful and the warning can be hidden with the following enviro
 
 	$ export AVAHI_COMPAT_NOWARN=1
 
-For further investigation, see <http://0pointer.de/avahi-compat?s=libdns_sd&e=node>
+For further investigation, enquire <http://0pointer.de/avahi-compat?s=libdns_sd&e=node>
 
 
 [zmq]: https://www.npmjs.org/package/zmq
