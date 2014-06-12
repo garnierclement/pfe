@@ -2,6 +2,31 @@
 
 In the following, the words *core* and *manticore* with/without a capital letter are used indistinctly and refer to the same program.
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+
+- [Manticore](#manticore)
+  - [Getting started](#getting-started)
+  - [Guide](#guide)
+    - [Introduction](#introduction)
+    - [Objectives](#objectives)
+      - [What we want to achieve ?](#what-we-want-to-achieve-)
+      - [How does it work ?](#how-does-it-work-)
+      - [Note about the use of ZeroMQ Sockets](#note-about-the-use-of-zeromq-sockets)
+      - [Use cases](#use-cases)
+    - [Interactive commands](#interactive-commands)
+    - [Events](#events)
+    - [Core commands](#core-commands)
+    - [Source files](#source-files)
+  - [Prerequisites](#prerequisites)
+    - [Prerequisites on Mac OS X](#prerequisites-on-mac-os-x)
+    - [Prerequisites on Raspbian (Raspberry Pi)](#prerequisites-on-raspbian-raspberry-pi)
+  - [Installation](#installation)
+  - [Warning](#warning)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Getting started
 
 To start Manticore, you can either use node
@@ -28,7 +53,7 @@ or npm
 	How do we track when others nodes come and go ?
 * 	**Connectivity**  
 	How do we connect one node to another ?
-* 	**Group messaging** (aka multicast)  
+* 	**Group messaging** (a.k.a multicast)  
 	How do we send a message from one node to a group of other nodes ?
 * 	**Point-to-point messaging**  
 	How do we send a message from one node to another ?
