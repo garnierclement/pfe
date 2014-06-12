@@ -150,15 +150,15 @@ self.requester.on('message', function(data) {
 		console.log(arguments[k].toString());
 	switch (arguments.length) {
 		case 2:
-			var data = arguments[1];
+			var data = JSON.parse(arguments[1]);
 			break;
 		case 3:
-			var data = arguments[2];
+			var data = JSON.parse(arguments[2]);
 			break;
 		default:
 			return;
 	}
-	self.emit('reply', JSON.parse(data));
+	self.emit('reply', data.header, data.payload));
 });
 
 /**

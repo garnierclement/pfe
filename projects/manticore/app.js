@@ -132,11 +132,11 @@ core.on('mach', function(envelope, header, payload) {
 /**
  * Handles the 'reply' event on the core
  */
-core.on('reply', function(data) {
-	console.log('>[MACH] '+data.name+' replied with '+data.type);
-	switch(data.type) {
+core.on('reply', function(header, payload) {
+	console.log('>[MACH] '+header.name+' replied with '+header.type);
+	switch(header.type) {
 		default:
-			console.log(data.payload);
+			console.log(payload);
 	}
 });
 
