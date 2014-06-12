@@ -28,9 +28,10 @@ core.on('ready', function() {
 		console.log('+[HTTP] Request id '+req.param('id'));
 		if (core.findNodeById(req.param('id'))) {
 			var resource = req.param('id');
-			core.syncSend(resource, 'request', {data: resource, port: 16161}, function(reply) {
+			core.syncSend(resource, 'request', {data: resource, port: 16161}, function(header, payload) {
 				console.log(reply);
-				if (reply.payload.status) {
+				console.log(payload);
+				if (payload.status) {
 					res.send(resource);
 				}
 				else {
@@ -49,25 +50,25 @@ core.on('ready', function() {
  * Handles the 'inch' event on the core
  * This event corresponds to the reception of a message on the subscriber socket
  */
-core.on('inch', function(data) {
-	console.log('>[INCH] '+data.type+' from '+data.name);
-	switch(data.type) {
+core.on('inch', function(header, payload) {
+	console.log('>[INCH] '+header.type+' from '+header.name+' ('+header.ip+')');
+	switch(header.type) {
 		case 'raw':
-			console.log(data.payload);
+			console.log(payload);
 			break;
 		case 'exec': 
-			trigger.execute(data.payload, function(stdout, stderr){
-				var dst = core.getNodeIpById(data.src)
-				console.log('+[CORE] Sending result of execution to '+data.name+'('+dst+')');
+			trigger.execute(payload, function(stdout, stderr){
+				var dst = header.ip;
+				console.log('+[CORE] Sending result of execution to '+header.name+'('+dst+')');
 				if (dst != null)
 					core.send(dst, 'raw', stdout+stderr);
 				else
-					console.log('![CORE] Cannot send reply to '+data.name);
+					console.log('![CORE] Cannot send reply to '+header.name);
 			});
 			break;
 		default:
-			console.log('![INCH] No message type');
-			console.log(data.payload);
+			console.log('![INCH] Message type not imlemented'+header.type);
+			console.log(payload);
 	}
 });
 
@@ -79,20 +80,20 @@ core.on('inch', function(data) {
  *		- nothing is done
  *		- we use the core.reply() command to send a response
  */
-core.on('mach', function(envelope, data) {
-	console.log('>[MACH] '+data.type+' from '+data.name);
-	switch(data.type) {
+core.on('mach', function(envelope, header, payload) {
+	console.log('>[MACH] '+header.type+' from '+header.name+' ('+header.ip+')');
+	switch(header.type) {
 		case 'raw':
-			console.log(data.payload);
+			console.log(payload);
 			core.reply('ack', envelope, "Bien reçu !");
 			break;
 		case 'ack':
-			console.log(data.payload);
+			console.log(payload);
 			break;
 		case 'request':
-			console.log(data.payload);
+			console.log(payload);
 			core.reply('ack', envelope, {status: true});
-			var dst = core.getNodeIpById(data.src);
+			var dst = header.ip;
 			if (dst != null) {
 				var outputfile = trigger.generate(dst, 16161,'../../pd/mousePosition.pd','../../var/run/output.pd');
 				var pd = "";
@@ -107,7 +108,7 @@ core.on('mach', function(envelope, data) {
 				});
 			}
 			else
-				console.log('![ERR] cannot find ip for '+data.src);
+				console.log('![ERR] cannot find ip for '+header);
 			
 			// NOT YET IMPLEMENTED
 			// To request a resource
@@ -117,14 +118,14 @@ core.on('mach', function(envelope, data) {
 			// Need to trigger.execute()
 			break;
 		case 'release':
-			console.log(data.payload);
+			console.log(payload);
 			// NOT YET IMPLEMENTED
 			// To release a resource
 			// Need to trigger.kill()
 			break;
 		default:
 			console.log('![INCH] No message type');
-			console.log(data.payload);
+			console.log(payload);
 	}
 });
 

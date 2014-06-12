@@ -76,7 +76,7 @@ process.stdin.on('readable', function() {
 			var cmd = chunk.slice(7,chunk.length-1);
 			try {
 				console.log("+[INCH] Remote execution of '"+cmd+"'");
-				core.publish(core.createMessage('exec',cmd));
+				core.publish('exec', cmd);
 			}
 			catch(e) {
 				console.log("![SEND] "+e);

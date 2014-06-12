@@ -35,6 +35,7 @@ function Core()
 	this.name = require('os').hostname();
 	this.uuid = uuid.v1();
 	this.nodes = [];
+	this.ip = null;
 	this.sensors = [];
 	this.resources = [];
 	this.publisher = zmq.socket('pub');	// publisher socket (inch)
@@ -86,7 +87,6 @@ Core.prototype.init = function() {
 			console.log('+[MACH] Socket listening on '+MACH_PORT);
 	});
 	// subscribe socket
-	this.subscriber.identity = this.name;
 	this.emit('ready');
 };
 
@@ -113,7 +113,8 @@ Core.prototype.browse = function() {
  * @param  {blob} data [blob of data (JSON)]
  */
 self.subscriber.on('message', function(data) {
-	self.emit('inch', JSON.parse(data));
+	var msg = JSON.parse(data);
+	self.emit('inch', msg.header, msg.payload);
 });
 
 /**
@@ -130,17 +131,17 @@ self.mach.on('message', function() {
 	switch (arguments.length) {
 		case 2:
 			var envelope = arguments[0];
-			var data = arguments[1];
+			var msg = JSON.parse(arguments[1]);
 			break;
 		case 3:
 			var envelope = arguments[0];
-			var data = arguments[2];
+			var msg = JSON.parse(arguments[2]);
 			break;
 		default:
 			return;
 	}
-	
-	self.emit('mach', envelope, JSON.parse(data));
+
+	self.emit('mach', envelope, msg.header, msg.payload);
 });
 
 self.requester.on('message', function(data) {
@@ -194,10 +195,16 @@ self.browser.on('serviceUp', function(service) {
 	if(!self.findNodeById(service.txtRecord.id))
 	{
 		var new_node = new Node(service);
-		self.nodes.push(new_node);
 		if (self.uuid != service.txtRecord.id) {
 			self.newSubscribe(new_node.ip);
 		}
+		else {
+			// note if itself
+			new_node.itself = 'true';
+			// register advertising ip, we should see ourself
+			self.ip = new_node.ip;
+		}
+		self.nodes.push(new_node);
 		console.log('+[CORE] Adding node id '+service.txtRecord.id);
 	}
 	else {
@@ -258,8 +265,8 @@ Core.prototype.close = function(exit) {
  * [publish description]
  * @param  {[type]} data [description]
  */
-Core.prototype.publish = function(data) {
-	this.publisher.send(JSON.stringify(data));
+Core.prototype.publish = function(cmd, data) {
+	this.publisher.send(JSON.stringify(this.createMessage(cmd, data)));
 };
 
 /**
@@ -272,19 +279,29 @@ Core.prototype.publish = function(data) {
  * @return {Object}      [message sent on the socket]
  */
 Core.prototype.createMessage = function(cmd, data) {
-	return {src: this.uuid, name: this.name, type: cmd, payload: data};
+	var h = {src: this.uuid, name: this.name, ip: this.ip, type: cmd};
+	return {header: h, payload: data};
 };
 
+/**
+ * [send description]
+ * @param  {[type]} dst  [description]
+ * @param  {[type]} cmd  [description]
+ * @param  {[type]} data [description]
+ * @return {[type]}      [description]
+ */
 Core.prototype.send = function(dst, cmd, data) {
 	if (dst != null) {
 		this.requester.connect('tcp://'+dst+':'+MACH_PORT);
 		this.requester.send([null, JSON.stringify(this.createMessage(cmd, data))]);
 	}
+	else {
+		throw 'send() to null IP';
+	}	
 };
 
-Core.prototype.syncSend = function(dst_id, cmd, data, callback) {
+Core.prototype.syncSend = function(dst, cmd, data, callback) {
 	var socket = zmq.socket('req');
-	var dst = this.getNodeIpById(dst_id);
 	if (dst != null) {
 		socket.connect('tcp://'+dst+':'+MACH_PORT);
 		socket.send(JSON.stringify(this.createMessage(cmd, data)));
@@ -292,12 +309,13 @@ Core.prototype.syncSend = function(dst_id, cmd, data, callback) {
 
 		socket.on('message', function(data) {
 			console.log('>[SYNC] Received '+data.toString());
-			callback(JSON.parse(data));
+			var msg = JSON.parse(data);
+			callback(msg.header, msg.payload);
 			socket.close();
 		});
 	}
 	else {
-		console.log('![SYNC] error no dst found')
+		throw 'send() to null IP';
 	}
 };
 
