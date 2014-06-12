@@ -158,7 +158,7 @@ self.requester.on('message', function(data) {
 		default:
 			return;
 	}
-	self.emit('reply', data.header, data.payload));
+	self.emit('reply', data.header, data.payload);
 });
 
 /**
