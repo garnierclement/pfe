@@ -93,17 +93,22 @@ core.on('mach', function(envelope, data) {
 			console.log(data.payload);
 			core.reply('ack', envelope, {status: true});
 			var dst = core.getNodeIpById(data.src);
-			var outputfile = trigger.generate(dst, 16161,'../../pd/mousePosition.pd','../../var/run/output.pd');
-			var pd = "";
-			if(isDarwin()) {
-				pd = "/Applications/Pd-extended.app/Contents/MacOS/Pd-extended";
+			if (dst != null) {
+				var outputfile = trigger.generate(dst, 16161,'../../pd/mousePosition.pd','../../var/run/output.pd');
+				var pd = "";
+				if(isDarwin()) {
+					pd = "/Applications/Pd-extended.app/Contents/MacOS/Pd-extended";
+				}
+				else if (isLinux()) {
+					pd = "pd-extended";
+				}
+				trigger.execute(pd+' '+outputfile, function(err, stdout,stderr) {
+					console.log(stdout+stderr);
+				});
 			}
-			else if (isLinux()) {
-				pd = "pd-extended";
-			}
-			trigger.execute(pd+' '+outputfile, function(err, stdout,stderr) {
-				console.log(stdout+stderr);
-			});
+			else
+				console.log('![ERR] cannot find ip for '+data.src);
+			
 			// NOT YET IMPLEMENTED
 			// To request a resource
 			// Need to trigger.check() (resource availability)
