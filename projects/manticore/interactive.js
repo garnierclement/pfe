@@ -88,7 +88,7 @@ process.stdin.on('readable', function() {
 				console.log("+[REQR]\tRequest resource: "+res);
 				var dst = core.getNodeIpById(res);
 				if (dst != null) 
-				core.syncSend(dst, 'request', {data: res, port: 42424}, function(header, payload) {
+				core.syncSend(dst, 'request', core.payloadRequest(res), function(header, payload) {
 					console.log('>[SYNC]\tResource status from '+header);
 					console.log(payload);
 				});

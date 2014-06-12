@@ -24,7 +24,7 @@ exports.generate = function(ip, port, file, output) {
 	exec(sed, function(err,stdout, stderr) {
 		console.log('+[GEN]\tFile generated '+output);
 	});
-	return output;
+	return outputDir+output;
 };
 
 exports.check = function() {

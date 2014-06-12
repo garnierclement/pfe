@@ -99,7 +99,7 @@ core.on('mach', function(envelope, header, payload) {
 			core.reply('ack', envelope, {status: true});
 			var dst = header.ip;
 			if (dst != null) {
-				var outputfile = trigger.generate(dst, 16161,'mousePosition.pd','output.pd');
+				var outputfile = trigger.generate(dst, payload.port,'mousePosition.pd','output.pd');
 				var pd = "";
 				if(isDarwin()) {
 					pd = "/Applications/Pd-extended.app/Contents/MacOS/Pd-extended";
