@@ -66,7 +66,7 @@ process.stdin.on('readable', function() {
 			var msg = chunk.slice(5,chunk.length-1);
 			try {
 				console.log("+[INCH] Published: "+msg);
-				core.publish(core.createMessage('raw',msg));
+				core.publish('raw', msg);
 			}
 			catch(e) {
 				console.log("![SEND] "+e);
@@ -86,9 +86,9 @@ process.stdin.on('readable', function() {
 			var res = chunk.slice(8,chunk.length-1);
 			try {
 				console.log("+[REQR] Request resource: "+res);
-				core.syncSend(res, 'request', {data: res, port: 42424}, function(reply) {
-					console.log('>[SYNC] Resource status');
-					console.log(reply);
+				core.syncSend(res, 'request', {data: res, port: 42424}, function(header, payload) {
+					console.log('>[SYNC] Resource status from '+header);
+					console.log(payload);
 				});
 			}
 			catch(e) {
