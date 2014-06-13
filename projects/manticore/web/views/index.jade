@@ -1,0 +1,53 @@
+extends layout
+
+block content
+	h1= title
+	h2 Nodes
+	p.lead Available nodes on the network : #{nodes.length}
+	table.table.table-hover
+		thead
+			tr
+				th Name
+				th Host
+				th IP address
+				th UUID
+				th Request resource
+		each node, index in nodes
+			tr
+				td= node.name
+				td 
+					a(href='http://#{node.host}:3000') #{node.host}
+				td= node.ip
+				td
+					a(href='/request/#{node.id}') #{node.id}
+				td
+					form(methode='GET', action='/request/#{node.id}')
+						input(name='port', type='number', value=42424, min=0, max=65536)
+						input.btn.btn-default(type='submit', value="Request")
+	h2 API
+	table.table.table-hover
+		thead 
+			th HTTP method
+			th URL
+			th Parameter
+		tr
+			td GET
+			td 
+				a(href='/nodes') /nodes
+			td None
+		tr
+			td GET
+			td /request/[:id]?port=[:portnumber]
+			td 
+				dl
+					dt [:id]
+					dd UUID
+					dt [:portnumber]
+					dd Listening port number
+		tr
+			td GET
+			td /release/:id
+			td NOT IMPLEMENTED YET
+
+
+

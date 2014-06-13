@@ -20,9 +20,10 @@ var zmq = require('zmq');
 function Node (service)
 {
 	this.id = service.txtRecord.id;
-	this.host = service.host;
+	this.host = service.host.slice(0, service.host.length-1);
 	this.name = service.name;
 	this.ip = filter_ipv4(service.addresses);
+	this.sensors = [];
 }
 
 module.exports = Node;

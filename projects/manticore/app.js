@@ -2,10 +2,16 @@
 
 var express = require('express');
 var api = express();
+var path = require('path');
 
 var core = require('./manticore.js');
 var interactive = require('./interactive.js');
 var trigger = require('./trigger.js');
+
+// view engine set up
+api.set('views', path.join(__dirname, 'web/views'));
+api.set('view engine', 'jade');
+api.use(express.static(path.join(__dirname, 'web/static')));
 
 // Start HTTP server to serve JSON API
 api.listen(3000, function() {
@@ -19,20 +25,27 @@ api.listen(3000, function() {
  */
 core.on('ready', function() {
 
-	api.get('/nodes/', function(req, res) {
+	api.get('/', function(req, res) {
+		res.render('index', { title: 'Manticore on '+core.name, nodes: core.nodes });
+	});
+
+	api.get('/nodes', function(req, res) {
 		res.set({'Content-Type': 'application/json'});
 		res.send({nodes: core.nodes });
 	});
 
 	api.get('/request/:id', function(req, res) {
+		res.set({'Content-Type': 'text/plain'});
 		console.log('+[HTTP]\tRequest id '+req.param('id'));
 		if (core.findNodeById(req.param('id'))) {
 			var resource = req.param('id');
+			var p = req.query.port || 16161;
 			// WARNING on request a resource but use node uuid
 			// need to be changed when sensor is set up
 			var dst = core.getNodeIpById(resource);
+			if (dst = core.ip) dst = '127.0.0.1';
 			if (dst != null) 
-			core.syncSend(dst, 'request', {data: resource, port: 16161}, function(header, payload) {
+			core.syncSend(dst, 'request', {data: resource, port: p}, function(header, payload) {
 				console.log(header);
 				console.log(payload);
 				if (payload.status) {
