@@ -56,7 +56,7 @@ or npm
 	How do we track when others nodes come and go ?
 * 	**Connectivity**  
 	How do we connect one node to another ?
-* 	**Group messaging** (a.k.a multicast)  
+* 	**Group messaging** (a.k.a. multicast)  
 	How do we send a message from one node to a group of other nodes ?
 * 	**Point-to-point messaging**  
 	How do we send a message from one node to another ?
@@ -172,7 +172,7 @@ The message exchanged on the communication channels (InCh and MaCh) are JSON fil
 It is simply a Javascript object with 2 main parts :
 
 * `header` contains the type of message and some information about the sender (uuid, hostname and IP address)
-* `payload` is a object or any other Javascript compliant type, its structure will depend on the type of the message
+* `payload` can be any Javascript primitive data types (i.e. `String`, `Boolean` or `Number`), composite data types (i.e. `Object` or `Array`) or special data types (i.e. `null` or `undefined`). In the case of composite types, its structure will be related to the type of message specified in the header.
 
 > // TODO : need to write about ZeroMQ Frame and envelope
 
