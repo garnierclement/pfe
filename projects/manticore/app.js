@@ -43,7 +43,8 @@ core.on('ready', function() {
 			// WARNING on request a resource but use node uuid
 			// need to be changed when sensor is set up
 			var dst = core.getNodeIpById(resource);
-			if (dst = core.ip) dst = '127.0.0.1';
+			console.log(dst);
+			if (dst === core.ip) dst = '127.0.0.1';
 			if (dst != null) 
 			core.syncSend(dst, 'request', {data: resource, port: p}, function(header, payload) {
 				console.log(header);
