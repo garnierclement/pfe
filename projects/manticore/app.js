@@ -33,7 +33,7 @@ core.on('ready', function() {
 			var dst = core.getNodeIpById(resource);
 			if (dst != null) 
 			core.syncSend(dst, 'request', {data: resource, port: 16161}, function(header, payload) {
-				console.log(reply);
+				console.log(header);
 				console.log(payload);
 				if (payload.status) {
 					res.send(resource);
