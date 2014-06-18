@@ -9,23 +9,23 @@ float testData[100] = {0.0};
 
 int CountLines(char *filename)//获取文件的行数
 {
-ifstream ReadFile;
-int n=0;
-string temp;
-ReadFile.open(filename,ios::in);//ios::in 表示以只读的方式读取文件
-if(ReadFile.fail())//文件打开失败:返回0
-{
-   return 0;
-}
-else//文件存在,返回文件行数
-{
-   while(getline(ReadFile,temp))
-   {
-    n++;
-   }
-   return n;
-}
-ReadFile.close();
+	ifstream ReadFile;
+	int n=0;
+	string temp;
+	ReadFile.open(filename,ios::in);//ios::in 表示以只读的方式读取文件
+	if(ReadFile.fail())//文件打开失败:返回0
+	{
+	   return 0;
+	}
+	else//文件存在,返回文件行数
+	{
+	   while(getline(ReadFile,temp))
+	   {
+	    n++;
+	   }
+	   return n;
+	}
+	ReadFile.close();
 }
 
 
