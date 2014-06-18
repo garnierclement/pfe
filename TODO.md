@@ -16,7 +16,7 @@
 - [ ] what about FAUST ? and its integration ?
 - [ ] Create standard service/auto-start process for manticore on Linux (SysV-init) and OS X (launchd)
 - [ ] Better logging library for Manticore ? see https://github.com/flatiron/winston
-- [ ] Bottstrap process to install pd-extended on raspberry pi
+- [ ] Bootstrap process to install pd-extended on raspberry pi
 - [ ] Find why the PoC doesn't work on Rapsberry Pi
 - [ ] Write a documentation about Yang Fan's xBeeSerialReader
 - [ ] Write a Q&A readme files for anything specific or not yet mentioned into the readme files
