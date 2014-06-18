@@ -21,7 +21,7 @@ By default, oscpack libraires and headers are installed in `/usr/local/lib` and 
 
 This driver is composed of the following elements
 
-* `xBeeSerialSerial.cpp` is the main program, it a driver that
+* `xBeeSerialSerial.cpp` is the main program, it is a driver that
 	+ read from serial interface to get raw intertial data provided by the xBee chip
 	+ calibrate the raw inertial data and package them into OSC packets
 	+ send the forged OSC packets on UDP stream
@@ -29,7 +29,7 @@ This driver is composed of the following elements
 * `_config.txt` is a simple text file that specifies the number of intertial sensors and 
 	+ the first line says the count of intertial sensors (it also corresponds to the number of following lines in the same file)
 	+ each following line is divided into 2 columns separated by a tabulation like `A   node_a.txt`, the **first** element is the **name** (a letter) of the sensor and the **second** one is the path to the text file containing its **calibration** information
-* `node_[letter].txt` contains calibration data for each sensor
+* `node_[letter].txt` contains calibration data for a sensor designated by a letter
 * `fun.cpp/.h` source files contain useful tool functions used in the main program
 
 ## Compile 
