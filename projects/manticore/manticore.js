@@ -335,7 +335,7 @@ Core.prototype.deleteDeadNode = function(node_name){
 		if (this.nodes[k].name == node_name)  index = k;
 	}
 	if(index != null) {
-		if (node_name != this.name && this.nodes[index].ip != null) {
+		if (node_name != this.name && this.nodes[index].ip != this.ip) {
 			this.subscriber.disconnect('tcp://'+this.nodes[index].ip+':'+INCH_PORT);
 		}
 		this.nodes.splice(index,1);
