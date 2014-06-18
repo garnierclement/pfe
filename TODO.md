@@ -4,13 +4,20 @@
 - [ ] Windows compatibility (never been tested)
 - [ ] Give a model to sensor
 - [ ] Insert new sensors : MIDI Keyboard + Inertial sensor
-- [ ] Design a proper message object with header + type + payload
+- [x] Design a proper message object with header + type + payload
 - [ ] Test with more than 4 nodes
 - [ ] If request is too long or fail, timeout and return fail request resource
 - [ ] Keep track of local requested resource
-- [ ] Handle soft/hard release in API and 
-- [ ] Store this.ip reliabily
-- [ ] add a flag in nodes[] when it is itself
+- [ ] Handle soft/hard release in API 
+- [x] Store this.ip reliabily
+- [x] add a flag in nodes[] when it is itself
 - [ ] design a simple client with processing/openFrameworks
-- [ ] try Max/MSP external ?
+- [ ] try Max/MSP external ? Homère is on it with Java externals
 - [ ] what about FAUST ? and its integration ?
+- [ ] Create standard service/auto-start process for manticore on Linux (SysV-init) and OS X (launchd)
+- [ ] Better logging library for Manticore ? see https://github.com/flatiron/winston
+- [ ] Bottstrap process to install pd-extended on raspberry pi
+- [ ] Find why the PoC doesn't work on Rapsberry Pi
+- [ ] Write a documentation about Yang Fan's xBeeSerialReader
+- [ ] Write a Q&A readme files for anything specific or not yet mentioned into the readme files
+- [ ] Write a quick start developer guide
