@@ -34,6 +34,7 @@ core.on('ready', function() {
 		res.send({nodes: core.nodes });
 	});
 
+	// HTTP GET /request/[uuid]?port=[portnumber]
 	api.get('/request/:id', function(req, res) {
 		res.set({'Content-Type': 'text/plain'});
 		console.log('+[HTTP]\tRequest id '+req.param('id'));
