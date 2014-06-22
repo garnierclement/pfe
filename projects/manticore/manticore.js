@@ -399,6 +399,9 @@ function createAdvertisement(uuid)  {
 
 
 /******* protocol *********/
+Core.prototype.requestProtocol = function (res, port) {
+
+};
 
 /******* message *********/
 Core.prototype.payloadRequest = function (res, port) {
@@ -408,4 +411,8 @@ Core.prototype.payloadRequest = function (res, port) {
 
 Core.prototype.payloadAck = function (s) {
 	return {status: s};
+};
+
+Core.prototype.payloadRelease = function (res) {
+	return {data: res};
 };
