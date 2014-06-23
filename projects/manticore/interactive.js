@@ -8,7 +8,10 @@ process.stdin.on('readable', function() {
 	var chunk = process.stdin.read();
 	if (chunk !== null) {
 		if (chunk == "debug\n") {
+			console.log("+[DBUG] Core.nodes");
 			console.log(core.nodes);
+			console.log("+[DBUG] Core.sensors");
+			console.log(core.sensors);
 		}
 		else if (chunk == "exit\n") {
 			core.close();
