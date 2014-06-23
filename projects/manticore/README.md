@@ -84,7 +84,7 @@ or npm
 	6. The local core receives the response, process it and can now answer the client.
 	7. A OSC stream over UDP must now be flowing between from the node with the requested to resource to the client
 
-**Note**: Both *MaCh* and *Inch* need to be reliable communication channels and thus use TCP as transport protocol.  
+**Note**: Both *MaCh* and *InCh* need to be reliable communication channels and thus use TCP as transport protocol.  
 **Note 2**: These channels are solely used to inter-core communication. That is to say that any external communication with a core must use the built-in HTTP server.
 
 
@@ -94,10 +94,13 @@ or npm
 * SUB to subscribe to a PUB socket
 * REQ to issue a synchronous request
 * REP to issue a synchronous reply (not used actually, see DEALER)
-* ROUTER to issue asynchronous requests
-* DEALER to issue asynchronous replies
+* ROUTER to issue asynchronous replies
+* DEALER to issue asynchronous requests
+
+We can think of REQ and DEALER soscket sas "clients" and ROUTER sockets as "servers". That is why we bind the ROUTER sockets and connect REQ and DEALER sockets to them.
 
 > //TODO: write about 0MQ sockets and pattern
+> Node: see bind/connect mechanism in UNIX sockets
 
 
 #### Use cases
