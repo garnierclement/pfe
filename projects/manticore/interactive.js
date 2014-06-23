@@ -87,18 +87,11 @@ process.stdin.on('readable', function() {
 		}
 		else if (/^request /.test(chunk)) {
 			var res = chunk.slice(8,chunk.length-1);
-			try {
-				console.log("+[REQR]\tRequest resource: "+res);
-				var dst = core.getNodeIpById(res);
-				if (dst != null) 
-				core.syncSend(dst, 'request', core.requestPayload(res), function(header, payload) {
-					console.log('>[SYNC]\tResource status from '+header);
-					console.log(payload);
-				});
-			}
-			catch(e) {
-				console.log("![SEND]\t"+e);
-			}
+			console.log("+[REQR]\tRequest resource: "+res);
+			core.requestResource(res, 42424, function(header, payload) {
+				console.log('>[SYNC]\tResource status from '+header);
+				console.log(payload);
+			});
 		}
 		else if (/^fake/.test(chunk)) {
 			core.fakeSensors();

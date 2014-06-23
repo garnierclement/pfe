@@ -26,7 +26,7 @@ var Sensor = require('./sensor.js');	// Sensor object
  * @uuid		unique identifier of the current core process
  * @nodes		array of Node objects 
  * @publisher	publisher socket (ZeroMQ) for information channel (InCh)
- * @udp			udp socket (unused)
+ * @udp			udp socket 
  * @advertiser	mDNS advertiser of service _node._tcp
  * @browser		DNS-SD browser of _node._tcp services		
  * @mach		tcp socket for direct communication between node's core (MaCh)
@@ -35,14 +35,14 @@ function Core()
 {
 	this.name = require('os').hostname();
 	this.uuid = uuid.v1();
-	this.nodes = [];
-	this.ip = null;
-	this.sensors = [];
-	this.resources = [];
-	this.publisher = zmq.socket('pub');	// publisher socket (inch)
-	this.subscriber = zmq.socket('sub');
-	this.udp = dgram.createSocket('udp4');	// local channel
-	this.requester = zmq.socket('dealer');
+	this.nodes = [];						// store discovered nodes
+	this.ip = null;							// IP address advertised on Zeroconf
+	this.sensors = [];						// store local sensors
+	this.resources = [];					// store requested resources
+	this.publisher = zmq.socket('pub');		// publisher socket (InCh)
+	this.subscriber = zmq.socket('sub');	// subscriber socket (InCh)
+	this.udp = dgram.createSocket('udp4');	// local udp socket for receiving OSC data
+	this.requester = zmq.socket('dealer');	//
 	this.mach = zmq.socket('router');
 	this.syncRequester = zmq.socket('req');
 	// advertisement of a _node._tcp. service on this node, on port 32323
@@ -404,10 +404,13 @@ Core.prototype.requestResource = function (res, port, callback) {
 	// WARNING on request a resource but use node uuid
 	// need to be changed when sensor is set up
 	var p = checkPortNumber(port) ? port : 16161;
-	var dst = core.getNodeIpById(resource);
-	if (dst === core.ip) dst = '127.0.0.1';
+	var dst = this.getNodeIpById(res);
+	if (dst === this.ip) dst = '127.0.0.1';
 	if (dst != null) {
-		core.syncSend(dst, 'request', requestPayload(res,p), callback);
+		this.syncSend(dst, 'request', this.requestPayload(res,p), callback);
+	}
+	else {
+		console.log('![REQR] Cannot find IP for resource '+res);
 	}
 	
 };
