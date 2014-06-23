@@ -96,8 +96,9 @@ core.on('inch', function(header, payload) {
 			});
 			break;
 		case 'new_sensor':
-			var idx = findNodeById(header.src);
-			core.nodes[idx].sensors = payload;
+			var idx = core.findNodeById(header.src);
+			if (idx != null)
+				core.nodes[idx].sensors = payload;
 			break;
 		default:
 			console.log('![INCH]\tMessage type not imlemented'+header.type);
