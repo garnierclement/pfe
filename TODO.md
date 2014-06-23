@@ -21,3 +21,4 @@
 - [ ] Write a documentation about Yang Fan's xBeeSerialReader
 - [ ] Write a Q&A readme files for anything specific or not yet mentioned into the readme files
 - [ ] Write a quick start developer guide
+- [ ] Run Manticore as a daemon
