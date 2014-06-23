@@ -88,7 +88,7 @@ process.stdin.on('readable', function() {
 				console.log("+[REQR]\tRequest resource: "+res);
 				var dst = core.getNodeIpById(res);
 				if (dst != null) 
-				core.syncSend(dst, 'request', core.payloadRequest(res), function(header, payload) {
+				core.syncSend(dst, 'request', core.requestPayload(res), function(header, payload) {
 					console.log('>[SYNC]\tResource status from '+header);
 					console.log(payload);
 				});
@@ -96,6 +96,9 @@ process.stdin.on('readable', function() {
 			catch(e) {
 				console.log("![SEND]\t"+e);
 			}
+		}
+		else if (/^fake/.test(chunk)) {
+			core.fakeSensors();
 		}
 		else {
 			console.log("![CORE]\tAvailable commands : help|debug|eval|log|exec|send|remote|emit|request");

@@ -63,6 +63,16 @@ core.on('ready', function() {
 			console.log('![HTTP]\tid not found');
 		}
 	});
+
+	api.get('/release/:id', function(req, res) {
+		res.set({'Content-Type': 'text/plain'});
+		if (1) {
+			res.send(true);
+		}
+		else {
+			res.send(false);
+		}
+	});
 });
 
 /**
@@ -84,6 +94,10 @@ core.on('inch', function(header, payload) {
 				else
 					console.log('![CORE]\tCannot send reply to '+header.name);
 			});
+			break;
+		case 'new_sensor':
+			var idx = findNodeById(header.src);
+			core.nodes[idx].sensors = payload;
 			break;
 		default:
 			console.log('![INCH]\tMessage type not imlemented'+header.type);

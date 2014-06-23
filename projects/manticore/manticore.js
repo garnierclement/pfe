@@ -16,7 +16,8 @@ var dgram = require('dgram');	// for UDP sockets
 var util = require('util'),		// extend the Core to be an EventEmitter
 	EventEmitter = require('events').EventEmitter;
 
-var Node = require('./node.js');// Node object
+var Node = require('./node.js');		// Node object
+var Sensor = require('./sensor.js');	// Sensor object
 
 /**
  * Core object
@@ -399,20 +400,56 @@ function createAdvertisement(uuid)  {
 
 
 /******* protocol *********/
-Core.prototype.requestProtocol = function (res, port) {
-
+Core.prototype.requestResource = function (res, port, callback) {
+	// WARNING on request a resource but use node uuid
+	// need to be changed when sensor is set up
+	var p = checkPortNumber(port) ? port : 16161;
+	var dst = core.getNodeIpById(resource);
+	if (dst === core.ip) dst = '127.0.0.1';
+	if (dst != null) {
+		core.syncSend(dst, 'request', requestPayload(res,p), callback);
+	}
+	
 };
 
-/******* message *********/
-Core.prototype.payloadRequest = function (res, port) {
+function checkPortNumber(port) {
+	if(!isNaN(Number(port))) {
+		if (port > 0 && port <= 65536)
+			return true;
+	}
+	return false;
+}
+
+/******* Message payloads *********/
+Core.prototype.requestPayload = function (res, port) {
 	var _p = port || UDP_PORT;
 	return {data: res, port: _p};
 };
 
-Core.prototype.payloadAck = function (s) {
+Core.prototype.ackPayload = function (s) {
 	return {status: s};
 };
 
-Core.prototype.payloadRelease = function (res) {
+Core.prototype.releasePayload = function (res) {
 	return {data: res};
+};
+
+/*** Debug ****/
+Core.prototype.fakeSensors = function () {
+	// Generate fake sensors
+	var sensor1 = new Sensor("Mouse");
+	sensor1.addData('X','/mouse/x f');
+	sensor1.addData('Y','/mouse/y f');
+	this.sensors.push(sensor1);
+	var sensor2 = new Sensor("Intertial");
+	sensor2.addData('Roll','/intertial/roll f');
+	sensor2.addData('Pitch','/intertial/pitch f');
+	sensor2.addData('Yaw','/intertial/yaw f');
+	this.sensors.push(sensor2);
+	// publish them
+	this.newSensor();
+};
+
+Core.prototype.newSensor = function() {
+	this.publish('new_sensor', this.sensors);
 };
