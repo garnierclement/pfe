@@ -193,7 +193,7 @@ self.udp.on('message', function(buffer, rinfo) {
 self.browser.on('serviceUp', function(service) {
 	console.log('+[mDNS]\tService up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
 
-	if(!self.findNodeById(service.txtRecord.id))
+	if(self.findNodeById(service.txtRecord.id) == false)
 	{
 		var new_node = new Node(service);
 		if (self.uuid != service.txtRecord.id) {
@@ -357,7 +357,7 @@ Core.prototype.deleteDeadNode = function(node_name){
 Core.prototype.findNodeById = function (uuid){
 	for(k in this.nodes){
 		if (this.nodes[k].id == uuid)  
-			return true;
+			return k;
 	}
 	return false;
 };
