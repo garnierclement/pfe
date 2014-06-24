@@ -22,3 +22,4 @@
 - [ ] Write a Q&A readme files for anything specific or not yet mentioned into the readme files
 - [ ] Write a quick start developer guide
 - [ ] Run Manticore as a daemon
+- [ ] Forward data, advertise a sensor on a node that receives data from any computer/device that is not a node of the network
