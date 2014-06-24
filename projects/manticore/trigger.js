@@ -31,7 +31,7 @@ exports.check = function() {
 
 };
 
-exports.kill = function() {
-
+exports.kill = function(pid) {
+	
 };
 
