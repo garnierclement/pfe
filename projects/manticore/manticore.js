@@ -18,6 +18,7 @@ var util = require('util'),		// extend the Core to be an EventEmitter
 
 var Node = require('./node.js');		// Node object
 var Sensor = require('./sensor.js');	// Sensor object
+var Record = require('./record.js');	// Record object
 
 /**
  * Core object
@@ -38,6 +39,7 @@ function Core()
 	this.nodes = [];						// store discovered nodes
 	this.ip = null;							// IP address advertised on Zeroconf
 	this.sensors = [];						// store local sensors
+	this.records = [];
 	this.resources = [];					// store requested resources
 	this.publisher = zmq.socket('pub');		// publisher socket (InCh)
 	this.subscriber = zmq.socket('sub');	// subscriber socket (InCh)
@@ -292,18 +294,18 @@ Core.prototype.createMessage = function(cmd, data) {
  * @return {[type]}      [description]
  */
 Core.prototype.send = function(dst, cmd, data) {
-	if (dst != null) {
+	if (dst !== null) {
 		this.requester.connect('tcp://'+dst+':'+MACH_PORT);
 		this.requester.send([null, JSON.stringify(this.createMessage(cmd, data))]);
 	}
 	else {
 		throw 'send() to null IP';
-	}	
+	}
 };
 
 Core.prototype.syncSend = function(dst, cmd, data, callback) {
 	var socket = zmq.socket('req');
-	if (dst != null) {
+	if (dst !== null) {
 		socket.connect('tcp://'+dst+':'+MACH_PORT);
 		socket.send(JSON.stringify(this.createMessage(cmd, data)));
 		console.log('+[SYNC]\tSending '+data+' to '+dst);
@@ -406,11 +408,17 @@ Core.prototype.requestResource = function (res, port, callback) {
 	var p = checkPortNumber(port) ? port : 16161;
 	var dst = this.getNodeIpById(res);
 	if (dst === this.ip) dst = '127.0.0.1';
-	if (dst != null) {
-		this.syncSend(dst, 'request', this.requestPayload(res,p), callback);
+	if (dst !== null) {
+		this.syncSend(dst, 'request', this.requestPayload(res,p), function(header, payload) {
+			if (payload.status) {
+				self.records.push(new Record(res));
+			}
+			callback(null, header, payload);
+		});
 	}
 	else {
-		console.log('![REQR] Cannot find IP for resource '+res);
+		var err = '![REQR] Cannot find IP for resource '+res;
+		callback(err, null, null);
 	}
 	
 };
@@ -450,9 +458,6 @@ Core.prototype.fakeSensors = function () {
 	sensor2.addData('Yaw','/intertial/yaw f');
 	this.sensors.push(sensor2);
 	// publish them
-	this.newSensor();
-};
-
-Core.prototype.newSensor = function() {
 	this.publish('new_sensor', this.sensors);
 };
+

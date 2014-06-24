@@ -12,6 +12,10 @@ process.stdin.on('readable', function() {
 			console.log(core.nodes);
 			console.log("+[DBUG] Core.sensors");
 			console.log(core.sensors);
+			console.log("+[DBUG] Core.resources");
+			console.log(core.resources);
+			console.log("+[DBUG] Core.records");
+			console.log(core.records);
 		}
 		else if (chunk == "exit\n") {
 			core.close();
@@ -88,9 +92,14 @@ process.stdin.on('readable', function() {
 		else if (/^request /.test(chunk)) {
 			var res = chunk.slice(8,chunk.length-1);
 			console.log("+[REQR]\tRequest resource: "+res);
-			core.requestResource(res, 42424, function(header, payload) {
-				console.log('>[SYNC]\tResource status from '+header);
-				console.log(payload);
+			core.requestResource(res, 42424, function(err, header, payload) {
+				if (err === null) {
+					console.log('>[SYNC]\tResource status from '+header);
+					console.log(payload);
+				}
+				else {
+					console.log(err);
+				}
 			});
 		}
 		else if (/^fake/.test(chunk)) {

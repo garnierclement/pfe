@@ -46,17 +46,17 @@ core.on('ready', function() {
 			var dst = core.getNodeIpById(resource);
 			console.log(dst);
 			if (dst === core.ip) dst = '127.0.0.1';
-			if (dst != null) 
-			core.syncSend(dst, 'request', {data: resource, port: p}, function(header, payload) {
-				console.log(header);
-				console.log(payload);
-				if (payload.status) {
-					res.send(resource);
-				}
-				else {
-					res.send(false);
-				}	
-			});
+			if (dst !== null)
+				core.syncSend(dst, 'request', {data: resource, port: p}, function(header, payload) {
+					console.log(header);
+					console.log(payload);
+					if (payload.status) {
+						res.send(resource);
+					}
+					else {
+						res.send(false);
+					}
+				});
 		}
 		else {
 			res.send(false);
@@ -85,11 +85,11 @@ core.on('inch', function(header, payload) {
 		case 'raw':
 			console.log(payload);
 			break;
-		case 'exec': 
+		case 'exec':
 			trigger.execute(payload, function(stdout, stderr){
 				var dst = header.ip;
 				console.log('+[CORE]\tSending result of execution to '+header.name+'('+dst+')');
-				if (dst != null)
+				if (dst !== null)
 					core.send(dst, 'raw', stdout+stderr);
 				else
 					console.log('![CORE]\tCannot send reply to '+header.name);
@@ -97,7 +97,7 @@ core.on('inch', function(header, payload) {
 			break;
 		case 'new_sensor':
 			var idx = core.findNodeById(header.src);
-			if (idx != null)
+			if (idx !== null)
 				for (var i = 0; i < payload.length; i++) {
 					core.nodes[idx].sensors.push(payload[i]);
 				}
@@ -130,7 +130,8 @@ core.on('mach', function(envelope, header, payload) {
 			console.log(payload);
 			core.reply('ack', envelope, {status: true});
 			var dst = header.ip;
-			if (dst != null) {
+			if (dst === this.ip) dst = '127.0.0.1';
+			if (dst !== null) {
 				var outputfile = trigger.generate(dst, payload.port,'mousePosition.pd','output.pd');
 				var pd = "";
 				if(isDarwin()) {
