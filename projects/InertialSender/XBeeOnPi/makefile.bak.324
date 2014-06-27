@@ -1,0 +1,17 @@
+xbeeObjs = SensorNode.o fun.o TestConfig.o
+
+test : $(xbeeObjs)
+	g++ $(xbeeObjs) -o test
+
+TestConfig.o : SensorNode.h fun.h
+	g++ -c TestConfig.cpp
+
+SensorNode.o : SensorNode.cpp SensorNode.h
+	g++ -c SensorNode.cpp
+
+fun.o : fun.cpp fun.h
+	g++ -c fun.cpp
+
+.PHONY : clean 
+clean : 
+	rm -f test *.o

@@ -1,0 +1,14 @@
+#N canvas -1 -1 810 685 10;
+#X obj 262 377 unpackOSC;
+#X obj 110 514 print unpacked;
+#X obj 258 326 udpreceive 7000;
+#X obj 256 594 print match_1;
+#X obj 322 572 print match_2;
+#X text -50 527 comment;
+#X text -47 570 comment;
+#X obj 258 454 routeOSC /node/B/;
+#X connect 0 0 7 0;
+#X connect 0 0 1 0;
+#X connect 2 0 0 0;
+#X connect 7 0 3 0;
+#X connect 7 1 4 0;

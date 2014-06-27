@@ -1,0 +1,31 @@
+xbeeObjs =	SimpleReceive.o OscReceivedElements.o \
+		 OscTypes.o \
+		IpEndpointName.o UdpSocket.o NetworkingUtils.o 
+
+SimpleReceive : $(xbeeObjs)
+	g++ $(xbeeObjs) -o SimpleReceive 
+
+SimpleReceive.o : SimpleReceive.cpp  osc/OscTypes.h osc/OscException.h \
+			 osc/OscPacketListener.h osc/OscReceivedElements.h \
+				ip/PacketListener.h ip/UdpSocket.h ip/NetworkingUtils.h \
+				 ip/IpEndpointName.h	
+	g++ -c SimpleReceive.cpp 
+
+OscTypes.o : osc/OscTypes.cpp osc/OscTypes.h
+	g++ -c osc/OscTypes.cpp
+
+IpEndpointName.o : ip/IpEndpointName.cpp ip/IpEndpointName.h ip/NetworkingUtils.h
+	g++ -c ip/IpEndpointName.cpp
+
+UdpSocket.o : ip/posix/UdpSocket.cpp ip/UdpSocket.h ip/PacketListener.h ip/TimerListener.h
+	g++ -c ip/posix/UdpSocket.cpp
+
+NetworkingUtils.o : ip/posix/NetworkingUtils.cpp ip/NetworkingUtils.h 
+	g++ -c ip/posix/NetworkingUtils.cpp
+
+OscReceivedElements.o : osc/OscReceivedElements.cpp osc/OscReceivedElements.h
+	g++ -c osc/OscReceivedElements.cpp
+
+.PHONY : clean 
+clean : 
+	rm -f SimpleReceive *.o

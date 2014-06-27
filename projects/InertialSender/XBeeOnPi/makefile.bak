@@ -1,0 +1,39 @@
+objs = SimpleSend.o OscOutboundPacketStream.o OscTypes.o \
+	IpEndpointName.o UdpSocket.o NetworkingUtils.o 
+
+SimpleSend : $(objs)
+	g++ -o SimpleSend $(objs)
+
+SimpleSend.o : SimpleSend.cpp osc/OscOutboundPacketStream.h ip/UdpSocket.h 
+	g++ -c SimpleSend.cpp
+
+OscOutboundPacketStream.o : osc/OscOutboundPacketStream.cpp osc/OscOutboundPacketStream.h osc/OscHostEndianness.h
+	g++ -c osc/OscOutboundPacketStream.cpp
+
+OscTypes.o : osc/OscTypes.cpp osc/OscTypes.h
+	g++ -c osc/OscTypes.cpp
+
+IpEndpointName.o : ip/IpEndpointName.cpp ip/IpEndpointName.h ip/NetworkingUtils.h
+	g++ -c ip/IpEndpointName.cpp
+
+UdpSocket.o : ip/posix/UdpSocket.cpp ip/UdpSocket.h ip/PacketListener.h ip/TimerListener.h
+	g++ -c ip/posix/UdpSocket.cpp
+
+NetworkingUtils.o : ip/posix/NetworkingUtils.cpp ip/NetworkingUtils.h 
+	g++ -c ip/posix/NetworkingUtils.cpp
+
+
+xbeeObjs = arduPi.o xBeeReadSerial.o
+xBeeReadSerial : $(xbeeObjs)
+	g++ -lrt -lpthread $(xbeeObjs) -o xBeeReadSerial 
+
+arduPi.o : arduPi.cpp arduPi.h
+	g++ -c arduPi.cpp
+
+xBeeReadSerial.o : xBeeReadSerial.cpp arduPi.h
+	g++ -c xBeeReadSerial.cpp
+
+
+.PHONY : clean 
+clean : 
+	rm -f SimpleSend xBeeReadSerial *.o

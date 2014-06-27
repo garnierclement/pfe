@@ -1,0 +1,4 @@
+3
+A	node_a.txt
+B	node_b.txt
+C	node_cc.txt
