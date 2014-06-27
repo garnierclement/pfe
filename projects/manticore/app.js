@@ -156,6 +156,8 @@ core.on('mach', function(envelope, header, payload) {
 			break;
 		case 'release':
 			console.log(payload);
+			// need to check Core.resources
+			core.reply('ack', envelope, this.core.ackPayload(true));
 			// NOT YET IMPLEMENTED
 			// To release a resource
 			// Need to trigger.kill()

@@ -184,7 +184,7 @@ self.publisher.on('error', function(err) {
 });
 
 self.udp.on('message', function(buffer, rinfo) {
-	console.log('>[UDP]\tfrom '+rinfo);
+	console.log('>[UDP]\tfrom '+rinfo.address+' on '+rinfo.port);
 	console.log(buffer.toString());
 });
 
@@ -420,7 +420,28 @@ Core.prototype.requestResource = function (res, port, callback) {
 		var err = '![REQR] Cannot find IP for resource '+res;
 		callback(err, null, null);
 	}
-	
+};
+
+Core.prototype.releaseResource = function (res, callback) {
+	// Check Core.records if the release request is correct
+	var correct = false;
+	var idx = 0;
+	for (idx = 0; idx < this.records.length; idx++) {
+		if (this.records[idx] === res) {
+			correct = true;
+			break;
+		}
+	}
+	if (correct) {
+		this.syncSend(dst, 'release', this.releasePayload(res), function(header, payload) {
+			callback(null, header, payload);
+			this.records.splice(idx,1);
+		});
+	}
+	else {
+		var err = '![RELR] The release resource is not correct, record not found';
+		callback(err);
+	}
 };
 
 function checkPortNumber(port) {
