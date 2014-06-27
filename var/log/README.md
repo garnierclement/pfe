@@ -1,1 +1,1 @@
-Log folder
+Store logs here

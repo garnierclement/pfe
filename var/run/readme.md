@@ -1,0 +1,1 @@
+Store PID files and temporary generated files (e.g automatically generated PureData patches)
