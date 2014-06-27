@@ -105,9 +105,9 @@ We can think of REQ and DEALER soscket sas "clients" and ROUTER sockets as "serv
 
 #### Use cases
 
-*   `PUB[1] --remote--> SUB[N] | ROUTER[N] --output--> DEALER[1] --ack--> ROUTER[N]` 
+*   `PUB[1] --remote--> SUB[N] | ROUTER[N] --output--> DEALER[1] --ack--> ROUTER[N]`  
 	(mixing InCh + MaCh and used for remote command execution)
-* 	`REQ[1] --request--> ROUTER[2] --ack|noack--> REQ[1]`
+* 	`REQ[1] --request--> ROUTER[2] --ack|noack--> REQ[1]`  
 	(using MaCh to request a resource)
 	
 > // TODO : detail the procedure
@@ -270,7 +270,7 @@ Install dependencies ([mdns] and [zmq]) with
 
 	$ npm install
 
-Manually
+If you encounter any issue with the automatic installation, you can manually install them one by one.
 
 	$ npm install mdns
 	$ npm install zmq
@@ -278,7 +278,7 @@ Manually
 	$ npm install jade
 	$ npm install uuid
 
-**Note**: [zmq] and [mdns] have other requirements, see the main README at the root of this repository
+**Note**: depending on the operating system [zmq] and [mdns] have other requirements (see the Prerequisites for your system above).
 
 ## Warning
 
