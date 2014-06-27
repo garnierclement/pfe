@@ -67,15 +67,15 @@ or npm
 
 #### How does it work ?
 
-* 	At startup, a node advertise its presence by broadcasting a `_node._tcp` service on Zeroconf. Doing so, other nodes can simply browse this service to dynamically discover its presence.
-* 	We assume that all the nodes are on the same network segment (i.e in the same subnet). Thus we can infer that they can directly address other nodes using the recipient IP address.
-* 	Each node provides different communication channels relying on a specific pattern : uni- or bidirectional, synchronous or asynchronous.
-* 	The group messaging is achieved by a communication channel called **Information Channel (InCh)** implementing the publisher/subscriber network pattern. Hence, each node has 2 sockets : 
+* 	At startup, a node **advertise** its **presence** by broadcasting a `_node._tcp` service on **Zeroconf**. Doing so, other nodes can simply browse this service to dynamically discover its presence.
+* 	We assume that all the nodes are on the **same network segment** (i.e in the same subnet). Thus we can infer that they can directly address other nodes using the recipient IP address.
+* 	Each node provides different **communication channels** relying on a specific pattern : **uni-** or **bidirectional**, **synchronous** or **asynchronous**.
+* 	The **group messaging** is achieved by a communication channel called *Information Channel (InCh)* implementing the publisher/subscriber network pattern. Hence, each node has 2 sockets : 
 	+ the publisher socket solely used to send information to all its subscribers.
 	+ the subscriber socket solely used to receive information from all other nodes.
-*	The point-to-point messaging is achieved by another communication channel called **Main Channel (MaCh)** implementing the request/reply network pattern. According to the situation, this request/reply can either be synchronous (an immediate reply is requested and thus will block the execution) or asynchronous (we expect a response but not urgently).
-*	To communicate with external processes, a HTTP server is embedded in each node and can provide a web API, accepting GET request and serving JSON file or raw status.
-*	The distribution of the resource data is made using OSC packets on UDP datagrams. The main use case is a client that desire a resource provided on a specific node of the network. To achieve a proper delivery of the dynamic OSC data stream to this client, we use the information collected on both InCh and MaCh and execute the following procedure :
+*	The **point-to-point messaging** is achieved by another communication channel called *Main Channel (MaCh)* implementing the request/reply network pattern. According to the situation, this request/reply can either be synchronous (an immediate reply is requested and thus will block the execution) or asynchronous (we expect a response but not urgently).
+*	To communicate with **external processes**, a HTTP server is embedded in each node and can provide a **web API**, accepting GET request and serving JSON file or plain text status.
+*	The **distribution of the resource** data is made using **OSC packets** on UDP datagrams. The main use case is a client that desire a resource provided on a specific node of the network. To achieve a proper delivery of the dynamic OSC data stream to this client, we use the information collected on both InCh and MaCh and execute the following procedure :
 	1. A client issue a request on a local core to know the network status and resources available
 	2. The server sends back a list of network nodes with its capabilities (this list is known by the core through 1. Browsing of `_node._tcp` service and 2. Listening on any published event on InCh)
 	3. The client issue a request on a resource, binds an UDP reception socket and wait for the core's response
