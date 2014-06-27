@@ -232,6 +232,7 @@ Core.prototype.newSubscribe = function(peer) {
 self.browser.on('serviceDown', function(service) {
 	console.log('-[mDNS]\tService down: '+service.name+' ('+service.networkInterface+')');
 	self.deleteDeadNode(service.name);
+	self.emit('died', service);
 });
 
 /**
