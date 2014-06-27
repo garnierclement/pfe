@@ -275,6 +275,7 @@ Manually
 	$ npm install mdns
 	$ npm install zmq
 	$ npm install express
+	$ npm install jade
 	$ npm install uuid
 
 **Note**: [zmq] and [mdns] have other requirements, see the main README at the root of this repository
