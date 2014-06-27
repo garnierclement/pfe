@@ -93,7 +93,7 @@ or npm
 * PUB to publish data
 * SUB to subscribe to a PUB socket
 * REQ to issue a synchronous request
-* REP to issue a synchronous reply (not used actually, see DEALER)
+* REP to issue a synchronous reply (not used actually, see ROUTER)
 * ROUTER to issue asynchronous replies
 * DEALER to issue asynchronous requests
 
@@ -130,8 +130,9 @@ The following commands are available
 
 * `ready` is triggered when **initialization finishes**
 * `inch` is triggered when the **subscriber** socket **receives** some data (meaning *I've just received some data on the information channel* or *Another node just published some information*)
-* `mach` is triggered when a **request** is **received** on MaCh (meaning *I've just received *)
+* `mach` is triggered when a **request** is **received** on MaCh (meaning *I've just received a request*)
 * `reply` is triggered when a **response** to **previous request** is received
+* `died` is triggered when we discover that a **node disapears** from the network
 * `test` (for testing purpose only)
 
 ### Core commands
@@ -179,10 +180,11 @@ It is simply a Javascript object with 2 main parts :
 
 > // TODO : need to write about ZeroMQ Frame and envelope
 
-#### Message types and associated payload
+#### Message command and associated payload
 
 * 	`raw`
 * 	`request`
+* 	`release`
 * 	`ack`
 
 ### External messaging
@@ -230,7 +232,7 @@ Install [Pure Data]
 
 	$ sudo apt-get install puredata
 
-Compile and install [Node.js] v0.10.28 from source tarball (**on the Pi, it takes around 2 hours !**)
+Compile and install [Node.js] v0.10.28 from source tarball (**on the Raspberry Pi, it takes around 2 hours !**)
 
 	$ wget http://nodejs.org/dist/v0.10.28/node-v0.10.28.tar.gz
 	$ tar xvzf node-v0.10.28.tar.gz
