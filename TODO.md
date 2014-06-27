@@ -5,21 +5,25 @@
 - [ ] Give a model to sensor
 - [ ] Insert new sensors : MIDI Keyboard + Inertial sensor
 - [x] Design a proper message object with header + type + payload
-- [ ] Test with more than 4 nodes
+- [ ] Test with more than 5 nodes
 - [ ] If request is too long or fail, timeout and return fail request resource
 - [ ] Keep track of local requested resource
 - [ ] Handle soft/hard release in API 
 - [x] Store this.ip reliabily
 - [x] add a flag in nodes[] when it is itself
 - [ ] design a simple client with processing/openFrameworks
-- [ ] try Max/MSP external ? Homère is on it with Java externals
+- [x] try Max/MSP external ? Homère is on it with Java externals
 - [ ] what about FAUST ? and its integration ?
 - [ ] Create standard service/auto-start process for manticore on Linux (SysV-init) and OS X (launchd)
 - [ ] Better logging library for Manticore ? see https://github.com/flatiron/winston
 - [ ] Bootstrap process to install pd-extended on raspberry pi
-- [ ] Find why the PoC doesn't work on Rapsberry Pi
+- [ ] Find why the PoC (mouse sensor) doesn't work on Rapsberry Pi
 - [ ] Write a documentation about Yang Fan's xBeeSerialReader
 - [ ] Write a Q&A readme files for anything specific or not yet mentioned into the readme files
 - [ ] Write a quick start developer guide
 - [ ] Run Manticore as a daemon
 - [ ] Forward data, advertise a sensor on a node that receives data from any computer/device that is not a node of the network
+- [ ] update web interface according to the use of senors
+- [ ] request sensor's uuid should not fail
+- [ ] Fully implement explicit release
+- [ ] Implement implicit release (when a node died, look if )
