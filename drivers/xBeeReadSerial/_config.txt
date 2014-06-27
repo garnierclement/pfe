@@ -1,3 +1,0 @@
-2
-A	node_a_num.txt
-B	node_b.txt

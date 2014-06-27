@@ -7,15 +7,15 @@
 # Repository tree structure
 
 * 	`definitions/`  
-	General conventions and definitions  
-* 	`drivers/`  
-	Specific drivers for sensors  
+	General conventions and definitions   
 * 	`pd/`  
 	Pure data patches  
 * 	`projects/`  
 	Main directory encompassing all the components of our project  
 * 	`scripts/`  
 	Scripts used for bootstrap, installation and debug  
+*	`sensors/`
+	Description of the sensors and their parameters
 * 	`var/`  
 	Directory used to store logs, PIDs, and any temporary genrated file during the execution of any component  
 
