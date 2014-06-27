@@ -5,24 +5,61 @@ import net.sf.json.JSONSerializer;
 
 
 import com.cycling74.max.*;
-
+/**
+ * This class represent a Node in the network within the Max/MSP client. It contains network and capacity information about the node all whilst having a GUI.
+ * @author Homere Faivre.
+ * @since 27/06/2014.
+ */
 public class Node extends MaxObject{
 
+	/**
+	 * Name of the Node.
+	 * @since 27/06/2014.
+	 */
 	private String name ;
 	
+	/**
+	 * System host name of the Node.
+	 * @since 27/06/2014.
+	 */
 	private String host ;
 	
+	/**
+	 * Unique ID (UUID) of the Node (different from the sensor id).
+	 * @since 27/06/2014.
+	 */
 	private String id;
 	
+	/**
+	 * IP address of the Node.
+	 * @since 27/06/2014.
+	 */
 	private String ip;
-		
+	
+	/** 
+	 * Position in the x axis of the Node GUI.
+	 * @since 27/06/2014.
+	 */
 	private int x_pos;
 	
+	/** 
+	 * Position in the y axis of the Node GUI.
+	 * @since 27/06/2014.
+	 */
 	private int y_pos;
 	
+	/**
+	 * The used patcher.
+	 * @since 27/06/2014.
+	 */
 	private MaxPatcher patcher =  this.getParentPatcher();
 	
+	/**
+	 * JSONArray of the available sensors on the Node.
+	 * @since 27/06/2014.
+	 */
 	private JSONArray sensors;
+
 
 	private MaxBox name_label;
 
@@ -39,7 +76,17 @@ public class Node extends MaxObject{
 
 	
 	
-	
+	/**
+	 * Sets the Node object with the following parameters:
+	 * @param x_pos Position of the Node GUI in the x axis.
+	 * @param y_pos Position of the Node GUI in the y axis.
+	 * @param name Name of the Node.
+	 * @param host Host name of the Node.
+	 * @param id Unique ID (UUID) of the Node.
+	 * @param ip IP address of the Node.
+	 * @param sensors Sensor JSONArray containing all the sensors of the Node.
+	 * @since 27/06/2014.
+	 */
 	public void set (final int x_pos, final int y_pos, final String name, final String host, final String id, final String ip,  String sensors){
 		
 		this.name = name;
@@ -65,6 +112,16 @@ public class Node extends MaxObject{
 		
 	}
 
+	/**
+	 * Draws a Max/MSP panel object according to the following parameters:
+	 * @param x_pos Position of the panel in the x axis.
+	 * @param y_pos Position of the panel in the y axis.
+	 * @param x_size Size of the panel in the x axis.
+	 * @param y_size Size of the panel in the y axis.
+	 * @param name Scripting name of the panel.
+	 * @return MaxBox with the scripting name defined by the scripting name.
+	 * @since 27/06/2014.
+	 */
 	public MaxBox drawPanel(int x_pos, int y_pos, int x_size, int y_size, String name){
 		
 		MaxBox panel = this.patcher.newDefault(x_pos,y_pos,"panel", null);
@@ -78,6 +135,15 @@ public class Node extends MaxObject{
 		return panel;
 	}
 	
+	/**
+	 * Draws a Max/MSP label object according to the following parameters:
+	 * @param x_pos Position of the label in the x axis.
+	 * @param y_pos Position of the label in the y axis.
+	 * @param info Information String to be shown by the label.
+	 * @param name Scripting name of the label.
+	 * @return MaxBox with the scripting name defined by the scripting name.
+	 * @since 27/06/2014
+	 */
 	public MaxBox drawLabel(int x_pos, int y_pos, String info, String name){
 		
 		MaxBox label = this.patcher.newDefault(x_pos,y_pos,"comment", null);
@@ -90,19 +156,10 @@ public class Node extends MaxObject{
 		return label;
 	}
 	
-	public MaxBox drawToggle(int x_pos, int y_pos, String name){
-		
-		MaxBox toggle = this.patcher.newDefault(x_pos,y_pos,"toggle", null);
-		toggle.send("size",new Atom[]{Atom.newAtom(43),Atom.newAtom(43)});
-		toggle.send("bgcolor",new Atom[]{Atom.newAtom(0.71),Atom.newAtom(0.62),Atom.newAtom(0.62)});
-		toggle.send("bordercolor",new Atom[]{Atom.newAtom(0.82),Atom.newAtom(0.80),Atom.newAtom(0.80)});
-		toggle.send("checkedcolor",new Atom[]{Atom.newAtom(0.34),Atom.newAtom(0.16),Atom.newAtom(0.16)});
-		toggle.send("varname",new Atom[]{Atom.newAtom(name)});
-		
-		return toggle;
-		
-	}
-	
+	/**
+	 * Creates the sensor GUIs.
+	 * @since 27/06/2014.
+	 */
 	public void create_sensors(){
 		for(int i=0; i< this.sensors.size(); i++){
 			MaxBox sensor = this.patcher.newDefault(0,0, "mxj", Atom.parse("Sensor"));
@@ -120,7 +177,12 @@ public class Node extends MaxObject{
 		}
 	}
 	
-	/* Send resource request message to local core information server */
+	/**
+	 * Resource requests with id and port to the local HTTP server. If the request is successful and the resource is available, a udprecieve socket is created within Max/MSP with the corresponding parameters.
+	 * @param id Sensor unique ID. 
+	 * @param port Port through which the user can recieve data on a UDP socket.
+	 * @since 27/06/2014.
+	 */
 	public void request(String id, int port){
 		
 		HttpInfoRequestor resource_requestor = new HttpInfoRequestor();
@@ -138,8 +200,13 @@ public class Node extends MaxObject{
 		}
 		
 	}
-		
-	/* Send resource release message to local core information server */
+	
+	/**
+	 * Release request with id and port to the local HTTP server. If the request is successful, the resource is release by Manticore and the udprecieve socket is destroyed.
+	 * @param id Sensor unique ID. 
+	 * @param port Port through which the user can recieve data on a UDP socket.
+	 * @since 27/06/2014.
+	 */
 	public void release(String id, int port){
 		HttpInfoRequestor resource_requestor = new HttpInfoRequestor();
 		try {
@@ -156,11 +223,21 @@ public class Node extends MaxObject{
 		}
 	}
 	
+	/**
+	 * Parses a string containing sensor info to a JSONArray
+	 * @param s JSON string containing sensor information.
+	 * @return	JSONArray containing sensor JSONObject.
+	 * @since 27/06/2014.
+	 */
 	public JSONArray parse_sensors(String s){
 		if(s == null) return null;
 		else return (JSONArray) JSONSerializer.toJSON(s);
 	}
 
+	/**
+	 * Removes all the Node GUIs
+	 * @since 27/06/2014.
+	 */
 	public void remove_node(){
 		this.patcher.getNamedBox(this.name_label.getName()).remove();
 		this.patcher.getNamedBox(this.host_label.getName()).remove();
