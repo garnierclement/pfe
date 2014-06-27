@@ -1,5 +1,7 @@
+import com.cycling74.max.Atom;
 import com.cycling74.max.MaxObject;
-import java.net.ConnectException;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONSerializer;
 
 
 import com.cycling74.max.*;
@@ -20,13 +22,25 @@ public class Node extends MaxObject{
 	
 	private MaxPatcher patcher =  this.getParentPatcher();
 	
-	private HttpInfoRequestor resource_requestor = new HttpInfoRequestor();
+	private JSONArray sensors;
+
+	private MaxBox name_label;
+
+	private MaxBox host_label;
+
+	private MaxBox ip_label;
+
+	private MaxBox info_box;
+
+	private MaxBox title_box;
+
+	private MaxBox outer_box;
 	
 
 	
 	
 	
-	public void set (final int x_pos, final int y_pos, final String name, final String host, final String id, final String ip){
+	public void set (final int x_pos, final int y_pos, final String name, final String host, final String id, final String ip,  String sensors){
 		
 		this.name = name;
 		this.host = host;
@@ -34,38 +48,23 @@ public class Node extends MaxObject{
 		this.ip = ip;
 		this.x_pos = x_pos;
 		this.y_pos = y_pos;
-		
-	/*	
-		MaxBox test = patcher.newDefault(0, 0, "patcher", null);
-		test.send("filepath", new Atom[]{ Atom.newAtom("/tmp/"+id)});
-		test.send("globalpatchername", new Atom[]{ Atom.newAtom(this.name)});
-		System.out.println(test.isPatcher());
-		test.getPatcher().newDefault(0, 0, "toggle", null);
-		
-		
-		patcher.getWindow().setVisible(true);
-		*/
-		
-		
-		declareIO(1,0);
-		
-		MaxBox name_label = drawLabel(this.x_pos + 20, this.y_pos + 9, "NAME : " + this.name, "name_label");
-		MaxBox host_label = drawLabel(this.x_pos+17, this.y_pos+42, "HOST : " + this.host, "host_label");
-		MaxBox ip_label = drawLabel(this.x_pos+17, this.y_pos+92, "IP : " + this.ip, "ip_label");
-		
-		MaxBox subscribe_toggle = drawToggle(this.x_pos + 202, this.y_pos + 105, "subscribe toggle");
-		
-		MaxBox info_box = drawPanel(this.x_pos + 8,this.y_pos + 36, 246, 119,"info_box");
-		MaxBox title_box = drawPanel(this.x_pos + 8,this.y_pos + 6, 246, 27,"title_box");
-		MaxBox outer_box = drawPanel(this.x_pos,this.y_pos, 262, 160,"outer_box");
-		
+		this.sensors = parse_sensors(sensors);
 		
 
-		this.patcher.connect(subscribe_toggle,0,this.getMaxBox(),0);
+			
+		declareIO(1,0);
+		
+		name_label = drawLabel(this.x_pos + 20, this.y_pos + 9, "NAME : " + this.name, "name_label");
+		host_label = drawLabel(this.x_pos+17, this.y_pos+42, "HOST : " + this.host, "host_label");
+		ip_label = drawLabel(this.x_pos+17, this.y_pos+65, "IP : " + this.ip, "ip_label");
+		info_box = drawPanel(this.x_pos + 8,this.y_pos + 36, 377, 50,"info_box");
+		title_box = drawPanel(this.x_pos + 8,this.y_pos + 7, 377, 25,"title_box");
+		outer_box = drawPanel(this.x_pos,this.y_pos, 391, 93,"outer_box");
+		
+		create_sensors();
 		
 	}
 
-	
 	public MaxBox drawPanel(int x_pos, int y_pos, int x_size, int y_size, String name){
 		
 		MaxBox panel = this.patcher.newDefault(x_pos,y_pos,"panel", null);
@@ -78,7 +77,6 @@ public class Node extends MaxObject{
 		
 		return panel;
 	}
-	
 	
 	public MaxBox drawLabel(int x_pos, int y_pos, String info, String name){
 		
@@ -105,27 +103,80 @@ public class Node extends MaxObject{
 		
 	}
 	
-	public void inlet(int val){
-		System.out.println(val);
-		if(val == 1){
-			try {
-				String rep = this.resource_requestor.sendGet("http://localhost:3000/request/" + this.id);
-			
-				if(rep.equals(this.id) == true){
-					MaxBox socket = this.patcher.newDefault(400, 400, "udpreceive", new Atom[]{Atom.newAtom(16161)});
-					MaxBox out = this.patcher.newDefault(300, 300, "outlet", null);
-					this.patcher.connect(socket, 0, out, 0);
-				}
-				
-			} catch (Exception e) {
-				post("[ERROR!] Could not retrieve data from Information Server");
+	public void create_sensors(){
+		for(int i=0; i< this.sensors.size(); i++){
+			MaxBox sensor = this.patcher.newDefault(0,0, "mxj", Atom.parse("Sensor"));
+			sensor.setRect(343,101 + 93, 75, 20);
+			sensor.toBackground(true);
+			sensor.setHidden(true);
+			sensor.send("set", new Atom[]{
+					Atom.newAtom(0),
+					Atom.newAtom(93 + i*145),
+					Atom.newAtom(this.sensors.getJSONObject(i).getString("name")),
+					Atom.newAtom(this.sensors.getJSONObject(i).getString("id")),
+					Atom.newAtom(this.sensors.getJSONObject(i).getInt("port")),
+					Atom.newAtom(this.sensors.getJSONObject(i).getJSONArray("data").toString())
+			});
+		}
+	}
+	
+	/* Send resource request message to local core information server */
+	public void request(String id, int port){
+		
+		HttpInfoRequestor resource_requestor = new HttpInfoRequestor();
+		try {
+			String rep = resource_requestor.sendGet("http://localhost:3000/request/" + id);
+		
+			if(rep.equals(this.id) == true){
+				MaxBox socket = this.patcher.newDefault(400, 400, "udpreceive", new Atom[]{Atom.newAtom(port)});
+				MaxBox out = this.patcher.newDefault(300, 300, "outlet", null);
+				this.patcher.connect(socket, 0, out, 0);
 			}
 			
-		}else{
-			
+		} catch (Exception e) {
+			post("[ERROR!] Could not retrieve data from Information Server");
 		}
-
+		
+	}
+		
+	/* Send resource release message to local core information server */
+	public void release(String id, int port){
+		HttpInfoRequestor resource_requestor = new HttpInfoRequestor();
+		try {
+			String rep = resource_requestor.sendGet("http://localhost:3000/request/" + id);
+		
+			if(rep.equals(this.id) == true){
+				MaxBox socket = this.patcher.newDefault(400, 400, "udpreceive", new Atom[]{Atom.newAtom(port)});
+				MaxBox out = this.patcher.newDefault(300, 300, "outlet", null);
+				this.patcher.connect(socket, 0, out, 0);
+			}
+			
+		} catch (Exception e) {
+			post("[ERROR!] Could not retrieve data from Information Server");
+		}
+	}
+	
+	public JSONArray parse_sensors(String s){
+		if(s == null) return null;
+		else return (JSONArray) JSONSerializer.toJSON(s);
 	}
 
-	
+	public void remove_node(){
+		this.patcher.getNamedBox(this.name_label.getName()).remove();
+		this.patcher.getNamedBox(this.host_label.getName()).remove();
+		this.patcher.getNamedBox(this.ip_label.getName()).remove();
+		this.patcher.getNamedBox(this.info_box.getName()).remove();
+		this.patcher.getNamedBox(this.title_box.getName()).remove();
+		this.patcher.getNamedBox(this.outer_box.getName()).remove();
+
+		this.name_label = null;
+		this.host_label = null;
+		this.ip_label = null;
+		this.info_box = null;
+		this.title_box = null;
+		this.outer_box = null;
+		this.patcher = null;
+		this.sensors = null;
+		
+	}
 }
