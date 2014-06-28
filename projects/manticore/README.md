@@ -279,6 +279,7 @@ If you encounter any issue with the automatic installation, you can manually ins
 	$ npm install express
 	$ npm install jade
 	$ npm install uuid
+	$ npm install underscore
 
 **Note**: depending on the operating system [zmq] and [mdns] have other requirements (see the Prerequisites for your system above).
 
