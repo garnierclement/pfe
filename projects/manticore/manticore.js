@@ -40,7 +40,6 @@ function Core()
 	this.ip = null;							// IP address advertised on Zeroconf
 	this.sensors = [];						// store local sensors
 	this.records = [];
-	this.resources = [];					// store requested resources
 	this.publisher = zmq.socket('pub');		// publisher socket (InCh)
 	this.subscriber = zmq.socket('sub');	// subscriber socket (InCh)
 	this.udp = dgram.createSocket('udp4');	// local udp socket for receiving OSC data
@@ -412,7 +411,7 @@ Core.prototype.requestResource = function (res, port, callback) {
 	if (dst !== null) {
 		this.syncSend(dst, 'request', this.requestPayload(res,p), function(header, payload) {
 			if (payload.status) {
-				self.records.push(new Record(res));
+				self.records.push(new Record(res, 'client_request'));
 			}
 			callback(null, header, payload);
 		});
