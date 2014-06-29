@@ -15,6 +15,7 @@ var zmq = require('zmq');		// ZeroMQ
 var dgram = require('dgram');	// for UDP sockets
 var util = require('util'),		// extend the Core to be an EventEmitter
 	EventEmitter = require('events').EventEmitter;
+var _ = require("underscore");
 
 var Node = require('./node.js');		// Node object
 var Sensor = require('./sensor.js');	// Sensor object
@@ -128,7 +129,7 @@ self.subscriber.on('message', function(data) {
 
 self.mach.on('message', function() {
 	console.log(':[DBUG]\tRouter: '+arguments.length);
-	for (k in arguments)
+	for (var k in arguments)
 		console.log(arguments[k].toString());
 	switch (arguments.length) {
 		case 2:
@@ -148,7 +149,7 @@ self.mach.on('message', function() {
 
 self.requester.on('message', function(data) {
 	console.log(':[DBUG]\tDealer: '+arguments.length);
-	for (k in arguments)
+	for (var k in arguments)
 		console.log(arguments[k].toString());
 	switch (arguments.length) {
 		case 2:
@@ -194,7 +195,7 @@ self.udp.on('message', function(buffer, rinfo) {
 self.browser.on('serviceUp', function(service) {
 	console.log('+[mDNS]\tService up: '+service.name+' at '+service.addresses+' ('+service.networkInterface+')');
 
-	if(self.findNodeById(service.txtRecord.id) == false)
+	if(self.findNodeById(service.txtRecord.id) === false)
 	{
 		var new_node = new Node(service);
 		if (self.uuid != service.txtRecord.id) {
@@ -334,10 +335,10 @@ Core.prototype.reply = function(cmd, envelope, data) {
  */
 Core.prototype.deleteDeadNode = function(node_name){
 	var index = null;
-	for(k in this.nodes){
+	for(var k in this.nodes){
 		if (this.nodes[k].name == node_name)  index = k;
 	}
-	if(index != null) {
+	if(index !== null) {
 		if (node_name != this.name && this.nodes[index].ip != this.ip) {
 			this.subscriber.disconnect('tcp://'+this.nodes[index].ip+':'+INCH_PORT);
 		}
@@ -357,24 +358,24 @@ Core.prototype.deleteDeadNode = function(node_name){
  * @return {Boolean}      [return true if found}
  */
 Core.prototype.findNodeById = function (uuid){
-	for(k in this.nodes){
-		if (this.nodes[k].id == uuid)  
+	for(var k in this.nodes){
+		if (this.nodes[k].id === uuid)  
 			return k;
 	}
 	return false;
 };
 
 Core.prototype.getNodeById = function(uuid){
-	for(idx in this.nodes){
-		if (this.nodes[idx].id == uuid)
+	for(var idx in this.nodes){
+		if (this.nodes[idx].id === uuid)
 			return this.nodes[idx];
 	}
 	return null;
 };
 
 Core.prototype.getNodeIpById = function(uuid){
-	for(idx in this.nodes){
-		if (this.nodes[idx].id == uuid)
+	for(var idx in this.nodes){
+		if (this.nodes[idx].id === uuid)
 			return this.nodes[idx].ip;
 	}
 	return null;
@@ -480,5 +481,21 @@ Core.prototype.fakeSensors = function () {
 	this.sensors.push(sensor2);
 	// publish them
 	this.publish('new_sensor', this.sensors);
+};
+
+Core.prototype.listId = function() {
+	var ids = [];
+	ids _.map(this.nodes, function(node) {
+		return node.id;
+	});
+	// _.find(this.nodes, function(node))
+	// _.where(this.nodes, {id: uuidlookedfor})
+	// _.findWhere
+	// _.contanis
+	// _.pluck extract a list of property values then test contains on it
+};
+
+Core.prototype.findInRecord(uuid) {
+
 };
 
