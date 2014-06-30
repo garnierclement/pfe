@@ -13,6 +13,7 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <string>
 
 //////////////////////////////////////////////////
 // add for OSC sent
@@ -30,6 +31,8 @@
 #define PORT 7000*/
 
 #define OUTPUT_BUFFER_SIZE 1024
+
+using namespace std;
 
 	
 // OSC initialization
@@ -369,22 +372,63 @@ xBeeReadSerial IPaddress portNum
 
 -----------------------------------------*/
 
+void usage()
+{
+  cout << "Usage: xBeeReadSerial" << endl;
+  cout << "\t -a or --addr <IP_addr_endpoint>" << endl;
+  cout << "\t -p or --port <UDP_port_endpoint>" << endl;
+  cout << "\t -c or --check to check if the Arduino shield is available (other parameters will be ignored)" << endl;
+}
+
 int main (int argc, char* argv[]){
 
-	if( argc >= 2){	
-		printf("You type Address is %s, port is %d", argv[1] ,atoi(argv[2]));
+  // parameters form the command line
+  bool check = false;
+  string ip_addr = "";
+  int udp_port = 0;
 
-		
-		transmitSocket = new UdpTransmitSocket( IpEndpointName( argv[1], atoi(argv[2]) ) );
+  // if no argument specified, displays usage and exits
+  if (argc == 1) {
+    usage();
+    return 0;
+  }
 
-	}else{
+  // parse arguments
+  for (int i = 1; i < argc; i++)
+  {
+    if (!strcmp(argv[i], "-a") || !strcmp(argv[i], "--addr")) {
+      if (i+1 < argc)
+        ip_addr = argv[++i];
+      else
+        cout << "Argument" << argv[i] << "needs a value" << endl;
+    }
+    else if (!strcmp(argv[i], "-p") || !strcmp(argv[i], "--port")) {
+      if (i+1 < argc)
+        udp_port = atoi(argv[++i]);
+      else
+        cout << "Argument" << argv[i] << "needs a value" << endl;
+    }
+    else if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--check")) {
+      // Need to do the cheking and exits
+      // TODO
+      // need to define some return code if 
+    }
+    else {
+      std::cout << "Unknown parameter : " << argv[i] << endl;
+      usage();
+      return 0;
+    }
+  }
+  
+  // add default values if not set
+  if (udp_port == 0) udp_port = PORT;
+  if (ip_addr.empty()) ip_addr = ADDRESS;
 
-		transmitSocket = new UdpTransmitSocket( IpEndpointName( ADDRESS, PORT ) );
-	}
+  // init socket
+  transmitSocket = new UdpTransmitSocket( IpEndpointName( ip_addr.c_str(), udp_port ) );
+
 
 	config = new SensorConfig("_config.txt"); // read gyro calibration data
-
-	
 
 	setup();
 	while(1){
