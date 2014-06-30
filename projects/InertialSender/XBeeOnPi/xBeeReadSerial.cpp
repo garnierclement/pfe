@@ -415,9 +415,13 @@ int main (int argc, char* argv[]){
       cout << "TODO checking" << endl;
       int returnCode = 0;
       setup();
-      if(!Serial.available()) {
-        returnCode = 1;
-      }
+      /*if(NOT_AVILABLE) {
+        returnCode = 1; // Error, no shield, return 1
+      } else {
+        if (NO_DATA) {
+          returnCode = 2; // Warning that the shield is here but we do not get any data from sensors
+        }
+      }*/
       return returnCode;
     }
     else {
