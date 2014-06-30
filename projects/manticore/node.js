@@ -1,7 +1,7 @@
 /**
  * Constants
  */
-const INCH_PORT = 32323;
+var INCH_PORT = 32323;
 
 /** 
  * Module dependencies
