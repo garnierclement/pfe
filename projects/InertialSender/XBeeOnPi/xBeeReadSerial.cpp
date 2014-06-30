@@ -419,7 +419,7 @@ int main (int argc, char* argv[]){
         returnCode = 1; // Error, no shield, return 1
       } else {
         if (NO_DATA) {
-          returnCode = 2; // Warning that the shield is here but we do not get any data from sensors
+          returnCode = 2; // Warning that the shield is here but we do not get any data from the inertial sensors
         }
       }*/
       return returnCode;
