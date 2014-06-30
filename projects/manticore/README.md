@@ -42,6 +42,10 @@ or npm
 
 	$ npm start
 
+on Windows, use `node.exe`
+
+	> node.exe app.js
+
 ## Guide
 
 ### Introduction
