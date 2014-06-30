@@ -12,8 +12,6 @@ process.stdin.on('readable', function() {
 			console.log(core.nodes);
 			console.log("+[DBUG] Core.sensors");
 			console.log(core.sensors);
-			console.log("+[DBUG] Core.resources");
-			console.log(core.resources);
 			console.log("+[DBUG] Core.records");
 			console.log(core.records);
 		}

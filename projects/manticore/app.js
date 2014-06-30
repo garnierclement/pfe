@@ -3,6 +3,7 @@
 var express = require('express');
 var api = express();
 var path = require('path');
+var _ = require("underscore");
 
 var core = require('./manticore.js');
 var interactive = require('./interactive.js');
@@ -21,7 +22,8 @@ api.listen(3000, function() {
 /**
  * Handles the 'ready' event on the core
  * This implies that the core has started
- * and that all the communication channels have been set up
+ * and have been initialized
+ * Thus, we can now handle external communication on the HTTP server
  */
 core.on('ready', function() {
 
@@ -132,6 +134,7 @@ core.on('mach', function(envelope, header, payload) {
 			var dst = header.ip;
 			if (dst === this.ip) dst = '127.0.0.1';
 			if (dst !== null) {
+				core.records.push(new Record(res, 'active_resource', header.src));
 				var outputfile = trigger.generate(dst, payload.port,'mousePosition.pd','output.pd');
 				var pd = "";
 				if(isDarwin()) {
@@ -176,6 +179,16 @@ core.on('reply', function(header, payload) {
 	switch(header.type) {
 		default:
 			console.log(payload);
+	}
+});
+
+/**
+ * Handles the disappearance of a node on the network
+ */
+core.on('died', function(deadNodeId) {
+	if (deadNodeId !== null) {
+		var deadNodeRecords = _.where(core.records, {src: deadNodeId});
+		console.log('deadNodeRecords:' + deadNodeRecords);
 	}
 });
 

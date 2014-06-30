@@ -231,8 +231,8 @@ Core.prototype.newSubscribe = function(peer) {
  */
 self.browser.on('serviceDown', function(service) {
 	console.log('-[mDNS]\tService down: '+service.name+' ('+service.networkInterface+')');
-	self.deleteDeadNode(service.name);
-	self.emit('died', service);
+	var deadNodeId = self.deleteDeadNode(service.name);
+	self.emit('died', deadNodeId);
 });
 
 /**
@@ -335,6 +335,7 @@ Core.prototype.reply = function(cmd, envelope, data) {
  */
 Core.prototype.deleteDeadNode = function(node_name){
 	var index = null;
+	var deadNodeId = null;
 	for(var k in this.nodes){
 		if (this.nodes[k].name == node_name)  index = k;
 	}
@@ -342,12 +343,14 @@ Core.prototype.deleteDeadNode = function(node_name){
 		if (node_name != this.name && this.nodes[index].ip != this.ip) {
 			this.subscriber.disconnect('tcp://'+this.nodes[index].ip+':'+INCH_PORT);
 		}
+		deadNodeId = this.nodes[index].id;
 		this.nodes.splice(index,1);
 		console.log('-[CORE]\tDeleting node '+node_name);
 	}
 	else {
 		console.log('![CORE]\tError cannot delete node '+node_name+', not found ; no harm, maybe just a duplicate serviceDown');
 	}
+	return deadNodeId;
 };
 
 /**
@@ -423,8 +426,14 @@ Core.prototype.requestResource = function (res, port, callback) {
 	}
 };
 
+/**
+ * Send a realease message to 
+ * @param  {String}   res      UUID of the resource to be released
+ * @param  {Function} callback [description]
+ */
 Core.prototype.releaseResource = function (res, callback) {
 	// Check Core.records if the release request is correct
+	// i.e there is a record for it
 	var correct = false;
 	var idx = 0;
 	for (idx = 0; idx < this.records.length; idx++) {
@@ -485,7 +494,7 @@ Core.prototype.fakeSensors = function () {
 
 Core.prototype.listId = function() {
 	var ids = [];
-	ids _.map(this.nodes, function(node) {
+	ids = _.map(this.nodes, function(node) {
 		return node.id;
 	});
 	// _.find(this.nodes, function(node))
@@ -494,8 +503,3 @@ Core.prototype.listId = function() {
 	// _.contanis
 	// _.pluck extract a list of property values then test contains on it
 };
-
-Core.prototype.findInRecord(uuid) {
-
-};
-
