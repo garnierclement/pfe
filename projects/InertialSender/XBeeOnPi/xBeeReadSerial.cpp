@@ -418,7 +418,6 @@ int main (int argc, char* argv[]){
       if(!Serial.available()) {
         returnCode = 1;
       }
-      else
       return returnCode;
     }
     else {
