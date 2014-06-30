@@ -29,52 +29,50 @@ api.listen(3000, function() {
 core.on('ready', function() {
 
 	api.get('/', function(req, res) {
+		console.log('>[HTTP]\tWeb UI from '+ req.ip +' on ' +req.headers['user-agent']);
 		res.render('index', { title: 'Manticore on '+core.name, name: core.name, nodes: core.nodes, sensors: core.sensors, records: core.records});
 	});
 
 	api.get('/nodes', function(req, res) {
+		console.log('>[HTTP]\t/nodes/ from '+ req.ip +' on '+ req.headers['user-agent']);
 		res.set({'Content-Type': 'application/json'});
 		res.send({nodes: core.nodes });
 	});
 
 	// HTTP GET /request/[uuid]?port=[portnumber]
 	api.get('/request/:id', function(req, res) {
+		console.log('>[HTTP]\tRequest resource from '+ req.ip +' with id '+req.param('id'));
 		res.set({'Content-Type': 'text/plain'});
-		console.log('+[HTTP]\tRequest id '+req.param('id'));
-		if (core.findNodeById(req.param('id'))) {
-			var resource = req.param('id');
-			var p = req.query.port || 16161;
-			// WARNING on request a resource but use node uuid
-			// need to be changed when sensor is set up
-			var dst = core.getNodeIpById(resource);
-			console.log(dst);
-			if (dst === core.ip) dst = '127.0.0.1';
-			if (dst !== null)
-				core.syncSend(dst, 'request', {data: resource, port: p}, function(header, payload) {
-					console.log(header);
-					console.log(payload);
-					if (payload.status) {
-						res.send(resource);
-					}
-					else {
-						res.send(false);
-					}
-				});
-		}
-		else {
-			res.send(false);
-			console.log('![HTTP]\tid not found');
-		}
+		var resource = req.param('id');
+		var port = req.query.port || 16161;
+		core.requestResource(resource, port, function(err, header, payload) {
+			if (err === null) {
+				if (payload.status)
+					res.send(resource);
+				else
+					res.send(false);
+			}
+			else {
+				res.send(false);
+				console.log(err);
+			}
+		});
 	});
 
 	api.get('/release/:id', function(req, res) {
+		console.log('>[HTTP]\tRelease resource from '+ req.ip +' with id '+req.param('id')+ " from\n\t"+ req.headers['user-agent']);
 		res.set({'Content-Type': 'text/plain'});
-		if (1) {
-			res.send(true);
-		}
-		else {
-			res.send(false);
-		}
+		var resource = req.param('id');
+		core.releaseResource(resource, function(err, header, payload) {
+			if (err === null) {
+				if (payload.status)
+					res.send(true);
+			}
+			else {
+				res.send(false);
+				console.log(err);
+			}
+		});
 	});
 });
 
@@ -135,7 +133,7 @@ core.on('mach', function(envelope, header, payload) {
 			var dst = header.ip;
 			if (dst === this.ip) dst = '127.0.0.1';
 			if (dst !== null) {
-				var activeRes = new Record(payload.data, 'active_resource', header.src);
+				var activeRes = new Record(payload.data, 'active_resource', header.src, dst);
 				var outputfile = trigger.generate(dst, payload.port,'mousePosition.pd','output.pd');
 				var pd = "";
 				if(isDarwin()) {
@@ -187,6 +185,7 @@ core.on('reply', function(header, payload) {
 
 /**
  * Handles the disappearance of a node on the network
+ * Implicit release and records cleanup
  */
 core.on('died', function(deadNodeId) {
 	if (deadNodeId !== null) {

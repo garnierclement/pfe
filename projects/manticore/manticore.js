@@ -17,7 +17,7 @@ var util = require('util'),		// extend the Core to be an EventEmitter
 	EventEmitter = require('events').EventEmitter;
 var _ = require("underscore");
 
-var node = require('./node.js');		// Node object
+var Node = require('./node.js');		// Node object
 var Sensor = require('./sensor.js');	// Sensor object
 var Record = require('./record.js');	// Record object
 
@@ -66,6 +66,7 @@ var self = module.exports = new Core();
  */
 Core.prototype.init = function() {
 	console.log('+[CORE]\tCore starting on '+this.name);
+	console.log('+[CORE]\tCore id '+this.uuid);
 	// bind local socket
 	this.udp.bind(UDP_PORT, function() {
 		var address = self.udp.address();
@@ -128,9 +129,9 @@ self.subscriber.on('message', function(data) {
  */
 
 self.mach.on('message', function() {
-	console.log(':[DBUG]\tRouter: '+arguments.length);
-	for (var k in arguments)
-		console.log(arguments[k].toString());
+	// console.log(':[DBUG]\tRouter: '+arguments.length);
+	// for (var k in arguments)
+	// 	console.log(arguments[k].toString());
 	switch (arguments.length) {
 		case 2:
 			var envelope = arguments[0];
@@ -143,14 +144,13 @@ self.mach.on('message', function() {
 		default:
 			return;
 	}
-
 	self.emit('mach', envelope, msg.header, msg.payload);
 });
 
 self.requester.on('message', function(data) {
-	console.log(':[DBUG]\tDealer: '+arguments.length);
-	for (var k in arguments)
-		console.log(arguments[k].toString());
+	// console.log(':[DBUG]\tDealer: '+arguments.length);
+	// for (var k in arguments)
+	// 	console.log(arguments[k].toString());
 	switch (arguments.length) {
 		case 2:
 			var data = JSON.parse(arguments[1]);
@@ -197,15 +197,17 @@ self.browser.on('serviceUp', function(service) {
 
 	if(self.findNodeById(service.txtRecord.id) === false)
 	{
-		var new_node = new node(service);
+		var new_node = new Node(service);
 		if (self.uuid != service.txtRecord.id) {
 			self.newSubscribe(new_node.ip);
 		}
 		else {
-			// note if itself
+			// note if node discovered itself
 			new_node.itself = true;
 			// register advertising ip, we should see ourself
 			self.ip = new_node.ip;
+			// link core.sensors with core.nodes[itself].sensors
+			new_node.sensors = self.sensors;
 		}
 		self.nodes.push(new_node);
 		console.log('+[CORE]\tAdding node id '+service.txtRecord.id);
@@ -298,6 +300,7 @@ Core.prototype.send = function(dst, cmd, data) {
 	if (dst !== null) {
 		this.requester.connect('tcp://'+dst+':'+MACH_PORT);
 		this.requester.send([null, JSON.stringify(this.createMessage(cmd, data))]);
+		console.log('+[ASYN]\tSending '+cmd+' with '+data+' to '+dst);
 	}
 	else {
 		throw 'send() to null IP';
@@ -309,7 +312,7 @@ Core.prototype.syncSend = function(dst, cmd, data, callback) {
 	if (dst !== null) {
 		socket.connect('tcp://'+dst+':'+MACH_PORT);
 		socket.send(JSON.stringify(this.createMessage(cmd, data)));
-		console.log('+[SYNC]\tSending '+data+' to '+dst);
+		console.log('+[SYNC]\tSending '+cmd+' with '+data+' to '+dst);
 
 		socket.on('message', function(data) {
 			console.log('>[SYNC]\tReceived '+data.toString());
@@ -405,29 +408,43 @@ function createAdvertisement(uuid)  {
 }
 
 
-/******* protocol *********/
+/**
+ * Procedure for requesting a resource from one node to another
+ *		- send a synchronous 'request' 
+ *		- return a callback the content of the reply
+ * @param  {String}   res      [description]
+ * @param  {Integer}   port     [description]
+ * @param  {Function} callback [description]
+ */
 Core.prototype.requestResource = function (res, port, callback) {
 	// WARNING on request a resource but use node uuid
 	// need to be changed when sensor is set up
 	var p = isValidPort(port) ? port : 16161;
-	var dst = this.getNodeIpById(res);
-	if (dst === this.ip) dst = '127.0.0.1';
-	if (dst !== null) {
+	var found = false;
+	for (var i = 0; i < this.nodes.length; i++) {
+		if (this.nodes[i].id === res || _.findWhere(this.node[i].sensors, {id: res}) !== undefined) {
+			found = true;
+			break;
+		}
+	}
+	if (found) {
+		var dst = this.nodes[i].ip;
+		if (dst === this.ip) dst = '127.0.0.1';
 		this.syncSend(dst, 'request', this.requestPayload(res,p), function(header, payload) {
 			if (payload.status) {
-				self.records.push(new Record(res, 'client_request'));
+				self.records.push(new Record(res, 'client_request', null, dst));
 			}
 			callback(null, header, payload);
 		});
 	}
 	else {
-		var err = '![REQR] Cannot find IP for resource '+res;
+		var err = '![REQR] Resource '+res+' not valid';
 		callback(err, null, null);
 	}
 };
 
 /**
- * Send a realease message to 
+ * Send a realease message to release a resource
  * @param  {String}   res      UUID of the resource to be released
  * @param  {Function} callback [description]
  */
@@ -435,10 +452,11 @@ Core.prototype.releaseResource = function (res, callback) {
 	// Check Core.records if the release request is correct
 	// i.e there is a record for it
 	var correct = false;
-	var idx = 0;
-	for (idx = 0; idx < this.records.length; idx++) {
-		if (this.records[idx] === res) {
+	var dst = "";
+	for (var idx = 0; idx < this.records.length; idx++) {
+		if (this.records[idx].resource === res) {
 			correct = true;
+			dst = this.records[idx].dst;
 			break;
 		}
 	}
@@ -488,8 +506,6 @@ Core.prototype.fakeSensors = function () {
 	sensor2.addData('Pitch','/intertial/pitch f');
 	sensor2.addData('Yaw','/intertial/yaw f');
 	this.sensors.push(sensor2);
-	var myself = _.findWhere(this.nodes, {itself: true});
-	myself.sensors = this.sensors;
 	// publish them
 	this.publish('new_sensor', this.sensors);
 };
