@@ -1,3 +1,24 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+
+- [Manticore FAQ](#manticore-faq)
+  - [What is Manticore ?](#what-is-manticore-)
+  - [How does one node communicate with another ?](#how-does-one-node-communicate-with-another-)
+  - [Do I need Manticore on my computer ?](#do-i-need-manticore-on-my-computer-)
+  - [What is a sensor ?](#what-is-a-sensor-)
+  - [What is *InCh* ?](#what-is-inch-)
+  - [What is *MaCh* ?](#what-is-mach-)
+  - [Why is there an HTTP server on Manticore ?](#why-is-there-an-http-server-on-manticore-)
+  - [How do I request a resource ?](#how-do-i-request-a-resource-)
+  - [What is a resource ?](#what-is-a-resource-)
+  - [How do I had a new sensor into the framework ?](#how-do-i-had-a-new-sensor-into-the-framework-)
+  - [What is ZeroMQ ?](#what-is-zeromq-)
+  - [What is Node.js ?](#what-is-nodejs-)
+  - [What is a Max/MSP external ?](#what-is-a-maxmsp-external-)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Manticore FAQ
 
 ## What is Manticore ?
