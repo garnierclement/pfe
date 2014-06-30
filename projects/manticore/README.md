@@ -102,6 +102,11 @@ We can think of REQ and DEALER soscket sas "clients" and ROUTER sockets as "serv
 > //TODO: write about 0MQ sockets and pattern
 > Node: see bind/connect mechanism in UNIX sockets
 
+#### Note about the use of mDNS
+
+We use the mdns module for Node.js.
+
+See the documentation : <http://agnat.github.io/node_mdns/user_guide.html>
 
 #### Use cases
 
@@ -194,6 +199,8 @@ Using GET HTTP request
 
 ## Prerequisites
 
+Manticore is based on Node.js and exploits ZeroMQ and Zeroconf/Bonjour.
+
 ### Prerequisites on Mac OS X
 
 Clone this repository
@@ -265,14 +272,40 @@ Compile and install [ZeroMQ] v4.0.4 from source tarball (it also requires libtoo
 	$ rm zeromq-4.0.4.tar.gz
 	$ rm -rf zeromq-4.0.4
 
+### Prerequisites on Windows
+
+This is experimental and only tested on Windows 7 x64.
+
+You need to dowload and install
+
+* 	[Node.js] v0.10.x  
+* 	[Bonjour SDK for Windows]  
+	To download the SDK, you need to have an Apple Developer ID (it's free)  
+	Bonjour SDK is required for the dns_sd.h header file used by the mdns module for Node.js  
+	At the time of writing version 2.0.4 is the latest available  
+* 	[Python 2.7]  
+	Python is required when installing the zmq module for Node.js  
+	During the installation, check the box *add python.exe to PATH*  
+* 	[ZeroMQ 4.0.4]  
+	During the installation, choose the full installation (with source code and compiled librairies)  
+	[Direct link for Windows x64](http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x64.exe)  
+	[Direct link for Windows x86](http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x86.exe)  
+* 	[Git] or [GitHub for Windows]  (optional)
+
+[Bonjour SDK for Windows]: https://developer.apple.com/downloads/index.action?q=Bonjour%20SDK%20for%20Windows#
+[Python 2.7]:
+[ZeroMQ 4.0.4]: http://zeromq.org/distro:microsoft-windows
+[Git]: http://git-scm.com/download/win
+[GitHub for Windows]: https://windows.github.com/
+
 ## Installation
 
-Install dependencies ([mdns] and [zmq]) with  
+Install Node.js module dependencies ([mdns] and [zmq]) with  
 (see `package.json` for more information about versions)
 
 	$ npm install
 
-If you encounter any issue with the automatic installation, you can manually install them one by one.
+If you encounter any issue with the automatic npm installation, you can manually install them one by one.
 
 	$ npm install mdns
 	$ npm install zmq
