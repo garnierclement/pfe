@@ -168,6 +168,12 @@ These are the methods used by the Core singleton to interact with its state and 
 * `interactive.js` contains code for interactive commands in the shell
 * `trigger.js` contains code for generating and executing processes
 
+### Data structures
+
+* 	Sensor
+* 	Node
+* 	Record
+
 ### Inter-core messaging
 
 #### Message structure
@@ -225,6 +231,8 @@ Install [Node.js] v0.10.28
 Install [ZeroMQ] 4.0.4
 
 	$ brew install zeromq
+
+**Note** : pkg-config may be required too (`brew install pkg-config`)
 
 ### Prerequisites on Raspbian (Raspberry Pi)
 
