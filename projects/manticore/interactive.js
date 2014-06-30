@@ -7,7 +7,7 @@ process.stdin.setEncoding('utf8');
 process.stdin.on('readable', function() {
 	var chunk = process.stdin.read();
 	if (chunk !== null) {
-		if (chunk == "debug\n") {
+		if (/^debug/.test(chunk)) {
 			console.log("+[DBUG] Core.nodes");
 			console.log(core.nodes);
 			console.log("+[DBUG] Core.sensors");
@@ -15,10 +15,10 @@ process.stdin.on('readable', function() {
 			console.log("+[DBUG] Core.records");
 			console.log(core.records);
 		}
-		else if (chunk == "exit\n") {
+		else if (/^exit/.test(chunk)) {
 			core.close();
 		}
-		else if (chunk == "help\n") {
+		else if (/^help/.test(chunk)) {
 			console.log("[HELP]\tUsage: cmd [param], see examples below");
 			console.log("\tdebug");
 			console.log("\teval core.nodes");
