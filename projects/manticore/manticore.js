@@ -17,7 +17,7 @@ var util = require('util'),		// extend the Core to be an EventEmitter
 	EventEmitter = require('events').EventEmitter;
 var _ = require("underscore");
 
-var Node = require('./node.js');		// Node object
+var node = require('./node.js');		// Node object
 var Sensor = require('./sensor.js');	// Sensor object
 var Record = require('./record.js');	// Record object
 
@@ -197,7 +197,7 @@ self.browser.on('serviceUp', function(service) {
 
 	if(self.findNodeById(service.txtRecord.id) === false)
 	{
-		var new_node = new Node(service);
+		var new_node = new node(service);
 		if (self.uuid != service.txtRecord.id) {
 			self.newSubscribe(new_node.ip);
 		}
@@ -362,7 +362,7 @@ Core.prototype.deleteDeadNode = function(node_name){
  */
 Core.prototype.findNodeById = function (uuid){
 	for(var k in this.nodes){
-		if (this.nodes[k].id === uuid)  
+		if (this.nodes[k].id === uuid)
 			return k;
 	}
 	return false;
