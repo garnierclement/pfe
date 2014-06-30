@@ -411,7 +411,9 @@ int main (int argc, char* argv[]){
     else if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--check")) {
       // Need to do the cheking and exits
       // TODO
-      // need to define some return code if 
+      // need to define some return code whether the board is connected and whethter we receive data
+      cout << "TODO checking" << endl;
+      return 0;
     }
     else {
       std::cout << "Unknown parameter : " << argv[i] << endl;
@@ -425,6 +427,7 @@ int main (int argc, char* argv[]){
   if (ip_addr.empty()) ip_addr = ADDRESS;
 
   // init socket
+  cout << "UDP socket sending to " << ip_addr << " on port " << udp_port << endl;
   transmitSocket = new UdpTransmitSocket( IpEndpointName( ip_addr.c_str(), udp_port ) );
 
 
