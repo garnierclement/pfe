@@ -411,9 +411,15 @@ int main (int argc, char* argv[]){
     else if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--check")) {
       // Need to do the cheking and exits
       // TODO
-      // need to define some return code whether the board is connected and whethter we receive data
+      // need to define some return code whether the board is connected or not and whether we receive data on the serial link
       cout << "TODO checking" << endl;
-      return 0;
+      int returnCode = 0;
+      setup();
+      if(!Serial.available()) {
+        returnCode = 1;
+      }
+      else
+      return returnCode;
     }
     else {
       std::cout << "Unknown parameter : " << argv[i] << endl;
