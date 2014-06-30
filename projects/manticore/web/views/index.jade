@@ -2,11 +2,12 @@ extends layout
 
 block content
 	h1= title
-	h2 Nodes
+	h2 Network of nodes and sensors
 	p.lead Available nodes on the network : #{nodes.length}
 	table.table.table-hover
 		thead
 			tr
+				th Type
 				th Name
 				th Host
 				th IP address
@@ -14,6 +15,8 @@ block content
 				th Request resource
 		each node, index in nodes
 			tr
+				td
+					b Node
 				td= node.name
 				td 
 					a(href='http://#{node.host}:3000') #{node.host}
@@ -24,6 +27,59 @@ block content
 					form(methode='GET', action='/request/#{node.id}')
 						input(name='port', type='number', value=42424, min=0, max=65536)
 						input.btn.btn-default(type='submit', value="Request")
+			if node.sensors.length > 0
+				each sensor, index in node.sensors
+					tr
+						td
+							b Sensor
+						td= sensor.name
+						td 
+							a(href='http://#{node.host}:3000') #{node.host}
+						td= node.ip
+						td
+							a(href='/request/#{sensor.id}') #{sensor.id}
+						td
+							form(methode='GET', action='/request/#{node.id}')
+								input(name='port', type='number', value=42424, min=0, max=65536)
+								input.btn.btn-default(type='submit', value="Request")
+
+	h2 Sensors 
+	p.lead Available sensors on #{name} : #{sensors.length}
+	if sensors.length > 0
+		table.table.table-hover
+			thead
+				tr
+					th Name
+					th UUID
+					th Data
+			each sensor, index in sensors
+				tr
+					td= sensor.name
+					td= sensor.id
+					td
+						each datum, index in sensor.data
+							ul
+								li #{datum.name} #{datum.osc}
+	h2 Records
+	p.lead Number of records on #{name} : #{records.length}
+	if records.length > 0
+		table.table.table-hover
+			thead
+				tr
+					th Date
+					th Type
+					th Source
+					th Resource
+					th PID
+			each record, index in records
+				tr
+					td= record.date
+					td= record.type
+					td= record.source
+					td= record.resource
+					td 
+						if record.child
+							#{record.child.pid}
 	h2 API
 	table.table.table-hover
 		thead 

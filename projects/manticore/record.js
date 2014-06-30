@@ -7,3 +7,12 @@ function Record (res, type, src)
 }
 
 module.exports = Record;
+
+/**
+ * Add the reference to a child process
+ * Used to track the child process for any 'active_resource'
+ * @param {[type]} child [description]
+ */
+Record.prototype.addChild = function(child) {
+	this.child = child;
+};

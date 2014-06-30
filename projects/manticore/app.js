@@ -8,6 +8,7 @@ var _ = require("underscore");
 var core = require('./manticore.js');
 var interactive = require('./interactive.js');
 var trigger = require('./trigger.js');
+var Record = require('./record.js');
 
 // view engine set up
 api.set('views', path.join(__dirname, 'web/views'));
@@ -28,7 +29,7 @@ api.listen(3000, function() {
 core.on('ready', function() {
 
 	api.get('/', function(req, res) {
-		res.render('index', { title: 'Manticore on '+core.name, nodes: core.nodes });
+		res.render('index', { title: 'Manticore on '+core.name, name: core.name, nodes: core.nodes, sensors: core.sensors, records: core.records});
 	});
 
 	api.get('/nodes', function(req, res) {
@@ -134,7 +135,7 @@ core.on('mach', function(envelope, header, payload) {
 			var dst = header.ip;
 			if (dst === this.ip) dst = '127.0.0.1';
 			if (dst !== null) {
-				core.records.push(new Record(res, 'active_resource', header.src));
+				var activeRes = new Record(payload.data, 'active_resource', header.src);
 				var outputfile = trigger.generate(dst, payload.port,'mousePosition.pd','output.pd');
 				var pd = "";
 				if(isDarwin()) {
@@ -143,9 +144,11 @@ core.on('mach', function(envelope, header, payload) {
 				else if (isLinux()) {
 					pd = "pd-extended";
 				}
-				var pid = trigger.execute(pd+' '+outputfile, function(err, stdout,stderr) {
+				var child = trigger.execute(pd+' '+outputfile, function(err, stdout,stderr) {
 					console.log(stdout+stderr);
 				});
+				activeRes.addChild(child);
+				core.records.push(activeRes);
 			}
 			else
 				console.log('![ERR]\tcannot find ip for '+header);
@@ -187,7 +190,8 @@ core.on('reply', function(header, payload) {
  */
 core.on('died', function(deadNodeId) {
 	if (deadNodeId !== null) {
-		var deadNodeRecords = _.where(core.records, {src: deadNodeId});
+		console.log(deadNodeId);
+		var deadNodeRecords = _.where(core.records, {source: deadNodeId});
 		console.log('deadNodeRecords:' + deadNodeRecords);
 	}
 });

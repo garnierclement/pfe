@@ -9,7 +9,7 @@ exports.execute = function(cmd, callback) {
 			console.log("+[EXEC]\tExecuting "+cmd+"\n"+stdout+stderr);
 			callback(stdout, stderr);
 		});
-		return child.pid;
+		return child;
 	}
 	catch(e) {
 		console.log("![EXEC]\t"+e);

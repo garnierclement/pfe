@@ -203,7 +203,7 @@ self.browser.on('serviceUp', function(service) {
 		}
 		else {
 			// note if itself
-			new_node.itself = 'true';
+			new_node.itself = true;
 			// register advertising ip, we should see ourself
 			self.ip = new_node.ip;
 		}
@@ -409,7 +409,7 @@ function createAdvertisement(uuid)  {
 Core.prototype.requestResource = function (res, port, callback) {
 	// WARNING on request a resource but use node uuid
 	// need to be changed when sensor is set up
-	var p = checkPortNumber(port) ? port : 16161;
+	var p = isValidPort(port) ? port : 16161;
 	var dst = this.getNodeIpById(res);
 	if (dst === this.ip) dst = '127.0.0.1';
 	if (dst !== null) {
@@ -454,7 +454,7 @@ Core.prototype.releaseResource = function (res, callback) {
 	}
 };
 
-function checkPortNumber(port) {
+function isValidPort(port) {
 	if(!isNaN(Number(port))) {
 		if (port > 0 && port <= 65536)
 			return true;
@@ -488,6 +488,8 @@ Core.prototype.fakeSensors = function () {
 	sensor2.addData('Pitch','/intertial/pitch f');
 	sensor2.addData('Yaw','/intertial/yaw f');
 	this.sensors.push(sensor2);
+	var myself = _.findWhere(this.nodes, {itself: true});
+	myself.sensors = this.sensors;
 	// publish them
 	this.publish('new_sensor', this.sensors);
 };
