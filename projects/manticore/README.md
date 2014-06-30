@@ -277,25 +277,23 @@ Compile and install [ZeroMQ] v4.0.4 from source tarball (it also requires libtoo
 This is experimental and only tested on Windows 7 x64.
 
 1. You need to dowload and install
-
-* 	[Node.js] v0.10.x  
-* 	[Bonjour SDK for Windows]  
-	To download the SDK, you need to have an Apple Developer ID (it's free)  
-	Bonjour SDK is required for the dns_sd.h header file used by the mdns module for Node.js  
-	At the time of writing version 2.0.4 is the latest available  
-* 	[Python 2.7]  
-	Python is required when installing the zmq module for Node.js  
-	During the installation, check the box *add python.exe to PATH*  
-* 	[ZeroMQ 4.0.4]  
-	During the installation, choose the full installation (with source code and compiled librairies)  
-	[Direct link for Windows x64](http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x64.exe)  
-	[Direct link for Windows x86](http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x86.exe)  
-* 	[Git] or [GitHub for Windows]  (optional)
-
+	* 	[Node.js] v0.10.x  
+	* 	[Bonjour SDK for Windows]  
+		To download the SDK, you need to have an Apple Developer ID (it's free)  
+		Bonjour SDK is required for the dns_sd.h header file used by the mdns module for Node.js  
+		At the time of writing version 2.0.4 is the latest available  
+	* 	[Python 2.7]  
+		Python is required when installing the zmq module for Node.js  
+		During the installation, check the box *add python.exe to PATH*  
+	* 	[ZeroMQ 4.0.4]  
+		During the installation, choose the full installation (with source code and compiled librairies)  
+		[Direct link for Windows x64](http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x64.exe)  
+		[Direct link for Windows x86](http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x86.exe)  
+	* 	[Git] or [GitHub for Windows]  (optional)
 2. Reboot your system 
 
 [Bonjour SDK for Windows]: https://developer.apple.com/downloads/index.action?q=Bonjour%20SDK%20for%20Windows#
-[Python 2.7]:
+[Python 2.7]: https://www.python.org/download/windows
 [ZeroMQ 4.0.4]: http://zeromq.org/distro:microsoft-windows
 [Git]: http://git-scm.com/download/win
 [GitHub for Windows]: https://windows.github.com/
