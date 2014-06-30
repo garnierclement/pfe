@@ -276,7 +276,7 @@ Compile and install [ZeroMQ] v4.0.4 from source tarball (it also requires libtoo
 
 This is experimental and only tested on Windows 7 x64.
 
-You need to dowload and install
+1. You need to dowload and install
 
 * 	[Node.js] v0.10.x  
 * 	[Bonjour SDK for Windows]  
@@ -291,6 +291,8 @@ You need to dowload and install
 	[Direct link for Windows x64](http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x64.exe)  
 	[Direct link for Windows x86](http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x86.exe)  
 * 	[Git] or [GitHub for Windows]  (optional)
+
+2. Reboot your system 
 
 [Bonjour SDK for Windows]: https://developer.apple.com/downloads/index.action?q=Bonjour%20SDK%20for%20Windows#
 [Python 2.7]:
