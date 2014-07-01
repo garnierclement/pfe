@@ -20,28 +20,22 @@ install_node() {
 }
 
 install_avahi_daemon() {
-	if hash avahi-daemon 2>/dev/null; then
-		echo "[INSTALL] Avahi-daemon already installed."
-	else
 		echo "[INSTALL] Installing Avahi-daemon..."
 		sudo apt-get install avahi-daemon libnss-mdns
 
 }
 
 install_avahi_utils() {
-	if hash avahi-utils 2>/dev/null; then
-		echo "[INSTALL] Avahi-utils already installed."
-	else
 		echo "[INSTALL] Installing Avahi-utils..."
 		sudo apt-get install avahi-utils
 }
 
 
 install_pd() {
-	if hash puredata 2>/dev/null; then
+	if hash pd-extended 2>/dev/null; then
 		echo "[INSTALL] PureData already installed."
 	else
-		echo "[INSTALL] Installing Avahi-utils..."
+		echo "[INSTALL] Installing PureData..."
 		sudo apt-get install puredata
 }
 
