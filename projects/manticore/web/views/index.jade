@@ -39,7 +39,7 @@ block content
 						td
 							a(href='/request/#{sensor.id}') #{sensor.id}
 						td
-							form(methode='GET', action='/request/#{node.id}')
+							form(methode='GET', action='/request/#{sensor.id}')
 								input(name='port', type='number', value=42424, min=0, max=65536)
 								input.btn.btn-default(type='submit', value="Request")
 

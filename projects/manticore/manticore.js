@@ -312,7 +312,7 @@ Core.prototype.syncSend = function(dst, cmd, data, callback) {
 	if (dst !== null) {
 		socket.connect('tcp://'+dst+':'+MACH_PORT);
 		socket.send(JSON.stringify(this.createMessage(cmd, data)));
-		console.log('+[SYNC]\tSending '+cmd+' with '+data+' to '+dst);
+		console.log('+[SYNC]\tSending '+cmd+' with '+data.toString()+' to '+dst);
 
 		socket.on('message', function(data) {
 			console.log('>[SYNC]\tReceived '+data.toString());
@@ -422,7 +422,7 @@ Core.prototype.requestResource = function (res, port, callback) {
 	var p = isValidPort(port) ? port : 16161;
 	var found = false;
 	for (var i = 0; i < this.nodes.length; i++) {
-		if (this.nodes[i].id === res || _.findWhere(this.node[i].sensors, {id: res}) !== undefined) {
+		if (this.nodes[i].id === res || _.findWhere(this.nodes[i].sensors, {id: res}) !== undefined) {
 			found = true;
 			break;
 		}
