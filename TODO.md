@@ -1,7 +1,7 @@
 # TODO List
 
 - [ ] Autostart of Manticore after the Pi has booted
-- [ ] Windows compatibility (never been tested)
+- [x] Windows compatibility (never been tested)
 - [ ] Give a model to sensor
 - [ ] Insert new sensors : MIDI Keyboard + Inertial sensor
 - [x] Design a proper message object with header + type + payload
@@ -23,7 +23,8 @@
 - [ ] Write a quick start developer guide
 - [ ] Run Manticore as a daemon
 - [ ] Forward data, advertise a sensor on a node that receives data from any computer/device that is not a node of the network
-- [ ] update web interface according to the use of senors
-- [ ] request sensor's uuid should not fail
+- [x] update web interface according to the use of senors
+- [x] request sensor's uuid should not fail
 - [ ] Fully implement explicit release
 - [ ] Implement implicit release (when a node died, look if )
+- [ ] Move the messaging structure into a message.js file
