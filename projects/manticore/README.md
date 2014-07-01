@@ -19,6 +19,8 @@ In the following, the words *core* and *manticore* with/without a capital letter
   - [Events](#events)
   - [Core commands](#core-commands)
   - [Source files](#source-files)
+  - [Data structures](#data-structures)
+    - [Record](#record)
   - [Inter-core messaging](#inter-core-messaging)
     - [Message structure](#message-structure)
     - [Message command and associated payload](#message-command-and-associated-payload)
