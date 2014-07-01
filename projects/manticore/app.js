@@ -160,7 +160,7 @@ core.on('mach', function(envelope, header, payload) {
 			var dst = header.ip;
 			if (dst === this.ip) dst = '127.0.0.1';
 			if (dst !== null) {
-				var activeRes = new Record(payload.data, 'active_resource', header.src, dst, payload.port);
+				var new_record = new Record(payload.data, 'active_resource', header.src, dst, payload.port);
 				var outputfile = trigger.generate(dst, payload.port,'mousePosition.pd','output.pd');
 				var pd = "";
 				if(isDarwin()) {
@@ -172,8 +172,8 @@ core.on('mach', function(envelope, header, payload) {
 				var child = trigger.execute(pd+' '+outputfile, function(err, stdout,stderr) {
 					console.log(stdout+stderr);
 				});
-				activeRes.addChild(child);
-				core.records.push(activeRes);
+				new_record.addChild(child);
+				core.records.push(new_record);
 			}
 			else
 				console.log('![ERR]\tcannot find ip for '+header);
@@ -221,9 +221,14 @@ core.on('reply', function(header, payload) {
  */
 core.on('died', function(deadNodeId) {
 	if (deadNodeId !== null) {
-		console.log(deadNodeId);
-		var deadNodeRecords = _.where(core.records, {source: deadNodeId});
-		console.log('deadNodeRecords:' + deadNodeRecords);
+		// implicit release/kill of active resources
+		var deadNodeRecords = _.where(this.records, {type: 'active_resource', source: deadNodeId});
+		_.each(deadNodeRecords, function(record) {
+			record.child.kill();
+			var index = _.indexOf(core.records, record);
+			core.records.splice(index,1);
+		});
+		// TODO need to do sthg with client_request too
 	}
 });
 
