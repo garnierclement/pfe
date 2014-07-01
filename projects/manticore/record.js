@@ -17,3 +17,29 @@ module.exports = Record;
 Record.prototype.addChild = function(child) {
 	this.child = child;
 };
+
+/**
+ * Add the port asked by the client
+ * Specific to 'client_request' records
+ * @param {Number} port [description]
+ */
+Record.prototype.addPort = function(port) {
+	this.port = port;
+};
+
+
+///// unfinished
+exports.findResourceIn = function(list, type, res, callback) {
+	for (var idx = 0; idx < list.length; idx++) {
+		if (list[idx].resource === res) {
+			switch(list[idx].type) {
+				case 'client_request':
+					break;
+				case 'active_resource':
+					break;
+				default:
+					break;
+			}
+		}
+	}
+};

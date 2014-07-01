@@ -45,7 +45,8 @@ core.on('ready', function() {
 		res.set({'Content-Type': 'text/plain'});
 		var resource = req.param('id');
 		var port = req.query.port || 16161;
-		core.requestResource(resource, port, function(err, header, payload) {
+		var src = req.ip;
+		core.requestResource(resource, port, src, function(err, header, payload) {
 			if (err === null) {
 				if (payload.status)
 					res.send(resource);
@@ -74,6 +75,28 @@ core.on('ready', function() {
 			}
 		});
 	});
+
+	api.get('/kill/:pid', function(req, res) {
+		console.log('>[HTTP]\tKill resource from '+ req.ip +' with id '+req.param('pid')+ " from\n\t"+ req.headers['user-agent']);
+		res.set({'Content-Type': 'text/plain'});
+		var pidToKill = req.param('pid');
+		// get record with matching PID
+		var record = _.find(core.records, function(record) {
+			if (record.type === 'active_resource') {
+				console.log(record.child.pid);
+				return record.child.pid == pidToKill;
+			}
+			return false;
+		});
+		if (record !== undefined) {
+			record.child.kill();
+			var index = _.indexOf(core.records, record);
+			core.records.splice(index,1);
+			res.send(true);
+		}
+		res.send(false);
+	});
+
 });
 
 /**
@@ -160,11 +183,16 @@ core.on('mach', function(envelope, header, payload) {
 			break;
 		case 'release':
 			console.log(payload);
-			// need to check Core.resources
-			core.reply('ack', envelope, this.core.ackPayload(true));
-			// NOT YET IMPLEMENTED
-			// To release a resource
-			// Need to trigger.kill()
+			// Check in the records whether the 'release' is valid
+			var record = _.findWhere(core.records, {type: 'active_resource', resource: payload.data, source: header.src});
+			var index = _.indexOf(core.records, record);
+			var replyStatus = false;
+			if (record !== undefined) {
+				record.child.kill();
+				replyStatus = true;
+				core.records.splice(index,1);
+			}
+			core.reply('ack', envelope, core.ackPayload(replyStatus));
 			break;
 		default:
 			console.log('![INCH]\tNo message type');

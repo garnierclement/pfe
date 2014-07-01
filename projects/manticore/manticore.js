@@ -416,9 +416,8 @@ function createAdvertisement(uuid)  {
  * @param  {Integer}   port     [description]
  * @param  {Function} callback [description]
  */
-Core.prototype.requestResource = function (res, port, callback) {
-	// WARNING on request a resource but use node uuid
-	// need to be changed when sensor is set up
+Core.prototype.requestResource = function (res, port, src_ip, callback) {
+	// Check validity of the request (port, resource)
 	var p = isValidPort(port) ? port : 16161;
 	var found = false;
 	for (var i = 0; i < this.nodes.length; i++) {
@@ -427,12 +426,16 @@ Core.prototype.requestResource = function (res, port, callback) {
 			break;
 		}
 	}
+	// Send the request to the corresponding node 
+	// (i.e. the one providing the resource)
 	if (found) {
 		var dst = this.nodes[i].ip;
 		if (dst === this.ip) dst = '127.0.0.1';
 		this.syncSend(dst, 'request', this.requestPayload(res,p), function(header, payload) {
 			if (payload.status) {
-				self.records.push(new Record(res, 'client_request', null, dst));
+				var new_record = new Record(res, 'client_request', src_ip, dst);
+				new_record.addPort(port);
+				self.records.push(new_record);
 			}
 			callback(null, header, payload);
 		});
@@ -454,7 +457,7 @@ Core.prototype.releaseResource = function (res, callback) {
 	var correct = false;
 	var dst = "";
 	for (var idx = 0; idx < this.records.length; idx++) {
-		if (this.records[idx].resource === res) {
+		if (this.records[idx].resource === res && this.records[idx].type === 'client_request') {
 			correct = true;
 			dst = this.records[idx].dst;
 			break;
@@ -462,8 +465,9 @@ Core.prototype.releaseResource = function (res, callback) {
 	}
 	if (correct) {
 		this.syncSend(dst, 'release', this.releasePayload(res), function(header, payload) {
+			// remove the 'client_request' record
+			self.records.splice(idx,1);
 			callback(null, header, payload);
-			this.records.splice(idx,1);
 		});
 	}
 	else {
