@@ -459,14 +459,19 @@ Core.prototype.releaseResource = function (res, callback) {
 	for (var idx = 0; idx < this.records.length; idx++) {
 		if (this.records[idx].resource === res && this.records[idx].type === 'client_request') {
 			correct = true;
-			dst = this.records[idx].dst;
+			var record = this.records[idx];
+			dst = record.dst;
 			break;
 		}
 	}
 	if (correct) {
 		this.syncSend(dst, 'release', this.releasePayload(res), function(header, payload) {
 			// remove the 'client_request' record
-			self.records.splice(idx,1);
+			// need to think about the status from the ack
+			// now we erase the record all the time (either the release was successful or not)
+			// 
+			var index = _.indexOf(self.records, record);
+			self.records.splice(index,1);
 			callback(null, header, payload);
 		});
 	}

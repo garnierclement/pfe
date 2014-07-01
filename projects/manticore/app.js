@@ -68,6 +68,8 @@ core.on('ready', function() {
 			if (err === null) {
 				if (payload.status)
 					res.send(true);
+				else
+					res.send(false);
 			}
 			else {
 				res.send(false);
@@ -94,7 +96,9 @@ core.on('ready', function() {
 			core.records.splice(index,1);
 			res.send(true);
 		}
-		res.send(false);
+		else {
+			res.send(false);
+		}
 	});
 
 });
@@ -185,11 +189,11 @@ core.on('mach', function(envelope, header, payload) {
 			console.log(payload);
 			// Check in the records whether the 'release' is valid
 			var record = _.findWhere(core.records, {type: 'active_resource', resource: payload.data, source: header.src});
-			var index = _.indexOf(core.records, record);
 			var replyStatus = false;
 			if (record !== undefined) {
 				record.child.kill();
 				replyStatus = true;
+				var index = _.indexOf(core.records, record);
 				core.records.splice(index,1);
 			}
 			core.reply('ack', envelope, core.ackPayload(replyStatus));
