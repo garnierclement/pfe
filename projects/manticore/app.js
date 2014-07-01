@@ -167,7 +167,7 @@ core.on('mach', function(envelope, header, payload) {
 					pd = "/Applications/Pd-extended.app/Contents/MacOS/Pd-extended";
 				}
 				else if (isLinux()) {
-					pd = "pd-extended";
+					pd = "pd-extended -nogui";
 				}
 				var child = trigger.execute(pd+' '+outputfile, function(err, stdout,stderr) {
 					console.log(stdout+stderr);
