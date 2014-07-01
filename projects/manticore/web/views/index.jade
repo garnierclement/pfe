@@ -69,17 +69,26 @@ block content
 					th Date
 					th Type
 					th Source
+					th Destination
 					th Resource
-					th PID
+					th Action
 			each record, index in records
 				tr
 					td= record.date
 					td= record.type
-					td= record.source
+					td
+						if record.port
+							span #{record.source}:#{record.port}
+						else
+							span #{record.source}
+					td= record.dst
 					td= record.resource
 					td 
-						if record.child
-							#{record.child.pid}
+						if record.type == 'active_resource'
+							if record.child
+								a.btn.btn-default(href='/kill/#{record.child.pid}') Kill #{record.child.pid}
+						else if record.type == 'client_request'
+							a.btn.btn-default(href='/release/#{record.resource}') Release
 	h2 API
 	table.table.table-hover
 		thead 
@@ -93,17 +102,19 @@ block content
 			td None
 		tr
 			td GET
-			td /request/[:id]?port=[:portnumber]
+			td /request/[id]?port=[portnumber]
 			td 
-				dl
-					dt [:id]
-					dd UUID
-					dt [:portnumber]
-					dd Listening port number
+				span [id] UUID of the resource
+				br
+				span [portnumber] Listening port number
 		tr
 			td GET
-			td /release/:id
-			td NOT IMPLEMENTED YET
+			td /release/[id]
+			td [id] UUID of the resource
+		tr
+			td GET
+			td /kill/[pid]
+			td [pid] PID of the process to be killed
 
 
 
