@@ -1,6 +1,9 @@
+import java.util.ArrayList;
+
 import com.cycling74.max.Atom;
 import com.cycling74.max.MaxObject;
 import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
 
@@ -60,6 +63,7 @@ public class Node extends MaxObject{
 	 */
 	private JSONArray sensors;
 
+	private ArrayList<String> outlets = new ArrayList<String>();
 
 	private MaxBox name_label;
 
@@ -187,11 +191,20 @@ public class Node extends MaxObject{
 		
 		HttpInfoRequestor resource_requestor = new HttpInfoRequestor();
 		try {
-			String rep = resource_requestor.sendGet("http://localhost:3000/request/" + id);
+			String rep = resource_requestor.sendGet("http://localhost:3000/request/" + id + "?port=" + port);
 		
-			if(rep.equals(this.id) == true){
-				MaxBox socket = this.patcher.newDefault(400, 400, "udpreceive", new Atom[]{Atom.newAtom(port)});
-				MaxBox out = this.patcher.newDefault(300, 300, "outlet", null);
+			if(rep.equals(id)){
+				MaxBox socket = this.patcher.newDefault(0, 417, "udpreceive", new Atom[]{Atom.newAtom(port)});
+				this.outlets.add(id);
+/*				int[] outlet_types = new int[this.outlets.size()];
+				for(int i = 0; i <outlet_types.length; i++){
+					outlet_types[i] = DataTypes.ALL;
+				}
+				this.declareOutlets(outlet_types);*/
+				this.getParentPatcher().getNamedBox(this.name);
+				MaxBox out = this.patcher.newDefault(0, 437, "outlet", null);
+				out.setName(id);
+				
 				this.patcher.connect(socket, 0, out, 0);
 			}
 			
@@ -202,20 +215,19 @@ public class Node extends MaxObject{
 	}
 	
 	/**
-	 * Release request with id and port to the local HTTP server. If the request is successful, the resource is release by Manticore and the udprecieve socket is destroyed.
+	 * Release request with id and port to the local HTTP server. If the request is successful, the resource is release by Manticore and the udpreceive socket is destroyed.
 	 * @param id Sensor unique ID. 
-	 * @param port Port through which the user can recieve data on a UDP socket.
+	 * @param port Port through which the user can receive data on a UDP socket.
 	 * @since 27/06/2014.
 	 */
 	public void release(String id, int port){
 		HttpInfoRequestor resource_requestor = new HttpInfoRequestor();
 		try {
-			String rep = resource_requestor.sendGet("http://localhost:3000/request/" + id);
+			String rep = resource_requestor.sendGet("http://localhost:3000/release/" + id);
 		
-			if(rep.equals(this.id) == true){
-				MaxBox socket = this.patcher.newDefault(400, 400, "udpreceive", new Atom[]{Atom.newAtom(port)});
-				MaxBox out = this.patcher.newDefault(300, 300, "outlet", null);
-				this.patcher.connect(socket, 0, out, 0);
+			if(rep.equals("true")){
+				this.patcher.getNamedBox(id).remove();
+				this.outlets.remove(id);
 			}
 			
 		} catch (Exception e) {

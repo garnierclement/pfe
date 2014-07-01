@@ -69,7 +69,6 @@ public class NetScan extends MaxObject {
 	 */
 	private int debug_mode = 0;
 	
-	
 	/**
 	 * A bang signal to the NetScan java internal will trigger several actions : 
 	 * 	- Retrieval of network info from the local HTTP server.
@@ -78,8 +77,7 @@ public class NetScan extends MaxObject {
 	 * @see com.cycling74.max.MaxObject#bang().
 	 * @since 27/06/2014.
 	 */
-	public void bang(){
-		
+	public void bang(){		
 		get_server_info();
 		unassign_ports();
 		create_new_ports();
@@ -209,10 +207,13 @@ public class NetScan extends MaxObject {
 				mxj_obj.toBackground(true);
 				mxj_obj.setRect(344, 82, 75,20);
 				mxj_obj.setName("Node");
+				mxj_obj.setHidden(true);
 				
 				/* Set the Patchers in interfaces[] visible and locked */
-				interfaces[i].getSubPatcher().getWindow().setSize(391, 170);
+				interfaces[i].getSubPatcher().getWindow().setSize(410, 200);
 				interfaces[i].getSubPatcher().setLocked(true);
+				interfaces[i].getSubPatcher().getWindow().setGrow(true);
+				interfaces[i].setName(this.nodes[i].get("name").toString());
 				
 			}
 			
