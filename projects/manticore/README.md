@@ -25,11 +25,13 @@ In the following, the words *core* and *manticore* with/without a capital letter
     - [Message structure](#message-structure)
     - [Message command and associated payload](#message-command-and-associated-payload)
   - [External messaging](#external-messaging)
-- [Prerequisites](#prerequisites)
-  - [Prerequisites on Mac OS X](#prerequisites-on-mac-os-x)
-  - [Prerequisites on Raspbian (Raspberry Pi)](#prerequisites-on-raspbian-raspberry-pi)
-  - [Prerequisites on Windows](#prerequisites-on-windows)
 - [Installation](#installation)
+  - [Prerequisites](#prerequisites)
+    - [Prerequisites on Mac OS X](#prerequisites-on-mac-os-x)
+    - [Prerequisites on Raspbian (Raspberry Pi)](#prerequisites-on-raspbian-raspberry-pi)
+    - [Prerequisites on Windows](#prerequisites-on-windows)
+  - [Node.js module dependencies](#nodejs-module-dependencies)
+  - [Let's go](#lets-go)
 - [Known issues](#known-issues)
   - [Avahi warning on Linux](#avahi-warning-on-linux)
 
@@ -233,11 +235,13 @@ It is simply a Javascript object with 2 main parts :
 Inspired by REST API
 Using GET HTTP request
 
-## Prerequisites
+## Installation
+
+### Prerequisites
 
 Manticore is based on Node.js and exploits ZeroMQ and Zeroconf/Bonjour.
 
-### Prerequisites on Mac OS X
+#### Prerequisites on Mac OS X
 
 Clone this repository
 
@@ -258,7 +262,7 @@ Install [ZeroMQ] 4.0.4
 
 **Note** : pkg-config may be required too (`brew install pkg-config`)
 
-### Prerequisites on Raspbian (Raspberry Pi)
+#### Prerequisites on Raspbian (Raspberry Pi)
 
 Clone this repository
 
@@ -310,7 +314,7 @@ Compile and install [ZeroMQ] v4.0.4 from source tarball (it also requires libtoo
 	$ rm zeromq-4.0.4.tar.gz
 	$ rm -rf zeromq-4.0.4
 
-### Prerequisites on Windows
+#### Prerequisites on Windows
 
 This is experimental and only tested on Windows 7 x64.
 
@@ -336,7 +340,7 @@ This is experimental and only tested on Windows 7 x64.
 [Git]: http://git-scm.com/download/win
 [GitHub for Windows]: https://windows.github.com/
 
-## Installation
+### Node.js module dependencies
 
 Install Node.js module dependencies ([mdns] and [zmq]) with  
 (see `package.json` for more information about versions)
@@ -353,6 +357,10 @@ If you encounter any issue with the automatic npm installation, you can manually
 	$ npm install underscore
 
 **Note**: depending on the operating system [zmq] and [mdns] have other requirements (see the Prerequisites for your system above).
+
+### Let's go
+
+Now that everything is set up, you can move up to [Getting started](#getting-started)
 
 ## Known issues
 
