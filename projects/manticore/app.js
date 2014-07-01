@@ -29,7 +29,7 @@ api.listen(3000, function() {
 core.on('ready', function() {
 
 	api.get('/', function(req, res) {
-		console.log('>[HTTP]\tWeb UI from '+ req.ip +' on ' +req.headers['user-agent']);
+		//console.log('>[HTTP]\tWeb UI from '+ req.ip +' on ' +req.headers['user-agent']);
 		res.render('index', { title: 'Manticore on '+core.name, name: core.name, nodes: core.nodes, sensors: core.sensors, records: core.records});
 	});
 
