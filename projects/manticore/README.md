@@ -176,7 +176,11 @@ These are the methods used by the Core singleton to interact with its state and 
 
 #### Record
 
-There are 2 types of records :
+The Record class is used to keep track of requests, states and history of the core activity and communication. 
+
+The implementation of the Record class is located in `record.js` and used either in the main application `app.js` and the Core `manticore.js`.
+
+We distinguish 2 types of records :
 
 * 	`active_resource` : these records track every resource that have been requested by another core node and are aware of : 
 	+	the time of the reception of the `request` command on MaCh
