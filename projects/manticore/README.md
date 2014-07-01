@@ -175,8 +175,9 @@ These are the methods used by the Core singleton to interact with its state and 
 
 ### Data structures
 
-* 	Sensor
+*	Message
 * 	Node
+* 	Sensor
 * 	Record
 
 #### Record
