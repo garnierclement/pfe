@@ -30,7 +30,8 @@ In the following, the words *core* and *manticore* with/without a capital letter
   - [Prerequisites on Raspbian (Raspberry Pi)](#prerequisites-on-raspbian-raspberry-pi)
   - [Prerequisites on Windows](#prerequisites-on-windows)
 - [Installation](#installation)
-- [Warning](#warning)
+- [Known issues](#known-issues)
+  - [Avahi warning on Linux](#avahi-warning-on-linux)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -353,7 +354,9 @@ If you encounter any issue with the automatic npm installation, you can manually
 
 **Note**: depending on the operating system [zmq] and [mdns] have other requirements (see the Prerequisites for your system above).
 
-## Warning
+## Known issues
+
+### Avahi warning on Linux
 
 On Linux distributions, we can see the following warning when executing the program
 
