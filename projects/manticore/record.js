@@ -1,10 +1,11 @@
-function Record (res, type, src, dst)
+function Record (res, type, src, dst, port)
 {
 	this.date = new Date();
 	this.resource = res;
 	this.type = type;	// 'active_resource' or 'client_request'
 	this.source = src;	// where does the record comes from (client, other node (UUID))
 	this.dst = dst;		// IP of recipient
+	this.port = port;		// source port (client request) dst port (active_resource)
 }
 
 module.exports = Record;
@@ -16,15 +17,6 @@ module.exports = Record;
  */
 Record.prototype.addChild = function(child) {
 	this.child = child;
-};
-
-/**
- * Add the port asked by the client
- * Specific to 'client_request' records
- * @param {Number} port [description]
- */
-Record.prototype.addPort = function(port) {
-	this.port = port;
 };
 
 

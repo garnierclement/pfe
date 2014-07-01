@@ -160,7 +160,7 @@ core.on('mach', function(envelope, header, payload) {
 			var dst = header.ip;
 			if (dst === this.ip) dst = '127.0.0.1';
 			if (dst !== null) {
-				var activeRes = new Record(payload.data, 'active_resource', header.src, dst);
+				var activeRes = new Record(payload.data, 'active_resource', header.src, dst, payload.port);
 				var outputfile = trigger.generate(dst, payload.port,'mousePosition.pd','output.pd');
 				var pd = "";
 				if(isDarwin()) {

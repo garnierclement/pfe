@@ -433,8 +433,7 @@ Core.prototype.requestResource = function (res, port, src_ip, callback) {
 		if (dst === this.ip) dst = '127.0.0.1';
 		this.syncSend(dst, 'request', this.requestPayload(res,p), function(header, payload) {
 			if (payload.status) {
-				var new_record = new Record(res, 'client_request', src_ip, dst);
-				new_record.addPort(port);
+				var new_record = new Record(res, 'client_request', src_ip, dst, port);
 				self.records.push(new_record);
 			}
 			callback(null, header, payload);

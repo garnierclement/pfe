@@ -77,11 +77,15 @@ block content
 					td= record.date
 					td= record.type
 					td
-						if record.port
+						if record.type == 'client_request'
 							span #{record.source}:#{record.port}
 						else
 							span #{record.source}
-					td= record.dst
+					td
+						if record.type == 'active_resource'
+							span #{record.dst}:#{record.port}
+						else
+							span #{record.dst}
 					td= record.resource
 					td 
 						if record.type == 'active_resource'

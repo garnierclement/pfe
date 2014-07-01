@@ -174,6 +174,23 @@ These are the methods used by the Core singleton to interact with its state and 
 * 	Node
 * 	Record
 
+#### Record
+
+There are 2 types of records :
+
+* 	`active_resource` : these records track every resource that have been requested by another core node and are aware of : 
+	+	the time of the reception of the `request` command on MaCh
+	+	the core node id which requested the resource (so he can identify it in `core.nodes[]`)
+	+	the IP address and port of the endpoint where to send the sensor data (namely OSC packets)
+	+	ulimately if the core node that requested the resource is on the same machine as the client the IP address of the endpoint should match the IP of the node id (but this is not mandatory)
+* 	`client_request` : these records track every request issued by a local client and is aware of :
+	+	the time of the reception of the method GET `/request/[id]?[port]` on the built in HTTP server
+	+	the IP address of the client (if local client, then 127.0.0.1)
+	+	the port that the client requested that we sent data on
+	+	the IP of the destination node that can provide the data (this is used as a commodity for the release resource procedure, so we do not need to look up the core.nodes[] and associated sensors[] to find the IP address)
+
+These records works in pairs and at any time if a `client_request` is a valid record in one node, you could fine an equivalent `active_resource` on another node of the network. This `active_resource` is matching to the previously initiated `client_request`.
+
 ### Inter-core messaging
 
 #### Message structure
