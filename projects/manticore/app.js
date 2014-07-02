@@ -155,24 +155,28 @@ core.on('mach', function(envelope, header, payload) {
 			console.log(payload);
 			break;
 		case 'request':
+			// TODO need to check the id
 			console.log(payload);
 			core.reply('ack', envelope, {status: true});
 			var dst = header.ip;
 			if (dst === this.ip) dst = '127.0.0.1';
 			if (dst !== null) {
 				var new_record = new Record(payload.data, 'active_resource', header.src, dst, payload.port);
-				var outputfile = trigger.generate(dst, payload.port,'mousePosition.pd','output.pd');
-				var pd = "";
+				var child;
 				if(isDarwin()) {
-					pd = "/Applications/Pd-extended.app/Contents/MacOS/Pd-extended";
+					var outputfile = trigger.generate(dst, payload.port,'mousePosition.pd','output.pd');
+					var pd = "/Applications/Pd-extended.app/Contents/MacOS/Pd-extended";
+					child = trigger.execute(pd+' '+outputfile, function(err, stdout,stderr) {
+						console.log(stdout+stderr);
+					});
 				}
 				else if (isLinux()) {
-					pd = "pd-extended -nogui";
+					//var pd = "pd-extended -nogui";
+					child = trigger.execute('../IntertialSender/XBeeOnPi/xBeeReadSerial -a '+dst+' -p '+payload.port);
 				}
-				var child = trigger.execute(pd+' '+outputfile, function(err, stdout,stderr) {
-					console.log(stdout+stderr);
-				});
-				new_record.addChild(child);
+				if (child) {
+					new_record.addChild(child);
+				}
 				core.records.push(new_record);
 			}
 			else
