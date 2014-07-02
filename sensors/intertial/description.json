@@ -1,9 +1,16 @@
 {
 	"name": "inertial",
 	"bootstrap": {
-		"availability": {
+		"platform": {
 			// definition des systèmes
 			},
+		"procedure": [
+			{
+				"cmd": "xBeeSerialReader",
+				"parameter": {},
+				"platform"
+			}
+			]
 		},
 	"request": {
 		"default": {

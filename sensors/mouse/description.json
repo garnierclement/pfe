@@ -1,5 +1,8 @@
 {
 	"name": "inertial",
+	"configuration": {
+		
+	}
 	"bootstrap": {
 		"availability": {
 			// definition des systèmes
