@@ -16,12 +16,12 @@ check_brew() {
     fi
 }
 
-# Check if Node JS is already installed.
+# Check if Node.js is already installed.
 install_node() {
 	if hash node 2>/dev/null; then
-		echo "[INSTALL] Node JS already installed."
+		echo "[INSTALL] Node.js already installed."
 	else
-		echo "[INSTALL] Installing Node JS..."
+		echo "[INSTALL] Installing Node.js..."
 		brew install node
 	fi
 }
