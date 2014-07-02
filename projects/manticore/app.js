@@ -172,7 +172,9 @@ core.on('mach', function(envelope, header, payload) {
 				}
 				else if (isLinux()) {
 					//var pd = "pd-extended -nogui";
-					child = trigger.execute('../IntertialSender/XBeeOnPi/xBeeReadSerial -a '+dst+' -p '+payload.port);
+					child = trigger.execute('../IntertialSender/XBeeOnPi/xBeeReadSerial -a '+dst+' -p '+payload.port, function(err, stdout, stderr) {
+						console.log(stdout, stderr);
+					});
 				}
 				if (child) {
 					new_record.addChild(child);
