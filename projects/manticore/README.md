@@ -236,6 +236,56 @@ It is simply a Javascript object with 2 main parts :
 Inspired by REST API
 Using GET HTTP request
 
+### Reading the log
+
+> // TODO write about conventions used in logging
+
+The logging have the following structure
+
+	<symbol>[<subject>] <message>
+
+Like this (starting procedure)
+
+	+[CORE]	Core starting on macbook-cgarnier.local
+	+[CORE]	Core id 506243e0-02b9-11e4-87f0-8dea239e7eaf
+	+[HTTP]	Listening on 3000
+	+[UDP]	UDP socket listening on 0.0.0.0:42424
+	+[PUB]	Publisher socket listening on 32323
+	+[CORE]	Advertising _node._tcp on 32323
+	+[mDNS]	Start browsing for _node._tcp services
+	+[MACH]	Socket listening on 45454
+
+The `<symbol>`can be
+
+*	`+` used for any relevant information
+*	`>` used for incoming message
+*	`!` used for errors
+*	`-` used for the disapperance of a node
+
+The `<subject>` can be
+
+*	`CORE`
+*	`HTTP`	for any connection or event related to the Web user interface
+*	`UDP`	for the creation and the reception on the built-in UDP socket
+*	`mDNS`	for anything related to the mdns module (browsing and advertising)
+*	`MACH`	for any message on the main channel (MaCh)
+*	`INCH`	for any message on the information channel (InCh) 
+*	`SYNC`	for any synchronous request
+*	`ASYN`	for any asynchronous request
+*	`RELR`	for the Release Resource procedure
+*	`REQR`	for the Request Resource procedure
+*	`REQ`	for anything related to a request (either synchronous or asynchronous)
+*	`REP`	for anything related to a reply
+*	`PUB`	for anything related to the publisher socket (used by InCh)
+*	`SUB`	for anything relted to the subscriber socket (used by InCh)
+
+### HTTP Web user interface
+
+#### Jade
+
+> // TODO Jade templating engine
+> // Add a screenshot
+
 ## Installation
 
 ### Prerequisites
@@ -382,6 +432,18 @@ This must not be harmful and the warning can be hidden with the following enviro
 
 For further investigation, enquire <http://0pointer.de/avahi-compat?s=libdns_sd&e=node>
 
+### Auto-detection on multiple interfaces
+
+Because a node advertises a _node._tcp service and at the same time browses/discovers any node advertising the same _node._tcp service, it is ultimately going to see multiple instance of itself. 
+
+Currently we only care about the first one it sees (but maybe it is not the one we want) and for the others, the log will show something like
+
+	+[mDNS]	Service up: macbook-cgarnier at 192.168.190.1 (vmnet1)
+	![CORE]	Node id 506243e0-02b9-11e4-87f0-8dea239e7eaf is already present
+
+So when a computer have multiples network interfaces, it is going to see itself multiple time.
+
+Note that this behavior is also shown with virtual interfaces such as `vmnet1` or `vmnet8` used by VMware.
 
 [zmq]: https://www.npmjs.org/package/zmq
 [mdns]: https://www.npmjs.org/package/mdns
