@@ -5,7 +5,7 @@
 - [ ] Give a model to sensor
 - [ ] Insert new sensors : MIDI Keyboard + Inertial sensor
 - [x] Design a proper message object with header + type + payload
-- [ ] Test with more than 5 nodes
+- [x] Test with more than 5 nodes
 - [ ] If request is too long or fail, timeout and return fail request resource
 - [ ] Keep track of local requested resource
 - [ ] Handle soft/hard release in API 
@@ -25,6 +25,7 @@
 - [ ] Forward data, advertise a sensor on a node that receives data from any computer/device that is not a node of the network
 - [x] update web interface according to the use of senors
 - [x] request sensor's uuid should not fail
-- [ ] Fully implement explicit release
-- [ ] Implement implicit release (when a node died, look if )
+- [x] Fully implement explicit release
+- [x] Implement implicit release (when a node died, look if )
 - [ ] Move the messaging structure into a message.js file
+- [ ] Periodic publishing of node capabilities
