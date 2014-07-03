@@ -352,7 +352,7 @@ Core.prototype.deleteDeadNode = function(service){
 		console.log('-[CORE]\tDeleting node '+service.name);
 	}
 	else {
-		console.log('![CORE]\tError cannot delete node '+service.name+', not found ; no harm, maybe just a duplicate serviceDown');
+		console.log('![CORE]\tError cannot delete node '+service.name+', not found ; no harm, maybe just a duplicate \'serviceDown\' or multiple interface self-discovery');
 	}
 	return deadNodeId;
 };
