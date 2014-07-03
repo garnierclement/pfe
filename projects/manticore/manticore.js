@@ -503,7 +503,11 @@ Core.prototype.releasePayload = function (res) {
 	return {data: res};
 };
 
-/*** Debug ****/
+/**
+ * Fake the detection of sensors and publish them on InCh
+ * This function is intented to be removed later
+ * It is just used to simulate the presence of sensors and their capabilities
+ */
 Core.prototype.fakeSensors = function () {
 	// Generate fake sensors
 	var sensor1 = new Sensor("Mouse");
@@ -517,16 +521,4 @@ Core.prototype.fakeSensors = function () {
 	this.sensors.push(sensor2);
 	// publish them
 	this.publish('new_sensor', this.sensors);
-};
-
-Core.prototype.listId = function() {
-	var ids = [];
-	ids = _.map(this.nodes, function(node) {
-		return node.id;
-	});
-	// _.find(this.nodes, function(node))
-	// _.where(this.nodes, {id: uuidlookedfor})
-	// _.findWhere
-	// _.contanis
-	// _.pluck extract a list of property values then test contains on it
 };
