@@ -24,6 +24,7 @@ function Node (service)
 	this.name = service.name;
 	this.ip = filter_ipv4(service.addresses);
 	this.sensors = [];
+	this.network_iface = service.networkInterface;
 }
 
 module.exports = Node;

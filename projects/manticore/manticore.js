@@ -233,7 +233,7 @@ Core.prototype.newSubscribe = function(peer) {
  */
 self.browser.on('serviceDown', function(service) {
 	console.log('-[mDNS]\tService down: '+service.name+' ('+service.networkInterface+')');
-	var deadNodeId = self.deleteDeadNode(service.name);
+	var deadNodeId = self.deleteDeadNode(service);
 	self.emit('died', deadNodeId);
 });
 
@@ -334,24 +334,25 @@ Core.prototype.reply = function(cmd, envelope, data) {
 /**
  * Delete node when service down
  * @param  {Node[]}	nodes      list of Node objects
- * @param  {String} node_name  node canonical name to be deleted
+ * @param  {Object} service 
  */
-Core.prototype.deleteDeadNode = function(node_name){
+Core.prototype.deleteDeadNode = function(service){
 	var index = null;
 	var deadNodeId = null;
 	for(var k in this.nodes){
-		if (this.nodes[k].name == node_name)  index = k;
+		if (this.nodes[k].name == service.name && this.nodes[k].network_iface == service.networkInterface)
+			index = k;
 	}
 	if(index !== null) {
-		if (node_name != this.name && this.nodes[index].ip != this.ip) {
+		if (service.name != this.name && this.nodes[index].ip != this.ip) {
 			this.subscriber.disconnect('tcp://'+this.nodes[index].ip+':'+INCH_PORT);
 		}
 		deadNodeId = this.nodes[index].id;
 		this.nodes.splice(index,1);
-		console.log('-[CORE]\tDeleting node '+node_name);
+		console.log('-[CORE]\tDeleting node '+service.name);
 	}
 	else {
-		console.log('![CORE]\tError cannot delete node '+node_name+', not found ; no harm, maybe just a duplicate serviceDown');
+		console.log('![CORE]\tError cannot delete node '+service.name+', not found ; no harm, maybe just a duplicate serviceDown');
 	}
 	return deadNodeId;
 };
