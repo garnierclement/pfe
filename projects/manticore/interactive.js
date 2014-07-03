@@ -19,7 +19,7 @@ process.stdin.on('readable', function() {
 			core.close();
 		}
 		else if (/^help/.test(chunk)) {
-			console.log("[HELP]\tUsage: cmd [param], see examples below");
+			console.log("+[HELP]\tUsage: cmd [param], see examples below");
 			console.log("\tdebug");
 			console.log("\teval core.nodes");
 			console.log("\tlog core.nodes");
@@ -117,7 +117,7 @@ process.stdin.on('readable', function() {
 			core.fakeSensors();
 		}
 		else {
-			console.log("![CORE]\tAvailable commands : help|debug|eval|log|exec|send|remote|emit|request");
+			console.log("![CORE]\tAvailable commands : help|debug|eval|log|exec|send|remote|emit|request|release|fake");
 		}
 	}
 });

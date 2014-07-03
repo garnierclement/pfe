@@ -489,6 +489,10 @@ function isValidPort(port) {
 	return false;
 }
 
+Core.prototype.detectSensors = function() {
+	// body...
+};
+
 /******* Message payloads *********/
 Core.prototype.requestPayload = function (res, port) {
 	var _p = port || UDP_PORT;

@@ -25,6 +25,9 @@ In the following, the words *core* and *manticore* with/without a capital letter
     - [Message structure](#message-structure)
     - [Message command and associated payload](#message-command-and-associated-payload)
   - [External messaging](#external-messaging)
+  - [Reading the log](#reading-the-log)
+  - [HTTP Web user interface](#http-web-user-interface)
+    - [Jade](#jade)
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
     - [Prerequisites on Mac OS X](#prerequisites-on-mac-os-x)
@@ -34,6 +37,7 @@ In the following, the words *core* and *manticore* with/without a capital letter
   - [Let's go](#lets-go)
 - [Known issues](#known-issues)
   - [Avahi warning on Linux](#avahi-warning-on-linux)
+  - [Auto-detection on multiple interfaces](#auto-detection-on-multiple-interfaces)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
