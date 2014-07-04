@@ -1,31 +1,69 @@
 {
-  "bootstrap": {
-    "availability": {}
+  "name": "mouse",
+  "system": {
+    "linux": {
+      "platform": "linux"
+    },
+    "osx": {
+      "platform": "darwin"
+    },
+    "win": {
+      "platform": "win32"
+    }
   },
-  "configuration": {},
-  "monitor": {},
-  "name": "inertial",
+  "bootstrap": [
+    {
+      "cmd": "checkMouse-osx.sh",
+      "system": [
+        "osx"
+      ]
+    },
+    {
+      "cmd": "checkMouse-linux.sh",
+      "system": [
+        "linux"
+      ]
+    },
+    {
+      "cmd": "checkMouse-windows.bat",
+      "system": [
+        "win"
+      ]
+    }
+  ],
   "request": {
     "default": {
-      "check": [
+      "options": [
+        "$ADDRESS",
+        "$PORT",
+        "$GENERATED_PATCH"
+      ],
+      "check": [],
+      "generate": [
         {
-          "cmd": "xBeeSerialReader",
-          "parameter": {
-            "-c": null
-          }
+          "cmd": "generateMousePosition.sh",
+          "parameter": [
+            "$ADDRESS",
+            "$PORT",
+            "$GENERATED_PATCH"
+          ],
+          "system": [
+            "osx",
+            "linux"
+          ]
         }
       ],
       "execute": [
         {
-          "cmd": "xBeeSerialReader",
-          "parameter": {
-            "-a": "ADDRESS",
-            "-p": "PORT"
-          },
-          "sudo": true
+          "cmd": "/Applications/Pd-extended.app/Contents/MacOS/Pd-extended",
+          "parameter": [
+            "$GENERATED_PATCH"
+          ],
+          "system": [
+            "osx"
+          ]
         }
-      ],
-      "generate": null
+      ]
     }
   }
 }
