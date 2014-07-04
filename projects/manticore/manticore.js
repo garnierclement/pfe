@@ -209,7 +209,7 @@ self.browser.on('serviceUp', function(service) {
 		var new_node = new Node(service);
 		if (self.uuid != service.txtRecord.id) {
 			self.newSubscribe(new_node.ip);
-			delayedPublishSensors(1000);
+			self.delayedPublishSensors(1000);
 		}
 		else {
 			// note if node discovered itself
@@ -535,7 +535,7 @@ Core.prototype.detectSensors = function() {
 			}
 		}
 	}
-	delayedPublishSensors(5000);
+	this.delayedPublishSensors(5000);
 };
 
 Core.prototype.delayedPublishSensors = function(delay) {
