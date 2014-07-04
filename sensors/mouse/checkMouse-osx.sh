@@ -7,26 +7,26 @@
 failure=1
 success=0
 
-echo "Checking for mouse or trackpad..."
+echo "+[SCPT]\tChecking for mouse or trackpad..."
 
 if system_profiler SPUSBDataType | grep MOUSE 
 then 
-	echo "MOUSE detected!"
+	echo "+[SCPT]\tMOUSE detected!\c"
 	exit $success 
 
 elif system_profiler SPUSBDataType | grep Trackpad 
 then 
-	echo "Trackpad detected!"
+	echo "+[SCPT]\tTrackpad detected!\c"
 	exit $success 
 
 elif system_profiler SPUSBDataType | grep Mouse 
 then 
-	echo "Mouse detected!"
+	echo "+[SCPT]\tMouse detected!\c"
 	exit $success
 
 elif system_profiler SPUSBDataType | grep mouse
 then
-	echo "mouse detected!" 
+	echo "+[SCPT]\tmouse detected!\c" 
 	exit $success
 else
 	exit $failure
