@@ -11,23 +11,24 @@ var _ = require('underscore');
 function Sensor (desc, systems)
 {
 	// du taff
-	_.each(desc.bootstrap, function(command) {
-		if (_.intersection(command.systems, systems) > 0) {
-			var cmdToExecute = command.cmd;
+	_.each(desc.bootstrap, function(command, key) {
+		var intersect = _.intersection(command.systems, systems);
+		if (intersect.length > 0) {
+			var cmdToExecute = "../../sensors/"+desc.name+"/"+command.cmd;
 			if (command.parameters > 0) {
 				for (var i = 0; i < command.parameters.length; i++) {
 					cmdToExecute += ' '+command.parameters[i];
 				}	
 			}
-			var child = executeCommand(command.cmd, function(stdout, stderr) {
-				console.log(stdout+stderr);
+			var child = executeCommand(cmdToExecute, function(stdout, stderr) {
+				//console.log(stdout+stderr);
 			});
 			child.on('exit', function(exit_code) {
 				if (exit_code === 0) {
 					console.log('+[DTEC] Bootstrap command '+command.cmd+' for sensor '+desc.name+ ' OK');
 				}
 				else {
-					var err = "![DTEC] Bootstrap command '+command.cmd+' for sensor '+desc.name+ ' failed";
+					var err = "![DTEC] Bootstrap command "+command.cmd+" for sensor "+desc.name+" failed";
 					console.log(err);
 						throw err;
 				}

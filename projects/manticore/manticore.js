@@ -71,6 +71,8 @@ var self = module.exports = new Core();
 Core.prototype.init = function() {
 	console.log('+[CORE]\tCore starting on '+this.name);
 	console.log('+[CORE]\tCore id '+this.uuid);
+	console.log('+[CORE]\tDetect sensors');
+	this.detectSensors();
 	// bind local socket
 	this.udp.bind(UDP_PORT, function() {
 		var address = self.udp.address();
