@@ -4,8 +4,8 @@
 # system_profiler SPUSBDataType
 # check for HI Device inputs
 
-failure=0
-success=1
+failure=1
+success=0
 
 echo "Checking for mouse or trackpad..."
 
