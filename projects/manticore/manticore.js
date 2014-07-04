@@ -71,8 +71,6 @@ var self = module.exports = new Core();
 Core.prototype.init = function() {
 	console.log('+[CORE]\tCore starting on '+this.name);
 	console.log('+[CORE]\tCore id '+this.uuid);
-	console.log('+[CORE]\tDetect sensors');
-	this.detectSensors();
 	// bind local socket
 	this.udp.bind(UDP_PORT, function() {
 		var address = self.udp.address();
@@ -96,6 +94,8 @@ Core.prototype.init = function() {
 		else
 			console.log('+[MACH]\tSocket listening on '+MACH_PORT);
 	});
+	console.log('+[CORE]\tDetect sensors');
+	this.detectSensors();
 	// subscribe socket
 	this.emit('ready');
 };
@@ -530,8 +530,13 @@ Core.prototype.detectSensors = function() {
 				console.log('![DTEC] '+e);
 			}
 		}
-		this.publish('new_sensor', this.sensors);
 	}
+	if (this.sensors.length > 0) {
+		setTimeout(function() {
+			console.log("+[DTEC] Publishing "+self.sensors.length+" sensors");
+			self.publish('new_sensor', this.sensors);
+		}, 5000);
+	}	
 };
 
 /******* Message payloads *********/
