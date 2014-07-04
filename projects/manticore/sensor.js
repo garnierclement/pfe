@@ -2,6 +2,8 @@
  * Module dependencies
  */
 var uuid = require('uuid');
+var exec = require('child_process').exec;
+var _ = require('underscore');
 
 /**
  * Sensor object
@@ -9,14 +11,34 @@ var uuid = require('uuid');
 function Sensor (desc, systems)
 {
 	// du taff
-	if (1) {
-		this.id = uuid.v1();
-		this.name = desc.name;
-		this.data = [];
-	}
-	else
-		throw 'unsupported platform';
-	
+	_.each(desc.bootstrap, function(command) {
+		if (_.intersection(command.systems, systems) > 0) {
+			var cmdToExecute = command.cmd;
+			if (command.parameters > 0) {
+				for (var i = 0; i < command.parameters.length; i++) {
+					cmdToExecute += ' '+command.parameters[i];
+				}	
+			}
+			var child = executeCommand(command.cmd, function(stdout, stderr) {
+				console.log(stdout+stderr);
+			});
+			child.on('exit', function(exit_code) {
+				if (exit_code === 0) {
+					console.log('+[DTEC] Bootstrap command '+command.cmd+' for sensor '+desc.name+ ' OK');
+				}
+				else {
+					var err = "![DTEC] Bootstrap command '+command.cmd+' for sensor '+desc.name+ ' failed";
+					console.log(err);
+						throw err;
+				}
+			});
+		}
+	});
+
+	this.id = uuid.v1();
+	this.name = desc.name;
+	this.data = [];
+
 }
 
 module.exports = Sensor;
@@ -29,4 +51,17 @@ module.exports = Sensor;
  */
 Sensor.prototype.addData = function(_name, osc_string) {
 	this.data.push({name: _name, osc: osc_string});
+};
+
+function executeCommand(cmd, callback) {
+	try {
+		var child = exec(cmd, function(err, stdout, stderr){
+			console.log("+[EXEC]\tExecuting "+cmd+"\n"+stdout+stderr);
+			callback(stdout, stderr);
+		});
+		return child;
+	}
+	catch(e) {
+		console.log("![EXEC]\t"+e);
+	}
 };

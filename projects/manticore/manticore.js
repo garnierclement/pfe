@@ -508,8 +508,6 @@ Core.prototype.detectSensors = function() {
 				var descriptionFile = require(elemPath+'/description.json');
 				var systems = [];
 				_.each(descriptionFile.systems, function(system, system_name) {
-					console.log(system_name);
-					console.log(system);
 					if (system.platform === self.platform) {
 						if (system.arch) {
 							if (system.arch === self.arch) {
