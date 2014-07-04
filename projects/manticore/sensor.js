@@ -38,14 +38,19 @@ function Sensor (desc, systems)
 
 	this.id = uuid.v1();
 	this.name = desc.name;
-	this.data = [];
+	var data = this.data = [];
 
-	console.log(desc.data);
 	// parsing the content of 'data' in the description file
 	_.each(desc.data, function(datum) {
-		console.log(datum);
-		this.data.push({name: datum.description, osc: datum.osc_format});
+		data.push({name: datum.description, osc: datum.osc_format});
 	});
+
+	this.request = function(mode, options) {
+		if (_.has(desc.request, mode)) {
+				var opt = _.object(desc.request[mode].options, options);
+		}
+
+	};
 
 }
 

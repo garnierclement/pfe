@@ -15,18 +15,13 @@
       ]
     }
   ],
-  "data": [
-    {
-      "description": "X position of the mouse",
-      "osc_format": "/mouse/x f"
-    },
-    {
-      "description": "Y position of the mouse",
-      "osc_format": "/mouse/y f"
-    }
-  ],
   "request": {
     "default": {
+       "options": [
+        "$ADDRESS",
+        "$PORT",
+        null
+      ],
       "check": [
         {
           "cmd": "xBeeSerialReader",

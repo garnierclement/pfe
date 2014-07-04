@@ -162,6 +162,7 @@ core.on('mach', function(envelope, header, payload) {
 			core.reply('ack', envelope, {status: true});
 			var dst = header.ip;
 			if (dst === this.ip) dst = '127.0.0.1';
+			//senser.request('default', args)
 			if (dst !== null) {
 				var new_record = new Record(payload.data, 'active_resource', header.src, dst, payload.port);
 				var child;
