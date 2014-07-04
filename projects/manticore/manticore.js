@@ -123,6 +123,9 @@ Core.prototype.browse = function() {
  * @param  {blob} data [blob of data (JSON)]
  */
 self.subscriber.on('message', function(data) {
+	console.log(':[DBUG]\tSubscriber: '+arguments.length);
+	for (var k in arguments)
+		console.log(arguments[k].toString());
 	var msg = JSON.parse(data);
 	self.emit('inch', msg.header, msg.payload);
 });
@@ -534,7 +537,7 @@ Core.prototype.detectSensors = function() {
 	if (this.sensors.length > 0) {
 		setTimeout(function() {
 			console.log("+[DTEC] Publishing "+self.sensors.length+" sensors");
-			self.publish('new_sensor', {sensors: this.sensors});
+			self.publish('new_sensor', {sensors: self.sensors});
 		}, 5000);
 	}	
 };
