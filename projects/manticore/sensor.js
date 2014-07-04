@@ -40,6 +40,13 @@ function Sensor (desc, systems)
 	this.name = desc.name;
 	this.data = [];
 
+	console.log(desc.data);
+	// parsing the content of 'data' in the description file
+	_.each(desc.data, function(datum) {
+		console.log(datum);
+		this.data.push({name: datum.description, osc: datum.osc_format});
+	});
+
 }
 
 module.exports = Sensor;
