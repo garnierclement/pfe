@@ -493,7 +493,9 @@ function isValidPort(port) {
 	return false;
 }
 
-// sync or async ?
+/**
+ * Sensors detection
+ */
 Core.prototype.detectSensors = function() {
 	console.log("+[DTEC] Looking for sensors");
 	var sensorsPath = '../../sensors/';
@@ -504,8 +506,25 @@ Core.prototype.detectSensors = function() {
 		if (stat.isDirectory()) {
 			try {
 				var descriptionFile = require(elemPath+'/description.json');
-				var new_sensor = new Sensor(descriptionFile, this.arch, this.platform);
-				this.sensors.push(new_sensor);
+				var systems = [];
+				_.each(descriptionFile.systems, function(system, system_name) {
+					console.log(system_name);
+					console.log(system);
+					if (system.platform === self.platform) {
+						if (system.arch) {
+							if (system.arch === self.arch) {
+								systems.push(system_name);
+							}
+						}
+						else {
+							systems.push(system_name);
+						}
+					}
+				});
+				if (systems.length > 0) {
+					var new_sensor = new Sensor(descriptionFile, systems);
+					this.sensors.push(new_sensor);
+				}
 			}
 			catch (e) {
 				console.log('![DTEC] '+e);
@@ -536,11 +555,11 @@ Core.prototype.releasePayload = function (res) {
  */
 Core.prototype.fakeSensors = function () {
 	// Generate fake sensors
-	var sensor1 = new Sensor({name: "Mouse"});
+	var sensor1 = new Sensor({name: "Mouse"}, null);
 	sensor1.addData('X','/mouse/x f');
 	sensor1.addData('Y','/mouse/y f');
 	this.sensors.push(sensor1);
-	var sensor2 = new Sensor({name: "Intertial"});
+	var sensor2 = new Sensor({name: "Intertial"}, null);
 	sensor2.addData('Roll','/intertial/roll f');
 	sensor2.addData('Pitch','/intertial/pitch f');
 	sensor2.addData('Yaw','/intertial/yaw f');
