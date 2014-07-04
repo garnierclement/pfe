@@ -1,16 +1,20 @@
 {
-  "bootstrap": {
-    "platform": {},
-    "procedure": [
-      {
-        "cmd": "xBeeSerialReader",
-        "parameter": {},
-        "platform": ""
-      }
-    ]
-  },
-  "monitor": {},
   "name": "inertial",
+  "system": {
+    "pi": {
+      "platform": "linux",
+      "arch": "arm"
+    }
+  },
+  "bootstrap": [
+    {
+      "cmd": "xBeeSerialReader",
+      "parameter": {},
+      "system": [
+        "pi"
+      ]
+    }
+  ],
   "request": {
     "default": {
       "check": [
@@ -18,7 +22,10 @@
           "cmd": "xBeeSerialReader",
           "parameter": {
             "-c": null
-          }
+          },
+          "system": [
+            "pi"
+          ]
         }
       ],
       "execute": [
@@ -28,7 +35,10 @@
             "-a": "ADDRESS",
             "-p": "PORT"
           },
-          "sudo": true
+          "sudo": true,
+          "system": [
+            "pi"
+          ]
         }
       ],
       "generate": null

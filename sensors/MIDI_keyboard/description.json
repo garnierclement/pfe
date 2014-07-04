@@ -1,5 +1,5 @@
 {
-  "name": "inertial",
+  "name": "MIDI_keyboard",
   "bootstrap": {
     "availability": {}
   },
