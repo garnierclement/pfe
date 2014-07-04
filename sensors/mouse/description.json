@@ -14,19 +14,19 @@
   "bootstrap": [
     {
       "cmd": "checkMouse-osx.sh",
-      "system": [
+      "systems": [
         "osx"
       ]
     },
     {
       "cmd": "checkMouse-linux.sh",
-      "system": [
+      "systems": [
         "linux"
       ]
     },
     {
       "cmd": "checkMouse-windows.bat",
-      "system": [
+      "systems": [
         "win"
       ]
     }
@@ -42,12 +42,12 @@
       "generate": [
         {
           "cmd": "generateMousePosition.sh",
-          "parameter": [
+          "parameters": [
             "$ADDRESS",
             "$PORT",
             "$GENERATED_PATCH"
           ],
-          "system": [
+          "systems": [
             "osx",
             "linux"
           ]
@@ -56,10 +56,10 @@
       "execute": [
         {
           "cmd": "/Applications/Pd-extended.app/Contents/MacOS/Pd-extended",
-          "parameter": [
+          "parameters": [
             "$GENERATED_PATCH"
           ],
-          "system": [
+          "systems": [
             "osx"
           ]
         }

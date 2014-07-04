@@ -9,8 +9,8 @@
   "bootstrap": [
     {
       "cmd": "xBeeSerialReader",
-      "parameter": {},
-      "system": [
+      "parameters": {},
+      "systems": [
         "pi"
       ]
     }
@@ -20,10 +20,10 @@
       "check": [
         {
           "cmd": "xBeeSerialReader",
-          "parameter": {
+          "parameters": {
             "-c": null
           },
-          "system": [
+          "systems": [
             "pi"
           ]
         }
@@ -31,12 +31,12 @@
       "execute": [
         {
           "cmd": "xBeeSerialReader",
-          "parameter": {
+          "parameters": {
             "-a": "ADDRESS",
             "-p": "PORT"
           },
           "sudo": true,
-          "system": [
+          "systems": [
             "pi"
           ]
         }
