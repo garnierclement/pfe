@@ -16,6 +16,7 @@ var dgram = require('dgram');	// for UDP sockets
 var util = require('util'),		// extend the Core to be an EventEmitter
 	EventEmitter = require('events').EventEmitter;
 var _ = require("underscore");
+var fs = require('fs');
 
 var Node = require('./node.js');		// Node object
 var Sensor = require('./sensor.js');	// Sensor object
@@ -489,8 +490,27 @@ function isValidPort(port) {
 	return false;
 }
 
+// sync or async ?
 Core.prototype.detectSensors = function() {
-	// body...
+	console.log("+[DTEC] Looking for sensors");
+	var sensorsPath = '../../sensors/';
+	fs.readdir(sensorsPath, function(err, list) {
+		console.log(list);
+		for (var i = 0; i < list.length; i++) {
+			var elemPath = sensorsPath+list[i];
+			var stat = fs.statSync(elemPath);
+			if (stat.isDirectory()) {
+				console.log(elemPath);
+				try {
+					var descriptionFile = require(elemPath+'/description.json');
+				} 
+				catch (e) {
+					console.log('![DTEC]'+e);
+				}
+				
+			}
+		}
+	});
 };
 
 /******* Message payloads *********/
