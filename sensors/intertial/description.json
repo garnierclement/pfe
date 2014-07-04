@@ -1,30 +1,28 @@
 {
-  "name": "inertial",
   "bootstrap": {
-    "platform": {
-      // definition des systèmes
-      },
+    "platform": {},
     "procedure": [
       {
         "cmd": "xBeeSerialReader",
         "parameter": {},
         "platform": ""
       }
-      ]
-    },
+    ]
+  },
+  "monitor": {},
+  "name": "inertial",
   "request": {
     "default": {
       "check": [
-        { 
+        {
           "cmd": "xBeeSerialReader",
           "parameter": {
             "-c": null
           }
         }
       ],
-      "generate": null,
       "execute": [
-        { 
+        {
           "cmd": "xBeeSerialReader",
           "parameter": {
             "-a": "ADDRESS",
@@ -33,7 +31,7 @@
           "sudo": true
         }
       ],
+      "generate": null
     }
-  },
-  "monitor": {},
+  }
 }
