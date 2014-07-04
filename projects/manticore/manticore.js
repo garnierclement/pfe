@@ -573,5 +573,5 @@ Core.prototype.fakeSensors = function () {
 	sensor2.addData('Yaw','/intertial/yaw f');
 	this.sensors.push(sensor2);
 	// publish them
-	this.publish('new_sensor', this.sensors);
+	this.publish('new_sensor', {sensors: this.sensors});
 };

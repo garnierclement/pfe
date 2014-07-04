@@ -126,10 +126,12 @@ core.on('inch', function(header, payload) {
 		case 'new_sensor':
 			console.log(payload);
 			var idx = core.findNodeById(header.src);
-			if (idx !== null)
-				for (var i = 0; i < payload.sensors.length; i++) {
-					core.nodes[idx].sensors.push(payload[i]);
+			if (idx !== null) {
+				var diff = _.difference(payload.sensors, core.nodes[idx].sensors);
+				if (diff.length > 0) {
+					core.nodes[idx].sensors.concat(diff);
 				}
+			}
 			break;
 		default:
 			console.log('![INCH]\tMessage type not imlemented'+header.type);
