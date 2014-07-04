@@ -1,6 +1,6 @@
 {
   "name": "mouse",
-  "system": {
+  "systems": {
     "linux": {
       "platform": "linux"
     },

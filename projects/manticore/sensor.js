@@ -6,7 +6,7 @@ var uuid = require('uuid');
 /**
  * Sensor object
  */
-function Sensor (desc, arch, platform)
+function Sensor (desc, systems)
 {
 	// du taff
 	if (1) {

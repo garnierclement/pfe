@@ -1,6 +1,6 @@
 {
   "name": "inertial",
-  "system": {
+  "systems": {
     "pi": {
       "platform": "linux",
       "arch": "arm"
