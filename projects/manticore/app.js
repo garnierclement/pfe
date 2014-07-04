@@ -159,6 +159,10 @@ core.on('mach', function(envelope, header, payload) {
 		case 'request':
 			// TODO need to check the id
 			console.log(payload);
+			// check id
+			// récupère l'object senser associé
+			// var sensor =
+			// sensor.reuest('default', dst, port, output)
 			core.reply('ack', envelope, {status: true});
 			var dst = header.ip;
 			if (dst === this.ip) dst = '127.0.0.1';
