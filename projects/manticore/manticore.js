@@ -123,9 +123,9 @@ Core.prototype.browse = function() {
  * @param  {blob} data [blob of data (JSON)]
  */
 self.subscriber.on('message', function(data) {
-	console.log(':[DBUG]\tSubscriber: '+arguments.length);
-	for (var k in arguments)
-		console.log(arguments[k].toString());
+	// console.log(':[DBUG]\tSubscriber: '+arguments.length);
+	// for (var k in arguments)
+	// 	console.log(arguments[k].toString());
 	var msg = JSON.parse(data);
 	self.emit('inch', msg.header, msg.payload);
 });
@@ -209,6 +209,7 @@ self.browser.on('serviceUp', function(service) {
 		var new_node = new Node(service);
 		if (self.uuid != service.txtRecord.id) {
 			self.newSubscribe(new_node.ip);
+			delayedPublishSensors(1000);
 		}
 		else {
 			// note if node discovered itself
@@ -534,12 +535,16 @@ Core.prototype.detectSensors = function() {
 			}
 		}
 	}
+	delayedPublishSensors(5000);
+};
+
+Core.prototype.delayedPublishSensors = function(delay) {
 	if (this.sensors.length > 0) {
 		setTimeout(function() {
 			console.log("+[DTEC] Publishing "+self.sensors.length+" sensors");
 			self.publish('new_sensor', {sensors: self.sensors});
-		}, 5000);
-	}	
+		}, delay);
+	}
 };
 
 /******* Message payloads *********/

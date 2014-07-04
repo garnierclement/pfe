@@ -124,13 +124,11 @@ core.on('inch', function(header, payload) {
 			});
 			break;
 		case 'new_sensor':
-			console.log(payload);
 			var idx = core.findNodeById(header.src);
 			if (idx !== null) {
 				var diff = _.difference(payload.sensors, core.nodes[idx].sensors);
-				console.log(diff);
-				if (diff.length > 0) {
-					core.nodes[idx].sensors.concat(diff);
+				for (var i = 0; i < diff.length; i++) {
+					core.nodes[idx].sensors.push(diff[i]);
 				}
 			}
 			break;
