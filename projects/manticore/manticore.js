@@ -534,7 +534,7 @@ Core.prototype.detectSensors = function() {
 	if (this.sensors.length > 0) {
 		setTimeout(function() {
 			console.log("+[DTEC] Publishing "+self.sensors.length+" sensors");
-			self.publish('new_sensor', this.sensors);
+			self.publish('new_sensor', {sensors: this.sensors});
 		}, 5000);
 	}	
 };

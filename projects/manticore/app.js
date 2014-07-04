@@ -124,9 +124,10 @@ core.on('inch', function(header, payload) {
 			});
 			break;
 		case 'new_sensor':
+			console.log(payload);
 			var idx = core.findNodeById(header.src);
 			if (idx !== null)
-				for (var i = 0; i < payload.length; i++) {
+				for (var i = 0; i < payload.sensors.length; i++) {
 					core.nodes[idx].sensors.push(payload[i]);
 				}
 			break;
