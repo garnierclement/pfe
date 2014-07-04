@@ -128,6 +128,7 @@ core.on('inch', function(header, payload) {
 			var idx = core.findNodeById(header.src);
 			if (idx !== null) {
 				var diff = _.difference(payload.sensors, core.nodes[idx].sensors);
+				console.log(diff);
 				if (diff.length > 0) {
 					core.nodes[idx].sensors.concat(diff);
 				}
