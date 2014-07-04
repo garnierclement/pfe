@@ -6,11 +6,17 @@ var uuid = require('uuid');
 /**
  * Sensor object
  */
-function Sensor (name)
+function Sensor (desc, arch, platform)
 {
-	this.id = uuid.v1();
-	this.name = name;
-	this.data = [];
+	// du taff
+	if (1) {
+		this.id = uuid.v1();
+		this.name = desc.name;
+		this.data = [];
+	}
+	else
+		throw 'unsupported platform';
+	
 }
 
 module.exports = Sensor;

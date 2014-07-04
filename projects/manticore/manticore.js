@@ -17,6 +17,7 @@ var util = require('util'),		// extend the Core to be an EventEmitter
 	EventEmitter = require('events').EventEmitter;
 var _ = require("underscore");
 var fs = require('fs');
+var os = require('os');
 
 var Node = require('./node.js');		// Node object
 var Sensor = require('./sensor.js');	// Sensor object
@@ -36,8 +37,10 @@ var Record = require('./record.js');	// Record object
  */
 function Core()
 {
-	this.name = require('os').hostname();
+	this.name = os.hostname();
 	this.uuid = uuid.v1();
+	this.arch = os.arch();
+	this.platform = os.platform();
 	this.nodes = [];						// store discovered nodes
 	this.ip = null;							// IP address advertised on Zeroconf
 	this.sensors = [];						// store local sensors
@@ -494,23 +497,22 @@ function isValidPort(port) {
 Core.prototype.detectSensors = function() {
 	console.log("+[DTEC] Looking for sensors");
 	var sensorsPath = '../../sensors/';
-	fs.readdir(sensorsPath, function(err, list) {
-		console.log(list);
-		for (var i = 0; i < list.length; i++) {
-			var elemPath = sensorsPath+list[i];
-			var stat = fs.statSync(elemPath);
-			if (stat.isDirectory()) {
-				console.log(elemPath);
-				try {
-					var descriptionFile = require(elemPath+'/description.json');
-				} 
-				catch (e) {
-					console.log('![DTEC]'+e);
-				}
-				
+	var list = fs.readdirSync(sensorsPath);
+	for (var i = 0; i < list.length; i++) {
+		var elemPath = sensorsPath+list[i];
+		var stat = fs.statSync(elemPath);
+		if (stat.isDirectory()) {
+			try {
+				var descriptionFile = require(elemPath+'/description.json');
+				var new_sensor = new Sensor(descriptionFile, this.arch, this.platform);
+				this.sensors.push(new_sensor);
+			}
+			catch (e) {
+				console.log('![DTEC] '+e);
 			}
 		}
-	});
+		this.publish('new_sensor', this.sensors);
+	}
 };
 
 /******* Message payloads *********/
@@ -534,11 +536,11 @@ Core.prototype.releasePayload = function (res) {
  */
 Core.prototype.fakeSensors = function () {
 	// Generate fake sensors
-	var sensor1 = new Sensor("Mouse");
+	var sensor1 = new Sensor({name: "Mouse"});
 	sensor1.addData('X','/mouse/x f');
 	sensor1.addData('Y','/mouse/y f');
 	this.sensors.push(sensor1);
-	var sensor2 = new Sensor("Intertial");
+	var sensor2 = new Sensor({name: "Intertial"});
 	sensor2.addData('Roll','/intertial/roll f');
 	sensor2.addData('Pitch','/intertial/pitch f');
 	sensor2.addData('Yaw','/intertial/yaw f');
