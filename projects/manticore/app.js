@@ -157,46 +157,26 @@ core.on('mach', function(envelope, header, payload) {
 			console.log(payload);
 			break;
 		case 'request':
-			// TODO need to check the id
 			console.log(payload);
-			// check id
-			// récupère l'object senser associé
-			// var sensor =
-			// sensor.reuest('default', dst, port, output)
-			core.reply('ack', envelope, {status: true});
-			var dst = header.ip;
-			if (dst === this.ip) dst = '127.0.0.1';
-			//senser.request('default', args)
-			if (dst !== null) {
+			var returnStatus = false;
+			var sensor = _.findWhere(core.sensors, {id: payload.data});
+			console.log('findwhere: '+sensor);
+			if (sensor !== undefined) {
+				var dst = header.ip;
+				if (dst === this.ip) dst = '127.0.0.1';
+				var opts = [dst, payload.port, header.src+'-'+payload.port];
 				var new_record = new Record(payload.data, 'active_resource', header.src, dst, payload.port);
-				var child;
-				if(isDarwin()) {
-					var outputfile = trigger.generate(dst, payload.port,'mousePosition.pd','output.pd');
-					var pd = "/Applications/Pd-extended.app/Contents/MacOS/Pd-extended";
-					child = trigger.execute(pd+' '+outputfile, function(err, stdout,stderr) {
-						console.log(stdout+stderr);
-					});
-				}
-				else if (isLinux()) {
-					//var pd = "pd-extended -nogui";
-					child = trigger.execute('../IntertialSender/XBeeOnPi/xBeeReadSerial -a '+dst+' -p '+payload.port, function(err, stdout, stderr) {
-						console.log(stdout, stderr);
-					});
-				}
-				if (child) {
-					new_record.addChild(child);
-				}
-				core.records.push(new_record);
+				sensor.request('default', opts, function(err, child) {
+					if (err === null) {
+						returnStatus = true;
+						if (child) {
+						new_record.addChild(child);
+						}
+						core.records.push(new_record);
+					}
+					core.reply('ack', envelope, {status: returnStatus});
+				});		
 			}
-			else
-				console.log('![ERR]\tcannot find ip for '+header);
-			
-			// NOT YET IMPLEMENTED
-			// To request a resource
-			// Need to trigger.check() (resource availability)
-			// Need to send a response true/false according to availability
-			// May need to trigger.generate()
-			// Need to trigger.execute()
 			break;
 		case 'release':
 			console.log(payload);

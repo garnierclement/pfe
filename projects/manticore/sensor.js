@@ -30,7 +30,7 @@ function Sensor (desc, systems)
 				else {
 					var err = "![DTEC] Bootstrap command "+command.cmd+" for sensor "+desc.name+" failed";
 					console.log(err);
-						throw err;
+					//throw err;
 				}
 			});
 		}
@@ -45,11 +45,17 @@ function Sensor (desc, systems)
 		data.push({name: datum.description, osc: datum.osc_format});
 	});
 
-	this.request = function(mode, options) {
+	this.request = function(mode, options, callback) {
+		var opt;
 		if (_.has(desc.request, mode)) {
-				var opt = _.object(desc.request[mode].options, options);
+				opt = _.object(desc.request[mode].options, options);
 		}
 
+
+
+		console.log(opt);
+
+		callback(null, "child");
 	};
 
 }
