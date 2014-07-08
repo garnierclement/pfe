@@ -57,17 +57,13 @@ function Sensor (desc, systems)
 			function(next) {
 				console.log("check");
 				// check
-				parseAndExecute(desc.name, desc.request[mode].check, systems, opt, function(err, child, cmd) {
-						exitCode(desc.name, child, cmd, next);
-				});
+				parseExecuteAndDie(desc.name, desc.request[mode].check, systems, opt, next);
 			},
 			function(next) {
 				// generate
 				console.log("generate");
 				if (_.has(desc.request[mode], 'generate')) {
-					parseAndExecute(desc.name, desc.request[mode].generate, systems, opt, function(err, child, cmd) {
-						exitCode(desc.name, child, cmd, next);
-					});
+					parseExecuteAndDie(desc.name, desc.request[mode].generate, systems, opt, next);
 				}
 				else {
 					next(null, null);
@@ -107,24 +103,40 @@ function parseAndExecute(sensor_name, cmd_array, systems, options, callback) {
 					cmdToExecute += ' '+param;
 				}
 			});
-			var child = executeCommand(cmdToExecute, {cwd: "../../sensors/"+sensor_name} ,function(stdout, stderr) {
+			var child = executeCommand(cmdToExecute, {cwd: "../../var/run"} ,function(stdout, stderr) {
 				//console.log(stdout+stderr);
 			});
-			callback(null, child, command.cmd);
+			callback(null, child);
 		}
 	});
 }
 
-function exitCode(sensor_name, child, command, callback) {
-	child.on('exit', function(exit_code) {
-		if (exit_code === 0) {
-			console.log('+[EXEC]\tCommand '+command+' for sensor '+sensor_name+ ' OK');
-			callback(null, exit_code);
-		}
-		else {
-			var err = "![EXEC]\tCommand "+command+" for sensor "+sensor_name+" failed with exit code "+exit_code;
-			console.log(err);
-			callback(err, exit_code);
+function parseExecuteAndDie(sensor_name, cmd_array, systems, options, callback) {
+	_.each(cmd_array, function(command, key) {
+		var intersect = _.intersection(command.systems, systems);
+		if (intersect.length > 0) {
+			var cmdToExecute = command.cmd;
+			_.each(command.parameters, function(param) {
+				if (_.has(options, param)) {
+					cmdToExecute += ' '+options[param];
+				} else {
+					cmdToExecute += ' '+param;
+				}
+			});
+			var child = executeCommand(cmdToExecute, {cwd: "../../sensors/"+sensor_name} ,function(stdout, stderr) {
+				});
+			child.on('exit', function(exit_code) {
+					console.log("sdkjhskjdfh");
+					if (exit_code === 0) {
+						console.log('+[EXEC]\tCommand '+command+' for sensor '+sensor_name+ ' OK');
+						callback(null, exit_code);
+					}
+					else {
+						var err = "![EXEC]\tCommand "+command+" for sensor "+sensor_name+" failed with exit code "+exit_code;
+						console.log(err);
+						callback(err, exit_code);
+					}
+			});
 		}
 	});
 }
