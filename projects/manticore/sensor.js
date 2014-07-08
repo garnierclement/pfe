@@ -15,10 +15,9 @@ function Sensor (desc, systems)
 		var intersect = _.intersection(command.systems, systems);
 		if (intersect.length > 0) {
 			var cmdToExecute = "../../sensors/"+desc.name+"/"+command.cmd;
-			if (command.parameters > 0) {
-				for (var i = 0; i < command.parameters.length; i++) {
-					cmdToExecute += ' '+command.parameters[i];
-				}
+			var params = _.keys(command.parameters);
+			for (var i = 0; i < params.length; i++) {
+				cmdToExecute += ' '+params[i];
 			}
 			var child = executeCommand(cmdToExecute, function(stdout, stderr) {
 				//console.log(stdout+stderr);
