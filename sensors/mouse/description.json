@@ -13,13 +13,13 @@
   },
   "bootstrap": [
     {
-      "cmd": "checkMouse-osx.sh",
+      "cmd": "./checkMouse-osx.sh",
       "systems": [
         "osx"
       ]
     },
     {
-      "cmd": "checkMouse-linux.sh",
+      "cmd": "./checkMouse-linux.sh",
       "systems": [
         "linux"
       ]
