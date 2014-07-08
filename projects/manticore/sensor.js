@@ -20,7 +20,7 @@ function Sensor (desc, systems)
 			for (var i = 0; i < params.length; i++) {
 				cmdToExecute += ' '+params[i];
 			}
-			var child = executeCommand(cmdToExecute, function(stdout, stderr) {
+			var child = executeCommand(cmdToExecute, {}, function(stdout, stderr) {
 				//console.log(stdout+stderr);
 			});
 			child.on('exit', function(exit_code) {
@@ -99,7 +99,6 @@ function parseAndExecute(sensor_name, cmd_array, systems, options, callback) {
 	_.each(cmd_array, function(command, key) {
 		var intersect = _.intersection(command.systems, systems);
 		if (intersect.length > 0) {
-			process.chdir("../../sensors/"+sensor_name);
 			var cmdToExecute = command.cmd;
 			_.each(command.parameters, function(param) {
 				if (_.has(options, param)) {
@@ -108,10 +107,9 @@ function parseAndExecute(sensor_name, cmd_array, systems, options, callback) {
 					cmdToExecute += ' '+param;
 				}
 			});
-			var child = executeCommand(cmdToExecute, function(stdout, stderr) {
+			var child = executeCommand(cmdToExecute, {cwd: "../../sensors/"+sensor_name} ,function(stdout, stderr) {
 				//console.log(stdout+stderr);
 			});
-			process.chdir("../../projects/manticore");
 			callback(null, child, command.cmd);
 		}
 	});
@@ -141,9 +139,9 @@ Sensor.prototype.addData = function(_name, osc_string) {
 	this.data.push({name: _name, osc: osc_string});
 };
 
-function executeCommand(cmd, callback) {
+function executeCommand(cmd, opts, callback) {
 	try {
-		var child = exec(cmd, function(err, stdout, stderr){
+		var child = exec(cmd, opts, function(err, stdout, stderr){
 			console.log("+[EXEC]\tExecuting "+cmd+"\n"+stdout+stderr);
 			callback(stdout, stderr);
 		});
