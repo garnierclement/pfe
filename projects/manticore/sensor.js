@@ -99,7 +99,8 @@ function parseAndExecute(sensor_name, cmd_array, systems, options, callback) {
 	_.each(cmd_array, function(command, key) {
 		var intersect = _.intersection(command.systems, systems);
 		if (intersect.length > 0) {
-			var cmdToExecute = "../../sensors/"+sensor_name+"/"+command.cmd;
+			process.chdir("../../sensors/"+sensor_name);
+			var cmdToExecute = command.cmd;
 			_.each(command.parameters, function(param) {
 				if (_.has(options, param)) {
 					cmdToExecute += ' '+options[param];
@@ -110,6 +111,7 @@ function parseAndExecute(sensor_name, cmd_array, systems, options, callback) {
 			var child = executeCommand(cmdToExecute, function(stdout, stderr) {
 				//console.log(stdout+stderr);
 			});
+			process.chdir("../../projects/manticore");
 			callback(null, child, command.cmd);
 		}
 	});
