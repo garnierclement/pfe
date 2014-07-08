@@ -61,11 +61,12 @@ function Sensor (desc, systems)
 			function(next) {
 				// generate
 				console.log("generate");
+				console.log(_.has(desc.request[mode], 'generate'));
 				if (_.has(desc.request[mode], 'generate')) {
 					parseExecuteAndDie(desc.name, desc.request[mode].generate, systems, opt, next);
 				}
 				else {
-					next(null, null);
+					next(null, 0);
 				}
 			},
 			function(next) {
