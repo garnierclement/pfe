@@ -160,7 +160,7 @@ core.on('mach', function(envelope, header, payload) {
 			console.log(payload);
 			var returnStatus = false;
 			var sensor = _.findWhere(core.sensors, {id: payload.data});
-			console.log('findwhere: '+sensor);
+			console.log(sensor);
 			if (sensor !== undefined) {
 				var dst = header.ip;
 				if (dst === this.ip) dst = '127.0.0.1';

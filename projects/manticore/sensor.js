@@ -55,13 +55,19 @@ function Sensor (desc, systems)
 		console.log(opt);
 		async.series([
 			function(next) {
+				console.log("check");
 				// check
-				parseAndExecute(desc.request[mode].check, systems, opt, next);
+				parseAndExecute(desc.request[mode].check, systems, opt, function(err, child) {
+						exitCode(child, next);
+				});
 			},
 			function(next) {
 				// generate
+				console.log("generate");
 				if (_.has(desc.request[mode], 'generate')) {
-					parseAndExecute(desc.request[mode].generate, systems, opt, next);
+					parseAndExecute(desc.request[mode].generate, systems, opt, function(err, child) {
+						exitCode(child, next);
+					});
 				}
 				else {
 					next(null, null);
@@ -69,11 +75,13 @@ function Sensor (desc, systems)
 			},
 			function(next) {
 				// execute
+				console.log("execute");
 				parseAndExecute(desc.request[mode].execute, systems, opt, next);
 			}
 		],
 		function(err, results) {
-			// see 'results'
+			// see 'results', normally exit code for check and generate
+			// and child for execute
 			if (err !== null) {
 				console.log(results);
 				callback(null, results[2]);
@@ -101,17 +109,21 @@ function parseAndExecute(cmd_array, systems, options, callback) {
 			var child = executeCommand(cmdToExecute, function(stdout, stderr) {
 				//console.log(stdout+stderr);
 			});
-			child.on('exit', function(exit_code) {
-				if (exit_code === 0) {
-					console.log('+[EXEC]\tCommand '+command.cmd+' for sensor '+desc.name+ ' OK');
-					callback(null, child);
-				}
-				else {
-					var err = "![EXEC]\tCommand "+command.cmd+" for sensor "+desc.name+" failed with exit code "+exit_code;
-					console.log(err);
-					callback(err, null);
-				}
-			});
+			callback(null, child);
+		}
+	});
+}
+
+function exitCode(child, callback) {
+	child.on('exit', function(exit_code) {
+		if (exit_code === 0) {
+			console.log('+[EXEC]\tCommand '+command.cmd+' for sensor '+desc.name+ ' OK');
+			callback(null, exit_code);
+		}
+		else {
+			var err = "![EXEC]\tCommand "+command.cmd+" for sensor "+desc.name+" failed with exit code "+exit_code;
+			console.log(err);
+			callback(err, exit_code);
 		}
 	});
 }
