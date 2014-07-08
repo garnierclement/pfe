@@ -15,12 +15,15 @@ function Sensor (desc, systems)
 	_.each(desc.bootstrap, function(command, key) {
 		var intersect = _.intersection(command.systems, systems);
 		if (intersect.length > 0) {
-			var cmdToExecute = "../../sensors/"+desc.name+"/"+command.cmd;
-			var params = _.keys(command.parameters);
-			for (var i = 0; i < params.length; i++) {
-				cmdToExecute += ' '+params[i];
-			}
-			var child = executeCommand(cmdToExecute, {}, function(stdout, stderr) {
+			var cmdToExecute = command.cmd;
+			_.each(command.parameters, function(param) {
+				if (_.has(options, param)) {
+					cmdToExecute += ' '+options[param];
+				} else {
+					cmdToExecute += ' '+param;
+				}
+			});
+			var child = executeCommand(cmdToExecute, {cwd: "../../sensors/"+desc.name}, function(stdout, stderr) {
 				//console.log(stdout+stderr);
 			});
 			child.on('exit', function(exit_code) {
