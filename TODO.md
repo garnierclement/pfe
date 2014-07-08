@@ -29,3 +29,4 @@
 - [x] Implement implicit release (when a node died, look if )
 - [ ] Move the messaging structure into a message.js file
 - [ ] Periodic publishing of node capabilities
+- [ ] handle properly the crash of manticore is another instance of manticore is already running (ports already bound)
