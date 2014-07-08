@@ -20,10 +20,11 @@ function Sensor (desc, systems)
 			_.each(command.parameters, function(param) {
 					cmdToExecute += ' '+param;
 			});
-			var working_dir = "../../sensors/"+desc.name;
+			var working_dir = "../../sensors"+desc.name;
 			if ('path' in command) {
 				working_dir = path.normalize(working_dir+'/'+command.path);
 			}
+			console.log(working_dir);
 			var child = executeCommand(cmdToExecute, {cwd: working_dir}, function(stdout, stderr) {
 				//console.log(stdout+stderr);
 			});
@@ -135,6 +136,7 @@ function parseExecuteAndDie(sensor_name, cmd_array, systems, options, callback) 
 			if ('path' in command) {
 				working_dir = path.normalize(working_dir+'/'+command.path);
 			}
+			console.log(working_dir);
 			var child = executeCommand(cmdToExecute, {cwd: working_dir} ,function(stdout, stderr) {
 				});
 			child.on('exit', function(exit_code) {
