@@ -101,7 +101,11 @@ function parseAndExecute(sensor_name, cmd_array, systems, options, callback) {
 					cmdToExecute += ' '+param;
 				}
 			});
-			var child = executeCommand(cmdToExecute, {cwd: "../../var/run"} ,function(stdout, stderr) {
+			var working_dir = "../../sensors"+sensor_name;
+			if ('path' in command) {
+				working_dir = command.path;
+			}
+			var child = executeCommand(cmdToExecute, {cwd: working_dir} ,function(stdout, stderr) {
 				//console.log(stdout+stderr);
 			});
 			callback(null, child);

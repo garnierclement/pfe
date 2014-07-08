@@ -90,7 +90,8 @@
           ],
           "systems": [
             "osx"
-          ]
+          ],
+          "path": "../../var/run"
         }
       ]
     }
