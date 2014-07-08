@@ -57,7 +57,7 @@ function Sensor (desc, systems)
 			function(next) {
 				console.log("check");
 				// check
-				parseAndExecute(desc.request[mode].check, systems, opt, function(err, child) {
+				parseAndExecute(desc.name, desc.request[mode].check, systems, opt, function(err, child) {
 						exitCode(child, next);
 				});
 			},
@@ -65,7 +65,7 @@ function Sensor (desc, systems)
 				// generate
 				console.log("generate");
 				if (_.has(desc.request[mode], 'generate')) {
-					parseAndExecute(desc.request[mode].generate, systems, opt, function(err, child) {
+					parseAndExecute(desc.name, desc.request[mode].generate, systems, opt, function(err, child) {
 						exitCode(child, next);
 					});
 				}
@@ -76,11 +76,11 @@ function Sensor (desc, systems)
 			function(next) {
 				// execute
 				console.log("execute");
-				parseAndExecute(desc.request[mode].execute, systems, opt, next);
+				parseAndExecute(desc.name, desc.request[mode].execute, systems, opt, next);
 			}
 		],
 		function(err, results) {
-			// see 'results', normally exit code for check and generate
+			// see 'results', normally exit code for check and generate or null
 			// and child for execute
 			if (err !== null) {
 				console.log(results);
@@ -95,11 +95,11 @@ function Sensor (desc, systems)
 
 module.exports = Sensor;
 
-function parseAndExecute(cmd_array, systems, options, callback) {
+function parseAndExecute(sensor_name, cmd_array, systems, options, callback) {
 	_.each(cmd_array, function(command, key) {
 		var intersect = _.intersection(command.systems, systems);
 		if (intersect.length > 0) {
-			var cmdToExecute = "../../sensors/"+desc.name+"/"+command.cmd;
+			var cmdToExecute = "../../sensors/"+sensor_name+"/"+command.cmd;
 			_.each(command.parameters, function(placeholder, param) {
 				cmdToExecute += ' '+param;
 				if (placeholder !== null) {
