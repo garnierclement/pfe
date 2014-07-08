@@ -60,8 +60,6 @@ function Sensor (desc, systems)
 			},
 			function(next) {
 				// generate
-				console.log("generate");
-				console.log('generate' in desc.request[mode]);
 				if ('generate' in desc.request[mode]) {
 					parseExecuteAndDie(desc.name, desc.request[mode].generate, systems, opt, next);
 				}
