@@ -9,9 +9,9 @@
   "bootstrap": [
     {
       "cmd": "InertialSender/XBeeOnPi/xBeeReadSerial",
-      "parameters": {
-        "-c": null
-        },
+      "parameters": [
+        "-c"
+      ],
       "systems": [
         "pi"
       ]
@@ -19,7 +19,7 @@
   ],
   "request": {
     "default": {
-       "options": [
+      "options": [
         "$ADDRESS",
         "$PORT",
         "$GENERATED_PATCH"
@@ -27,9 +27,9 @@
       "check": [
         {
           "cmd": "InertialSender/XBeeOnPi/xBeeReadSerial",
-          "parameters": {
-            "-c": null
-          },
+          "parameters": [
+            "-c"
+          ],
           "systems": [
             "pi"
           ]
@@ -38,10 +38,12 @@
       "execute": [
         {
           "cmd": "InertialSender/XBeeOnPi/xBeeReadSerial",
-          "parameters": {
-            "-a": "$ADDRESS",
-            "-p": "$PORT"
-          },
+          "parameters": [
+            "-a",
+            "$ADDRESS",
+            "-p",
+            "$PORT"
+          ],
           "sudo": true,
           "systems": [
             "pi"
