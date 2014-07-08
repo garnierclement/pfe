@@ -100,10 +100,11 @@ function parseAndExecute(sensor_name, cmd_array, systems, options, callback) {
 		var intersect = _.intersection(command.systems, systems);
 		if (intersect.length > 0) {
 			var cmdToExecute = "../../sensors/"+sensor_name+"/"+command.cmd;
-			_.each(command.parameters, function(placeholder, param) {
-				cmdToExecute += ' '+param;
-				if (placeholder !== null) {
-					cmdToExecute += ' '+options[placeholder];
+			_.each(command.parameters, function(param) {
+				if (_.has(options, param)) {
+					cmdToExecute += ' '+options[param];
+				} else {
+					cmdToExecute += ' '+param;
 				}
 			});
 			var child = executeCommand(cmdToExecute, function(stdout, stderr) {
