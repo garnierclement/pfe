@@ -20,7 +20,11 @@ function Sensor (desc, systems)
 			_.each(command.parameters, function(param) {
 					cmdToExecute += ' '+param;
 			});
-			var child = executeCommand(cmdToExecute, {cwd: "../../sensors/"+desc.name}, function(stdout, stderr) {
+			var working_dir = "../../sensors"+desc.name;
+			if ('path' in command) {
+				working_dir = path.normalize(working_dir+'/'+command.path);
+			}
+			var child = executeCommand(cmdToExecute, {cwd: working_dir}, function(stdout, stderr) {
 				//console.log(stdout+stderr);
 			});
 			child.on('exit', function(exit_code) {
