@@ -8,7 +8,7 @@
   },
   "bootstrap": [
     {
-      "cmd": "xBeeSerialReader",
+      "cmd": "InertialSender/XBeeOnPi/xBeeSerialReader",
       "parameters": {},
       "systems": [
         "pi"
@@ -24,7 +24,7 @@
       ],
       "check": [
         {
-          "cmd": "xBeeSerialReader",
+          "cmd": "InertialSender/XBeeOnPi/xBeeSerialReader",
           "parameters": {
             "-c": null
           },
@@ -35,7 +35,7 @@
       ],
       "execute": [
         {
-          "cmd": "xBeeSerialReader",
+          "cmd": "InertialSender/XBeeOnPi/xBeeSerialReader",
           "parameters": {
             "-a": "ADDRESS",
             "-p": "PORT"
