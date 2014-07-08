@@ -18,7 +18,6 @@ function Sensor (desc, systems)
 			var cmdToExecute = command.cmd;
 			_.each(command.parameters, function(param) {
 					cmdToExecute += ' '+param;
-				}
 			});
 			var child = executeCommand(cmdToExecute, {cwd: "../../sensors/"+desc.name}, function(stdout, stderr) {
 				//console.log(stdout+stderr);
