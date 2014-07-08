@@ -5,6 +5,7 @@ var uuid = require('uuid');
 var exec = require('child_process').exec;
 var _ = require('underscore');
 var async = require('async');
+var path = require('path');
 
 /**
  * Sensor object
@@ -103,8 +104,9 @@ function parseAndExecute(sensor_name, cmd_array, systems, options, callback) {
 			});
 			var working_dir = "../../sensors"+sensor_name;
 			if ('path' in command) {
-				working_dir = command.path;
+				working_dir = path.normalize(working_dir+'/'+command.path);
 			}
+			console.log(working_dir);
 			var child = executeCommand(cmdToExecute, {cwd: working_dir} ,function(stdout, stderr) {
 				//console.log(stdout+stderr);
 			});
