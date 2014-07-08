@@ -20,7 +20,7 @@ function Sensor (desc, systems)
 				cmdToExecute += ' '+params[i];
 			}
 			var child = executeCommand(cmdToExecute, function(stdout, stderr) {
-				//console.log(stdout+stderr);
+				console.log(stdout+stderr);
 			});
 			child.on('exit', function(exit_code) {
 				if (exit_code === 0) {
