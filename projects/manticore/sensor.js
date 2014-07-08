@@ -20,7 +20,7 @@ function Sensor (desc, systems)
 			_.each(command.parameters, function(param) {
 					cmdToExecute += ' '+param;
 			});
-			var working_dir = "../../sensors"+desc.name;
+			var working_dir = "../../sensors/"+desc.name;
 			if ('path' in command) {
 				working_dir = path.normalize(working_dir+'/'+command.path);
 			}

@@ -9,7 +9,7 @@
   "bootstrap": [
     {
       "path": "InertialSender/XBeeOnPi",
-      "cmd": "xBeeReadSerial",
+      "cmd": "./xBeeReadSerial",
       "parameters": [
         "-c"
       ],
@@ -28,7 +28,7 @@
       "check": [
         {
           "path": "InertialSender/XBeeOnPi",
-          "cmd": "xBeeReadSerial",
+          "cmd": "./xBeeReadSerial",
           "parameters": [
             "-c"
           ],
@@ -40,7 +40,7 @@
       "execute": [
         {
           "path": "InertialSender/XBeeOnPi",
-          "cmd": "xBeeReadSerial",
+          "cmd": "./xBeeReadSerial",
           "parameters": [
             "-a",
             "$ADDRESS",
