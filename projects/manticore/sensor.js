@@ -57,16 +57,16 @@ function Sensor (desc, systems)
 			function(next) {
 				console.log("check");
 				// check
-				parseAndExecute(desc.name, desc.request[mode].check, systems, opt, function(err, child) {
-						exitCode(child, next);
+				parseAndExecute(desc.name, desc.request[mode].check, systems, opt, function(err, child, cmd) {
+						exitCode(desc.name, child, cmd, next);
 				});
 			},
 			function(next) {
 				// generate
 				console.log("generate");
 				if (_.has(desc.request[mode], 'generate')) {
-					parseAndExecute(desc.name, desc.request[mode].generate, systems, opt, function(err, child) {
-						exitCode(child, next);
+					parseAndExecute(desc.name, desc.request[mode].generate, systems, opt, function(err, child, cmd) {
+						exitCode(desc.name, child, cmd, next);
 					});
 				}
 				else {
@@ -109,19 +109,19 @@ function parseAndExecute(sensor_name, cmd_array, systems, options, callback) {
 			var child = executeCommand(cmdToExecute, function(stdout, stderr) {
 				//console.log(stdout+stderr);
 			});
-			callback(null, child);
+			callback(null, child, command.cmd);
 		}
 	});
 }
 
-function exitCode(child, callback) {
+function exitCode(sensor_name, child, command, callback) {
 	child.on('exit', function(exit_code) {
 		if (exit_code === 0) {
-			console.log('+[EXEC]\tCommand '+command.cmd+' for sensor '+desc.name+ ' OK');
+			console.log('+[EXEC]\tCommand '+command+' for sensor '+sensor_name+ ' OK');
 			callback(null, exit_code);
 		}
 		else {
-			var err = "![EXEC]\tCommand "+command.cmd+" for sensor "+desc.name+" failed with exit code "+exit_code;
+			var err = "![EXEC]\tCommand "+command+" for sensor "+sensor_name+" failed with exit code "+exit_code;
 			console.log(err);
 			callback(err, exit_code);
 		}
