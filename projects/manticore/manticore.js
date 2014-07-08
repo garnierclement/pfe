@@ -45,7 +45,7 @@ function Core()
 	this.ip = null;							// IP address advertised on Zeroconf
 	this.sensors = [];						// store local sensors
 	this.records = [];
-	this.lastPublish = new Date();
+	this.lastPublish = null;
 	this.publisher = zmq.socket('pub');		// publisher socket (InCh)
 	this.subscriber = zmq.socket('sub');	// subscriber socket (InCh)
 	this.udp = dgram.createSocket('udp4');	// local udp socket for receiving OSC data
@@ -541,7 +541,8 @@ Core.prototype.detectSensors = function() {
 
 Core.prototype.delayedPublishSensors = function(delay) {
 	var now = new Date();
-	if (this.sensors.length > 0 && (now - this.lastPublish) > 2000)  {
+	var dif = (this.lastPublish === null) ? 2001 : now - this.lastPublish;
+	if (this.sensors.length > 0 && dif > 2000)  {
 		setTimeout(function() {
 			console.log("+[SENS] Publishing "+self.sensors.length+" sensors");
 			self.publish('new_sensor', {sensors: self.sensors});
