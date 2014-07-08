@@ -48,7 +48,26 @@
         "$PORT",
         "$GENERATED_PATCH"
       ],
-      "check": [],
+      "check": [
+        {
+          "cmd": "checkMouse-osx.sh",
+          "systems": [
+            "osx"
+          ]
+        },
+        {
+          "cmd": "checkMouse-linux.sh",
+          "systems": [
+            "linux"
+          ]
+        },
+        {
+          "cmd": "checkMouse-windows.bat",
+          "systems": [
+            "win"
+          ]
+        }
+      ],
       "generate": [
         {
           "cmd": "generateMousePosition.sh",
