@@ -22,7 +22,7 @@
        "options": [
         "$ADDRESS",
         "$PORT",
-        null
+        "$GENERATED_PATCH"
       ],
       "check": [
         {
@@ -39,8 +39,8 @@
         {
           "cmd": "InertialSender/XBeeOnPi/xBeeReadSerial",
           "parameters": {
-            "-a": "ADDRESS",
-            "-p": "PORT"
+            "-a": "$ADDRESS",
+            "-p": "$PORT"
           },
           "sudo": true,
           "systems": [
