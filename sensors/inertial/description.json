@@ -9,7 +9,9 @@
   "bootstrap": [
     {
       "cmd": "InertialSender/XBeeOnPi/xBeeReadSerial",
-      "parameters": {},
+      "parameters": {
+        "-c": null
+        },
       "systems": [
         "pi"
       ]
