@@ -17,9 +17,6 @@ function Sensor (desc, systems)
 		if (intersect.length > 0) {
 			var cmdToExecute = command.cmd;
 			_.each(command.parameters, function(param) {
-				if (_.has(options, param)) {
-					cmdToExecute += ' '+options[param];
-				} else {
 					cmdToExecute += ' '+param;
 				}
 			});
