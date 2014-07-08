@@ -106,7 +106,7 @@ function parseAndExecute(sensor_name, cmd_array, systems, options, callback) {
 					cmdToExecute += ' '+param;
 				}
 			});
-			var working_dir = "../../sensors"+sensor_name;
+			var working_dir = "../../sensors/"+sensor_name;
 			if ('path' in command) {
 				working_dir = path.normalize(working_dir+'/'+command.path);
 			}
