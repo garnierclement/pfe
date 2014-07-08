@@ -24,9 +24,6 @@ block content
 				td
 					a(href='/request/#{node.id}') #{node.id}
 				td
-					form(methode='GET', action='/request/#{node.id}')
-						input(name='port', type='number', value=42424, min=0, max=65536)
-						input.btn.btn-default(type='submit', value="Request")
 			if node.sensors.length > 0
 				each sensor, index in node.sensors
 					tr
