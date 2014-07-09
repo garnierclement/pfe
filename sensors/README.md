@@ -8,19 +8,20 @@ In the following, we propose a standardized procedure to describe a sensor and w
 **Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
 
 - [Structure of `description.json`](#structure-of-descriptionjson)
-	- [System object](#system-object)
-	- [Command object](#command-object)
-	- [Data description object](#data-description-object)
-	- [Request procedure](#request-procedure)
-		- [Mode](#mode)
-		- [Options](#options)
-		- [Check/Generate/Execute](#checkgenerateexecute)
+  - [System object](#system-object)
+  - [Command object](#command-object)
+  - [Data description object](#data-description-object)
+  - [Request procedure](#request-procedure)
+    - [Mode](#mode)
+    - [Options](#options)
+    - [Steps: Check > Generate > Execute](#steps-check--generate--execute)
 - [A simple explained example: the mouse sensor](#a-simple-explained-example-the-mouse-sensor)
 - [Tutorial: Adding a sensor](#tutorial-adding-a-sensor)
-	- [Set up the workspace](#set-up-the-workspace)
-	- [Write the description file](#write-the-description-file)
+  - [Setting up the workspace](#setting-up-the-workspace)
+  - [Write the description file](#write-the-description-file)
 - [How is this description file used by Manticore ?](#how-is-this-description-file-used-by-manticore-)
-- [Further works and customization](#further-works-and-customization)
+- [Custom procedure](#custom-procedure)
+- [Further works](#further-works)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -125,6 +126,8 @@ Thus, considering that we are in the sensor working directory, the result of the
 	$ cd subfolder/scripts
 	$ sudo ./myscript.sh --addr [$ADDRESS] --port [$PORT]
 
+> need to write about the return value/exit code
+
 ### Data description object
 
 The Data object gives a description of the data provided by the sensor. 
@@ -228,6 +231,61 @@ As stated above, the repository contains a `sensors` folder wich contains all th
 					}
 			}
 		}
+
+4. Add the `data` description object that will describe the type of data provided by the sensor
+
+		{
+			"name": "my_new_sensor",
+			"systems": { ... },
+			"data": [
+				{
+					"description": "some data float value",
+					"osc_format": "/sensor/data f"
+				},
+				{
+					"description": "some button on/off",
+					"osc_format": "/sensor/button i"
+				}
+			]
+		}
+
+5. Describe the `bootstrap` procedure (i.e. the command used by Manticore at startup to detect the sensor). As we have stated above that the sensor is available on Linux, Mac OS X and Windows, we need to describe the commands accordingly.
+
+		{
+			"name": "my_new_sensor",
+			"systems": { ... },
+			"data": [ ... ],
+			"bootstrap": [
+				{
+					"cmd": "./checkMySensor-unixlike.sh",
+					"systems": [
+						"osx",
+						"linux"
+					]
+				},
+				{
+					"cmd": "checkMySensor-windows.bat",
+					"systems": [
+						"win"
+					]
+				}
+			]
+		}
+
+6. Describe the `request` procedure and add a `default` mode (it's mandatory, at least one mode)
+
+		{
+			"name": "my_new_sensor",
+			"systems": { ... },
+			"data": [ ... ],
+			"bootstrap": [ ... ],
+			"request": {
+				"default": {
+				}
+			}
+		}
+
+
 
 ## How is this description file used by Manticore ?
 
