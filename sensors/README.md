@@ -179,6 +179,8 @@ Each mode can have some options. These options corresponds to
 
 The convention used here is to write them starting with a `$` (dollar sign)
 
+> the name is just a way to remember what it is for but the order is very important (need to explain why)
+
 #### Steps: Check > Generate > Execute
 
 The 'default' mode of the Request procedure is divided into 3 steps that must be run one after another
@@ -234,14 +236,14 @@ You should now have the following tree view
 			"name": "my_new_sensor",
 			"systems": {
 				"linux": {
-							"platform": "linux"
-					},
-					"osx": {
-							"platform": "darwin"
-					},
-					"win": {
-							"platform": "win32"
-					}
+					"platform": "linux"
+				},
+				"osx": {
+					"platform": "darwin"
+				},
+				"win": {
+					"platform": "win32"
+				}
 			}
 		}
 
@@ -298,8 +300,120 @@ You should now have the following tree view
 			}
 		}
 
+	a. The `request` procedure is standardized with 3 options: the address of the endpoint (`$ADDRESS`), the port of the endpoint (`$PORT`) and a name for the generated script/executable if needed (`$GENERATED_PATCH`).
 
+			{
+				"name": "my_new_sensor",
+				"systems": { ... },
+				"data": [ ... ],
+				"bootstrap": [ ... ],
+				"request": {
+					"default": {
+						"options": [
+      			  "$ADDRESS",
+      			  "$PORT",
+      			  "$GENERATED_PATCH"
+      			],
+					}
+				}
+			}
 
+	b. Check
+
+			{
+				"name": "my_new_sensor",
+				"systems": { ... },
+				"data": [ ... ],
+				"bootstrap": [ ... ],
+				"request": {
+					"default": {
+						"options": [ ... ],
+						"check": [
+							{
+								"cmd": "./checkMySensor-unixlike.sh",
+								"systems": [
+									"osx",
+									"linux"
+								]
+							},
+							{
+								"cmd": "checkMySensor-windows.bat",
+								"systems": [
+									"win"
+								]
+							}
+						]
+					}
+				}
+			}
+
+	c. Generate, Let's assume no generation in needed here (for instance, the mouse sensor need a pure data patch whereas the inertial sensor does not need anything)
+
+			{
+				"name": "my_new_sensor",
+				"systems": { ... },
+				"data": [ ... ],
+				"bootstrap": [ ... ],
+				"request": {
+					"default": {
+						"options": [ ... ],
+						"check": [ ... ],
+						"generate": [
+							{
+								"cmd": "./checkMySensor-unixlike.sh",
+								"systems": [
+									"osx",
+									"linux"
+								]
+							},
+							{
+								"cmd": "checkMySensor-windows.bat",
+								"systems": [
+									"win"
+								]
+							}
+						]
+					}
+				}
+			}
+
+	d. execute
+
+			{
+				"name": "my_new_sensor",
+				"systems": { ... },
+				"data": [ ... ],
+				"bootstrap": [ ... ],
+				"request": {
+					"default": {
+						"options": [ ... ],
+						"check": [ ... ],
+						"generate": [],
+						"execute": [
+							{
+								"cmd": "./sendData-unixlike.sh",
+								"parameters": [
+									"$ADDRESS",
+									"$PORT"
+								],
+								"systems": [
+									"osx",
+									"linux"
+								]
+							},
+							{
+								"cmd": "sendData-windows.bat",
+								"parameters": [
+									"$ADDRESS",
+									"$PORT"
+								],
+								"systems": [
+									"win"
+								]
+							}
+						]
+					}
+				
 ## How is this description file used by Manticore ?
 
 At the startup of Manticore, the program will try to detect the presence of sensors on the node. To achieve this goal, Manticore will browse the content of each folder in `sensors/`. Each of these folders are the working directories of a specific sensor and thus must contain a `description.js` file.
