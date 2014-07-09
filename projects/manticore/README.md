@@ -410,6 +410,7 @@ If you encounter any issue with the automatic npm installation, you can manually
 	$ npm install jade
 	$ npm install uuid
 	$ npm install underscore
+	$ npm install async
 
 **Note**: depending on the operating system [zmq] and [mdns] have other requirements (see the Prerequisites for your system above).
 
