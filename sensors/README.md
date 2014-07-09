@@ -137,7 +137,7 @@ The Data object gives a description of the data provided by the sensor.
 The object has a simple structure with 2 properties :
 
 *	The `descriptionn` property provides a simple text description of the data 
-*	The `osc_format` property shows the syntax of the OSC address pattern and type tag. For more information about OSC, refer to the specifications <http://opensoundcontrol.org/spec-1_0>
+*	The `osc_format` property shows the syntax of the OSC address pattern and type tag. For more information about OSC, refer to the [specifications](http://opensoundcontrol.org/spec-1_0)
 
 Remember that the OSC format must be in accordance with the program that is responsible to forge the OSC packets and to send send (i.e. the program triggered by the *execute* step in [Request] procedure). 
 
