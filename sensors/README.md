@@ -150,7 +150,7 @@ Remember that the OSC format must be in accordance with the program that is resp
 
 ### Request procedure
 
-The Request procedure corresponds to the ability to send the sensor's data to another that have requested it.
+The Request procedure corresponds to the ability to send the sensor's data in OSC format to another that have requested it.
 
 	"request": {
 			"default": {
@@ -175,9 +175,10 @@ The request procedure is already implemented into Manticore, so it means that yo
 
 #### Mode
 
-As you can notice on the above excerpt of `request`, it has a property called `default`. We will refer in the following as the *mode* of the Request procedure. This will help us to give some granularity in the request procedure. Let's consider that situation where we might want a slightly different type of the Request procedure. It is easy to implement it by just adding a new property after `default`. 
-
+As you can notice on the above excerpt of `request`, it has a property called `default`. We will refer in the following as the *mode* of the Request procedure. This will help us to give some granularity in the request procedure.  
 Usually, there will only be one `mode` called `default`. Therefore the `default` mode is mandatory, others are optional.
+
+Let's consider that situation where we might want a slightly different type of the Request procedure. It is easy to implement it by just adding a new property after `default`. As previously defined, the `default` procedure objective is *to send the sensor's data in OSC format to some other node*. Here another mode can be *send the sensor's data with another type of format* or *to send the data over TCP (instead of UDP)*.
 
 #### Options
 
@@ -361,10 +362,6 @@ You should now have the following tree view
 			}
 		}
 
-### Write your scripts/programs
-
-
-
 9. Generate, Let's assume no generation in needed here (for instance, the mouse sensor need a pure data patch whereas the inertial sensor does not need anything)
 
 		{
@@ -421,6 +418,24 @@ You should now have the following tree view
 				}
 			}
 		}
+
+### Write your scripts/programs
+
+According to the written `description.json` file, now you should write your scripts.
+
+For the `bootstrap` procedure and the `check` step of the `request` procedure
+
+*	`checkMySensor-unixlike.sh`
+* `checkMySensor-windows.bat`
+
+Both of these scripts must return an exit code `0` if the test is a success.
+
+For the `execute` step of the `request` procedure
+
+* `sendData-unixlike.sh` that takes 2 arguments (address and port)
+*	`sendData-windows.bat` that takes 2 arguments (address and port)
+
+Both of these scripts must trigger a program that will send OSC data to the endpoint
 				
 ## How is this description file used by Manticore ?
 
