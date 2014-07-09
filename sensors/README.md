@@ -8,17 +8,17 @@ In the following, we propose a standardized procedure to describe a sensor and w
 **Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
 
 - [Structure of `description.json`](#structure-of-descriptionjson)
-  - [System object](#system-object)
-  - [Command object](#command-object)
-  - [Data description object](#data-description-object)
-  - [Request procedure](#request-procedure)
-    - [Mode](#mode)
-    - [Options](#options)
-    - [Check/Generate/Execute](#checkgenerateexecute)
+	- [System object](#system-object)
+	- [Command object](#command-object)
+	- [Data description object](#data-description-object)
+	- [Request procedure](#request-procedure)
+		- [Mode](#mode)
+		- [Options](#options)
+		- [Check/Generate/Execute](#checkgenerateexecute)
 - [A simple explained example: the mouse sensor](#a-simple-explained-example-the-mouse-sensor)
 - [Tutorial: Adding a sensor](#tutorial-adding-a-sensor)
-  - [Set up the workspace](#set-up-the-workspace)
-  - [Write the description file](#write-the-description-file)
+	- [Set up the workspace](#set-up-the-workspace)
+	- [Write the description file](#write-the-description-file)
 - [How is this description file used by Manticore ?](#how-is-this-description-file-used-by-manticore-)
 - [Further works and customization](#further-works-and-customization)
 
@@ -62,8 +62,8 @@ Each sensor **must** be described by a [JSON] file called `description.json`. Th
 A system object is a data structure that describes the operating systems and architectures supported by a sensor. In the description file, that looks like the following :
 
 	"alias_of_system": {
-	  "platform": "platform_of_system",
-	  "arch": "architecture_of_system"
+		"platform": "platform_of_system",
+		"arch": "architecture_of_system"
 	}
 
 *	The value of the `alias_of_system` can be anything that gives an understandable description to the system such as `linux`, `osx` or even `my_own_pc`.
@@ -77,15 +77,15 @@ A system object is a data structure that describes the operating systems and arc
 Pay attention to the difference between
 
 	"linux": {
-      "platform": "linux"
-    }
+			"platform": "linux"
+		}
 
 and
 
 	"pi": {
-      "platform": "linux",
-      "arch": "arm"
-    }
+			"platform": "linux",
+			"arch": "arm"
+		}
 
 The first one will target all Linux operating systems (regardless of the architecture) whereas the second one only targets those that run on ARM processors (but not specifically Raspberry Pi, the alias just implies it).
 
@@ -98,20 +98,20 @@ The important thing is to choose an alias that fits best to what you want to ach
 The Command object is data structure representing a command that must be executing to perform any action.
 
 	{
-	  "path": "subfolder/scripts",
-      "cmd": "./my_script.sh",
-      "parameters": [
-      	"--addr"
-        "$ADDRESS",
-        "--port",
-        "$PORT",
-      ],
-      "systems": [
-        "osx",
-        "linux"
-      ],
-      "sudo": true
-  	}
+		"path": "subfolder/scripts",
+			"cmd": "./my_script.sh",
+			"parameters": [
+				"--addr"
+				"$ADDRESS",
+				"--port",
+				"$PORT",
+			],
+			"systems": [
+				"osx",
+				"linux"
+			],
+			"sudo": true
+		}
 
 *	The `path` property is the place where the subshell will be executed. This property is optional if the command is in the environment variable `PATH` or if the command/program is in the same directory as the `description.json` file.
 *	The `cmd` property is the command that will be executed. This property is obviously **mandatory**.
@@ -130,9 +130,9 @@ Thus, considering that we are in the sensor working directory, the result of the
 The Data object gives a description of the data provided by the sensor. 
 
 	{
-      "description": "X position of the mouse",
-      "osc_format": "/mouse/x f"
-    }
+			"description": "X position of the mouse",
+			"osc_format": "/mouse/x f"
+		}
 
 The object has a simple structure with 2 properties :
 
@@ -146,20 +146,20 @@ Remember that the OSC format must be in accordance with the program that is resp
 The Request procedure corresponds to the ability for the 
 
 	"request": {
-      "default": {
-        "options": [
- 			// some options
-        ],
-        "check": [
-        	// some Command objects
-        ],
-        "generate": [
-        	// some Command objects
-        ],
-        "execute": [
-        	// some Command objects
-        ],
-      }
+			"default": {
+				"options": [
+			// some options
+				],
+				"check": [
+					// some Command objects
+				],
+				"generate": [
+					// some Command objects
+				],
+				"execute": [
+					// some Command objects
+				],
+			}
 	}
 
 
@@ -203,31 +203,31 @@ As stated above, the repository contains a `sensors` folder wich contains all th
 
 1. Create a `description.json` file with an empty object
 
-	{
-	}
+		{
+		}
 
 2. Add the `name` property and sets its value to the name of sensor (which must also be the name of the folder containing the description file)
 
-	{
-		"name": "my_new_sensor"
-	}
+		{
+			"name": "my_new_sensor"
+		}
 
 3. Add the `systems` property that will contain objects describing the platform and architecture supported by the sensor. Here we target Linux, Mac OS X and Windows operating (regardless of system versions and architecture)
 
-	{
-		"name": "my_new_sensor",
-		"systems": {
-			"linux": {
-    		  	"platform": "linux"
-    		},
-    		"osx": {
-    		  	"platform": "darwin"
-    		},
-    		"win": {
-    		  	"platform": "win32"
-    		}
+		{
+			"name": "my_new_sensor",
+			"systems": {
+				"linux": {
+							"platform": "linux"
+					},
+					"osx": {
+							"platform": "darwin"
+					},
+					"win": {
+							"platform": "win32"
+					}
+			}
 		}
-	}
 
 ## How is this description file used by Manticore ?
 
@@ -244,28 +244,28 @@ This description file -- which content is described in the previous section -- w
 If you want to create a custom procedure for your sensor. We can look at the [Request] procedure or the skeleton below.
 
 	"procedure_name": {
-      "default": {
-        "options": [
- 			// some options
-        ],
-        "step_1": [
-        	// some Command objects
-        ],
-        "step_2": [
-        	// some Command objects
-        ],
-      },
-      "custom_mode": {
-        "options": [
- 			// some options
-        ],
-        "step_1": [
-        	// some Command objects
-        ],
-        "step_2": [
-        	// some Command objects
-        ],
-      },
+			"default": {
+				"options": [
+			// some options
+				],
+				"step_1": [
+					// some Command objects
+				],
+				"step_2": [
+					// some Command objects
+				],
+			},
+			"custom_mode": {
+				"options": [
+			// some options
+				],
+				"step_1": [
+					// some Command objects
+				],
+				"step_2": [
+					// some Command objects
+				],
+			},
 	}
 
 It is important to understand that any new procedure implies that some ad-hoc development must be done in Manticore in order to handle it. To implement, you should edit the constructor of the *Sensor* object (`sensor.js`) and implement a new method called `procedure_name`. Doing so, you will then be able to call it in a standard way `my_sensor.procedure_name(mode, [args])` with `mode` being either `default` or `custom_mode` and the array of arguments matching to the `options` property of the considered mode.
