@@ -1,23 +1,53 @@
 # Sensors
 
-The main purpose of this project is to allow the use of sensors distributed over a network 
+The main purpose of this project is to allow the use of sensors distributed over a network ...
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+
+- [Structure of `description.json`](#structure-of-descriptionjson)
+  - [System object](#system-object)
+  - [Command object](#command-object)
+  - [Data description object](#data-description-object)
+  - [Request procedure](#request-procedure)
+- [A simple commented example: the mouse sensor](#a-simple-commented-example-the-mouse-sensor)
+- [Tutorial: Adding a sensor](#tutorial-adding-a-sensor)
+  - [Set up the workspace](#set-up-the-workspace)
+  - [Write the description file](#write-the-description-file)
+- [Further extension](#further-extension)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Structure of `description.json`
 
+Each sensor must described by a JSON file called `description.json`. This file must be located at the root of the sensor working directory folder (i.e. each type of sensor have its own folder in the `sensors/` directory of the repository).
+
 *	`name`
 	+	String
-	+	mandatory
-	+	must be the name of the folder containing the `description.json` file
+	+	**mandatory**
+	+	Name of the sensor and also the name of the folder containing the `description.json` file
 *	`systems`
-	+	Object containing System objects
-	+	mandatory (at leat one child)
-*	`bootstrap` mandatory
-	+ 	Object
-	+ 	mandatory
-	+ 	
+	+	Object containing [System] objects reference by an alias
+	+	**mandatory** (at leat one [Command] child)
+	+	Describe operating systems and architectures supported by the sensor. Each "system" is referenced by an alias used in the [Command] objects
+*	`bootstrap`
+	+ 	Array of [Command] objects
+	+ 	**mandatory**
+	+ 	Describe the command to be executing when Manticore starts in order to detect whether the sensor is present or not on the node
 *	`data`
-	+ Array
+	+ 	Array
+	+ 	**mandatory** (at least one [Data] child)
+	+ 	Describe the data and the related OSC format provided by a sensor
 *	`request`
+	+	Object
+	+	**mandatory**
+	+	Describe the [Request] procedure so that a node can request the sensors data. This procedure can have several *modes* and contains 3 mains steps *check* to check whether the sensor is still available, *generate* in the case that we need to generate a file and finally *execute* that will trigger the commands to send the data to some endpoint.
+
+[Command]: #command-object
+[System]: #system-object
+[Request]: #request-procedure
+[Data]: #data-description-object
 
 
 ### System object
@@ -31,7 +61,7 @@ A system object is a data structure that describe the operating systems and arch
 
 *	The value of the `alias_of_system` can be anything that describe correctly the system such as `linux`, `osx` or even `my_own_pc`.
 	+ 	Currently the value used are `linux`, `pi`, `win` and `osx`.
-*	The `platform` property is mandatory and must be equivalent to the value returned by `require('os').platform()` in Node.js.
+*	The `platform` property is **mandatory** and must be equivalent to the value returned by `require('os').platform()` in Node.js.
 *	The `arch`property is optional and if set then it must be equivalent to the value returned by `require('os').arch()` in Node.js.
 
 **Note**: for more information about the `OS` Node.js API, refer to <http://nodejs.org/api/os.html>
@@ -57,7 +87,30 @@ The important thing is to choose an alias that fits best to what you want to ach
 
 ### Command object
 
+The command object is data structure representing a command that must be executing to perform any action.
+
+	{
+	  "path": "subfolder/bin",
+      "cmd": "./my_script.sh",
+      "parameters": [
+      	"-addr"
+        "$ADDRESS",
+        "--port",
+        "$PORT",
+      ],
+      "systems": [
+        "osx",
+        "linux"
+      ],
+      "sudo": true
+  	}
+
+*	The `path` property is the place where the subshell will be executed. This property is optional if the command is in the environnement variable `PATH` or if the command/program is in the same directory as the `description.json` file.
+*	The `cmd` property is the command that will be executed. This property is obviously mandatory.
+
 ### Data description object
+
+### Request procedure
 
 
 ## A simple commented example: the mouse sensor
@@ -67,6 +120,9 @@ The important thing is to choose an alias that fits best to what you want to ach
 ### Set up the workspace
 
 As stated above, the repository contains a `sensors` folder wich contains all the sensors.
+
+	$ cd $REPO_ROOT/sensors
+	$ mkdir my_new_sensor
 
 ### Write the description file
 
@@ -98,5 +154,5 @@ As stated above, the repository contains a `sensors` folder wich contains all th
 		}
 	}
 
-
+## Further extension
 
