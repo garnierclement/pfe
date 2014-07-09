@@ -11,12 +11,12 @@ success=0
 
 echo "+[SCPT]\tChecking for mouse..."
 
-if ls /dev/input/by-id/ | grep -i mouse
+if ls /dev/input/by-id/ | grep -i mouse >/dev/null
 then 
 	echo "+[SCPT]\tMouse detected!\c"
 	exit $success 
 
-elif  ls /dev/input/by-path/ | grep -i mouse
+elif  ls /dev/input/by-path/ | grep -i mouse >/dev/null
 then 
 	echo "+[SCPT]\tMouse detected!\c"
 	exit $success 
