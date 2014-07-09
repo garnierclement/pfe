@@ -8,17 +8,17 @@ In the following, we propose a standardized procedure to describe a sensor and w
 **Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
 
 - [Structure of `description.json`](#structure-of-descriptionjson)
-  - [System object](#system-object)
-  - [Command object](#command-object)
-  - [Data description object](#data-description-object)
-  - [Request procedure](#request-procedure)
-    - [Mode](#mode)
-    - [Options](#options)
-    - [Steps: Check > Generate > Execute](#steps-check--generate--execute)
+	- [System object](#system-object)
+	- [Command object](#command-object)
+	- [Data description object](#data-description-object)
+	- [Request procedure](#request-procedure)
+		- [Mode](#mode)
+		- [Options](#options)
+		- [Steps: Check > Generate > Execute](#steps-check--generate--execute)
 - [A simple explained example: the mouse sensor](#a-simple-explained-example-the-mouse-sensor)
 - [Tutorial: Adding a sensor](#tutorial-adding-a-sensor)
-  - [Setting up the workspace](#setting-up-the-workspace)
-  - [Write the description file](#write-the-description-file)
+	- [Setting up the workspace](#setting-up-the-workspace)
+	- [Write the description file](#write-the-description-file)
 - [How is this description file used by Manticore ?](#how-is-this-description-file-used-by-manticore-)
 - [Custom procedure](#custom-procedure)
 - [Further works](#further-works)
@@ -300,7 +300,7 @@ You should now have the following tree view
 			}
 		}
 
-	a. The `request` procedure is standardized with 3 options: the address of the endpoint (`$ADDRESS`), the port of the endpoint (`$PORT`) and a name for the generated script/executable if needed (`$GENERATED_PATCH`).
+	6.1 The `request` procedure is standardized with 3 options: the address of the endpoint (`$ADDRESS`), the port of the endpoint (`$PORT`) and a name for the generated script/executable if needed (`$GENERATED_PATCH`).
 
 			{
 				"name": "my_new_sensor",
@@ -310,15 +310,15 @@ You should now have the following tree view
 				"request": {
 					"default": {
 						"options": [
-      			  "$ADDRESS",
-      			  "$PORT",
-      			  "$GENERATED_PATCH"
-      			],
+							"$ADDRESS",
+							"$PORT",
+							"$GENERATED_PATCH"
+						],
 					}
 				}
 			}
 
-	b. Check
+	6.2 Check
 
 			{
 				"name": "my_new_sensor",
@@ -347,7 +347,7 @@ You should now have the following tree view
 				}
 			}
 
-	c. Generate, Let's assume no generation in needed here (for instance, the mouse sensor need a pure data patch whereas the inertial sensor does not need anything)
+	6.3 Generate, Let's assume no generation in needed here (for instance, the mouse sensor need a pure data patch whereas the inertial sensor does not need anything)
 
 			{
 				"name": "my_new_sensor",
@@ -377,7 +377,7 @@ You should now have the following tree view
 				}
 			}
 
-	d. execute
+	6.4 execute
 
 			{
 				"name": "my_new_sensor",
