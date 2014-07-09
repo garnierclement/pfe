@@ -29,15 +29,12 @@ A system object is a data structure that describe the operating systems and arch
 		"arch": "architecture_of_system"
 	}
 
-The value of the `alias_of_system` can be anything that describe correctly the system such as `linux`, `osx` or even `my_own_pc`.
+*	The value of the `alias_of_system` can be anything that describe correctly the system such as `linux`, `osx` or even `my_own_pc`.
+	+ 	Currently the value used are `linux`, `pi`, `win` and `osx`.
+*	The `platform` property is mandatory and must be equivalent to the value returned by `require('os').platform()` in Node.js.
+*	The `arch`property is optional and if set then it must be equivalent to the value returned by `require('os').arch()` in Node.js.
 
-Currently the value used are `linux`, `pi`, `win` and `osx`.
-
-The `platform` property is mandatory and must be equivalent to the value returned by `require('os').platform()` in Node.js.
-
-The `arch`property is optional and if set then it must be equivalent to the value returned by `require('os').arch()` in Node.js.
-
-For more information about the `OS` Node.js API, refer to <http://nodejs.org/api/os.html>
+**Note**: for more information about the `OS` Node.js API, refer to <http://nodejs.org/api/os.html>
 
 Pay attention to the difference between
 
