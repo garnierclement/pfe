@@ -300,119 +300,109 @@ You should now have the following tree view
 			}
 		}
 
-	6.1 The `request` procedure is standardized with 3 options: the address of the endpoint (`$ADDRESS`), the port of the endpoint (`$PORT`) and a name for the generated script/executable if needed (`$GENERATED_PATCH`).
+7. The `request` procedure is standardized with 3 options: the address of the endpoint (`$ADDRESS`), the port of the endpoint (`$PORT`) and a name for the generated script/executable if needed (`$GENERATED_PATCH`).
 
-			{
-				"name": "my_new_sensor",
-				"systems": { ... },
-				"data": [ ... ],
-				"bootstrap": [ ... ],
-				"request": {
-					"default": {
-						"options": [
-							"$ADDRESS",
-							"$PORT",
-							"$GENERATED_PATCH"
-						],
-					}
+		{
+			"name": "my_new_sensor",
+			"systems": { ... },
+			"data": [ ... ],
+			"bootstrap": [ ... ],
+			"request": {
+				"default": {
+					"options": [
+						"$ADDRESS",
+						"$PORT",
+						"$GENERATED_PATCH"
+					],
 				}
 			}
+		}
 
-	6.2 Check
+8. Check
 
-			{
-				"name": "my_new_sensor",
-				"systems": { ... },
-				"data": [ ... ],
-				"bootstrap": [ ... ],
-				"request": {
-					"default": {
-						"options": [ ... ],
-						"check": [
-							{
-								"cmd": "./checkMySensor-unixlike.sh",
-								"systems": [
-									"osx",
-									"linux"
-								]
-							},
-							{
-								"cmd": "checkMySensor-windows.bat",
-								"systems": [
-									"win"
-								]
-							}
-						]
-					}
+		{
+			"name": "my_new_sensor",
+			"systems": { ... },
+			"data": [ ... ],
+			"bootstrap": [ ... ],
+			"request": {
+				"default": {
+					"options": [ ... ],
+					"check": [
+						{
+							"cmd": "./checkMySensor-unixlike.sh",
+							"systems": [
+								"osx",
+								"linux"
+							]
+						},
+						{
+							"cmd": "checkMySensor-windows.bat",
+							"systems": [
+								"win"
+							]
+						}
+					]
 				}
 			}
+		}
 
-	6.3 Generate, Let's assume no generation in needed here (for instance, the mouse sensor need a pure data patch whereas the inertial sensor does not need anything)
+9. Generate, Let's assume no generation in needed here (for instance, the mouse sensor need a pure data patch whereas the inertial sensor does not need anything)
 
-			{
-				"name": "my_new_sensor",
-				"systems": { ... },
-				"data": [ ... ],
-				"bootstrap": [ ... ],
-				"request": {
-					"default": {
-						"options": [ ... ],
-						"check": [ ... ],
-						"generate": [
-							{
-								"cmd": "./checkMySensor-unixlike.sh",
-								"systems": [
-									"osx",
-									"linux"
-								]
-							},
-							{
-								"cmd": "checkMySensor-windows.bat",
-								"systems": [
-									"win"
-								]
-							}
-						]
-					}
+		{
+			"name": "my_new_sensor",
+			"systems": { ... },
+			"data": [ ... ],
+			"bootstrap": [ ... ],
+			"request": {
+				"default": {
+					"options": [ ... ],
+					"check": [ ... ],
+					"generate": [
+						// empty !
+					]
 				}
 			}
+		}
 
-	6.4 execute
+10. execute
 
-			{
-				"name": "my_new_sensor",
-				"systems": { ... },
-				"data": [ ... ],
-				"bootstrap": [ ... ],
-				"request": {
-					"default": {
-						"options": [ ... ],
-						"check": [ ... ],
-						"generate": [],
-						"execute": [
-							{
-								"cmd": "./sendData-unixlike.sh",
-								"parameters": [
-									"$ADDRESS",
-									"$PORT"
-								],
-								"systems": [
-									"osx",
-									"linux"
-								]
-							},
-							{
-								"cmd": "sendData-windows.bat",
-								"parameters": [
-									"$ADDRESS",
-									"$PORT"
-								],
-								"systems": [
-									"win"
-								]
-							}
-						]
-					}
+		{
+			"name": "my_new_sensor",
+			"systems": { ... },
+			"data": [ ... ],
+			"bootstrap": [ ... ],
+			"request": {
+				"default": {
+					"options": [ ... ],
+					"check": [ ... ],
+					"generate": [],
+					"execute": [
+						{
+							"cmd": "./sendData-unixlike.sh",
+							"parameters": [
+								"$ADDRESS",
+								"$PORT"
+							],
+							"systems": [
+								"osx",
+								"linux"
+							]
+						},
+						{
+							"cmd": "sendData-windows.bat",
+							"parameters": [
+								"$ADDRESS",
+								"$PORT"
+							],
+							"systems": [
+								"win"
+							]
+						}
+					]
+				}
+			}
+		}
 				
 ## How is this description file used by Manticore ?
 
