@@ -112,7 +112,10 @@ The Command object is data structure representing a command that must be executi
 
 *	The `path` property is the place where the subshell will be executed. This property is optional if the command is in the environnement variable `PATH` or if the command/program is in the same directory as the `description.json` file.
 *	The `cmd` property is the command that will be executed. This property is obviously **mandatory**.
-*	The `parameters`is an *Array* of 
+*	The `parameters`is an *Array* of arguments that will be passed to the command specified in the `cmd` property
+	+	Parameters starting with a `$` (dollar sign) are variables, this means that there are going going to be parsed and their value replaced by Manticore. For instance the `$ADDRESS` and `$PORT` in the above example are variables.
+*	The `systems` property is an *Array* of aliases to [System] objects that specifies on which systems you can apply the command. This property is **mandatory**.
+*	The `sudo` property is optional and when sets to `true` implies that the command must be executed with the superuser rights.
 
 ### Data description object
 
