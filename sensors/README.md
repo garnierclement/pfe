@@ -1,7 +1,7 @@
 # Sensors
 
 The main purpose of this project is to allow the use of sensors distributed over a network.
-In the following, we propose a standardized procedure to describe a sensor and we also explain how this file is included within the framework.
+In the following, we propose a standardized procedure to describe a sensor and we also explain how it is incorporated within the framework.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
