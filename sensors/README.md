@@ -8,17 +8,19 @@ In the following, we propose a standardized procedure to describe a sensor and w
 **Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
 
 - [Structure of `description.json`](#structure-of-descriptionjson)
-	- [System object](#system-object)
-	- [Command object](#command-object)
-	- [Data description object](#data-description-object)
-	- [Request procedure](#request-procedure)
-		- [Mode](#mode)
-		- [Options](#options)
-		- [Steps: Check > Generate > Execute](#steps-check--generate--execute)
+  - [System object](#system-object)
+  - [Command object](#command-object)
+    - [Command exit status](#command-exit-status)
+  - [Data description object](#data-description-object)
+  - [Request procedure](#request-procedure)
+    - [Mode](#mode)
+    - [Options](#options)
+    - [Steps: Check > Generate > Execute](#steps-check--generate--execute)
 - [A simple explained example: the mouse sensor](#a-simple-explained-example-the-mouse-sensor)
 - [Tutorial: Adding a sensor](#tutorial-adding-a-sensor)
-	- [Setting up the workspace](#setting-up-the-workspace)
-	- [Write the description file](#write-the-description-file)
+  - [Setting up the workspace](#setting-up-the-workspace)
+  - [Write the description file](#write-the-description-file)
+  - [Write your scripts/programs](#write-your-scriptsprograms)
 - [How is this description file used by Manticore ?](#how-is-this-description-file-used-by-manticore-)
 - [Custom procedure](#custom-procedure)
 - [Further works](#further-works)
@@ -126,6 +128,8 @@ Thus, considering that we are in the sensor working directory, the result of the
 	$ cd subfolder/scripts
 	$ sudo ./myscript.sh --addr [$ADDRESS] --port [$PORT]
 
+#### Command exit status
+
 > need to write about the return value/exit code
 
 ### Data description object
@@ -140,18 +144,20 @@ The Data object gives a description of the data provided by the sensor.
 The object has a simple structure with 2 properties :
 
 *	The `descriptionn` property provides a simple text description of the data 
-*	The `osc_format` property shows the syntax of the OSC address pattern and type tag. For more information about OSC, refer to the [specifications](http://opensoundcontrol.org/spec-1_0)
+*	The `osc_format` property shows the syntax of the OSC address pattern and type tag. For more information about OSC, refer to the [specification](http://opensoundcontrol.org/spec-1_0)
 
 Remember that the OSC format must be in accordance with the program that is responsible to forge the OSC packets and to send send (i.e. the program triggered by the *execute* step in [Request] procedure). 
 
 ### Request procedure
 
-The Request procedure corresponds to the ability for the 
+The Request procedure corresponds to the ability to send the sensor's data to another that have requested it.
 
 	"request": {
 			"default": {
 				"options": [
-					// some options
+					"$ADDRESS",
+					"$PORT",
+					"$GENERATED_PATCH"
 				],
 				"check": [
 					// some Command objects
@@ -165,21 +171,29 @@ The Request procedure corresponds to the ability for the
 			}
 	}
 
-
+The request procedure is already implemented into Manticore, so it means that you can create new sensors and there will be no ad-hoc development required to make the request of the sensor's data available to other nodes. Everything is defined here in the description file.
 
 #### Mode
 
-As you can notice on the above excerpt of `request`, it has a property called `default`. We will refer in the following as the *mode* of the Request procedure. his will help us to give some granularity in the case of we need to consider different types of a procedure. 
+As you can notice on the above excerpt of `request`, it has a property called `default`. We will refer in the following as the *mode* of the Request procedure. This will help us to give some granularity in the request procedure. Let's consider that situation where we might want a slightly different type of the Request procedure. It is easy to implement it by just adding a new property after `default`. 
 
-Usually, there will be only one `mode` called default is mandatory and obviously will be the default way of the procedure to be called.
+Usually, there will only be one `mode` called `default`. Therefore the `default` mode is mandatory, others are optional.
 
 #### Options
 
-Each mode can have some options. These options corresponds to 
+Each mode can have some options. These options corresponds to variables that will be set by Manticore at runtime.
 
-The convention used here is to write them starting with a `$` (dollar sign)
+The convention used here is to write them starting with a `$` (dollar sign).
 
-> the name is just a way to remember what it is for but the order is very important (need to explain why)
+The Request procedure have 3 options :
+
+*	`$ADDRESS$` corresponds to the IP address of the endpoint
+*	`$PORT$` corresponds to the port of the endpoint
+*	`$GENERATED_PATCH$` corresponds to the name of a generated file that can be needed before triggering the execution
+
+The name of the option is just a way to remember and describe it. If your need to generate a script and not a patch, then you can call the third options `$MYSCRIPT` and use this name in your `description.json`.
+
+However the order is very important because Manticore will process these variables in the same order that are they described above (first the address, then the port and finally the generated file name).
 
 #### Steps: Check > Generate > Execute
 
@@ -347,6 +361,10 @@ You should now have the following tree view
 			}
 		}
 
+### Write your scripts/programs
+
+
+
 9. Generate, Let's assume no generation in needed here (for instance, the mouse sensor need a pure data patch whereas the inertial sensor does not need anything)
 
 		{
@@ -365,7 +383,7 @@ You should now have the following tree view
 			}
 		}
 
-10. execute
+10. For the `execute` step, we will use some parameters that are variables. Like the
 
 		{
 			"name": "my_new_sensor",
