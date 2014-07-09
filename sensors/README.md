@@ -16,7 +16,6 @@ In the following, we propose a standardized procedure to describe a sensor and w
     - [Mode](#mode)
     - [Options](#options)
     - [Steps: Check > Generate > Execute](#steps-check--generate--execute)
-- [A simple explained example: the mouse sensor](#a-simple-explained-example-the-mouse-sensor)
 - [Tutorial: Adding a sensor](#tutorial-adding-a-sensor)
   - [Setting up the workspace](#setting-up-the-workspace)
   - [Write the description file](#write-the-description-file)
@@ -176,7 +175,7 @@ The request procedure is already implemented into Manticore, so it means that yo
 #### Mode
 
 As you can notice on the above excerpt of `request`, it has a property called `default`. We will refer in the following as the *mode* of the Request procedure. This will help us to give some granularity in the request procedure.  
-Usually, there will only be one `mode` called `default`. Therefore the `default` mode is mandatory, others are optional.
+Usually, there will only be one `mode` called `default`. Therefore the `default` mode is **mandatory**, others are optional.
 
 Let's consider that situation where we might want a slightly different type of the Request procedure. It is easy to implement it by just adding a new property after `default`. As previously defined, the `default` procedure objective is *to send the sensor's data in OSC format to some other node*. Here another mode can be *send the sensor's data with another type of format* or *to send the data over TCP (instead of UDP)*.
 
@@ -206,9 +205,9 @@ The 'default' mode of the Request procedure is divided into 3 steps that must be
 
 Each of these steps are just some arrays of [Command]. At each step, Manticore will monitor the exit code of the command. We use the standard C convention, 0 means that it is a success and so we can jump to the next step, any other value means that an error occurred a
 
-For those interested in the implementation, you can refer to the 
+> unfinished explanation
 
-## A simple explained example: the mouse sensor
+> For more details, you can look at the implementation in the *Sensor* constructor of Manticore
 
 ## Tutorial: Adding a sensor
 
@@ -333,7 +332,7 @@ You should now have the following tree view
 			}
 		}
 
-8. Check
+8. For the `check` step, we will use the same scripts previously used in the `bootstrap` procedure
 
 		{
 			"name": "my_new_sensor",
@@ -362,7 +361,7 @@ You should now have the following tree view
 			}
 		}
 
-9. Generate, Let's assume no generation in needed here (for instance, the mouse sensor need a pure data patch whereas the inertial sensor does not need anything)
+9. For the `generate` step, we will assume that no generation is required here (for instance, the mouse sensor need a Pure Data patch whereas the inertial sensor does not need anything)
 
 		{
 			"name": "my_new_sensor",
@@ -380,7 +379,7 @@ You should now have the following tree view
 			}
 		}
 
-10. For the `execute` step, we will use some parameters that are variables. Like the
+10. For the `execute` step, we will use some parameters that are variables.
 
 		{
 			"name": "my_new_sensor",
@@ -421,7 +420,7 @@ You should now have the following tree view
 
 ### Write your scripts/programs
 
-According to the written `description.json` file, now you should write your scripts.
+According to the written `description.json` file, now you should write your scripts or dedicated programs and drivers.
 
 For the `bootstrap` procedure and the `check` step of the `request` procedure
 
@@ -446,6 +445,7 @@ This description file -- which content is described in the previous section -- w
 1.	The first element parsed is the `systems`. According to the node's platform and architecture, Manticore will determine which system aliases that the node is entitled.
 2.	Then Manticore will try detect the sensor on the current node. To do so, it parses the `bootstrap` element and browses the [Command]. For each [Command], Manticore checks its `systems` property for matches with the system aliases. If it success, then the `cmd` is executed with `parameters`. In terms of implementation, this is done in the Sensor constructor (see `sensor.js` file), if the `bootstrap` fails (either because the sensor is not entitled to the node's system or because ), then constructor should not return a new *Sensor* object. If it is a success, the Sensor is created and the Core singleton get aware of it in its own `sensors` property.
 
+> unfinished explanation
 
 ## Custom procedure
 
