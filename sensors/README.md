@@ -1,7 +1,7 @@
 # Sensors
 
 The main purpose of this project is to allow the use of sensors distributed over a network.
-In the following, we propose a standardized procedure to describe a sensor
+In the following, we propose a standardized procedure to describe a sensor and we also explain how it is incorporated within the framework.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -15,17 +15,18 @@ In the following, we propose a standardized procedure to describe a sensor
     - [Mode](#mode)
     - [Options](#options)
     - [Check/Generate/Execute](#checkgenerateexecute)
-- [A simple commented example: the mouse sensor](#a-simple-commented-example-the-mouse-sensor)
+- [A simple explained example: the mouse sensor](#a-simple-explained-example-the-mouse-sensor)
 - [Tutorial: Adding a sensor](#tutorial-adding-a-sensor)
   - [Set up the workspace](#set-up-the-workspace)
   - [Write the description file](#write-the-description-file)
-- [Further extension](#further-extension)
+- [How is this description file used by Manticore ?](#how-is-this-description-file-used-by-manticore-)
+- [Further works and customization](#further-works-and-customization)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Structure of `description.json`
 
-Each sensor must described by a JSON file called `description.json`. This file must be located at the root of the sensor working directory folder (i.e. each type of sensor have its own folder in the `sensors/` directory of the repository).
+Each sensor **must** be described by a JSON file called `description.json`. This file **must** be located at the root of the sensor working directory folder (each sensor have its own folder in the `sensors/` directory of the repository).
 
 *	`name`
 	+	*String*
@@ -112,7 +113,10 @@ The Command object is data structure representing a command that must be executi
 
 *	The `path` property is the place where the subshell will be executed. This property is optional if the command is in the environnement variable `PATH` or if the command/program is in the same directory as the `description.json` file.
 *	The `cmd` property is the command that will be executed. This property is obviously **mandatory**.
-*	The `parameters`is an *Array* of 
+*	The `parameters`is an *Array* of arguments that will be passed to the command specified in the `cmd` property
+	+	Parameters starting with a `$` (dollar sign) are variables, this means that there are going going to be parsed and their value replaced by Manticore. For instance the `$ADDRESS` and `$PORT` in the above example are variables.
+*	The `systems` property is an *Array* of aliases to [System] objects that specifies on which systems you can apply the command. This property is **mandatory**.
+*	The `sudo` property is optional and when sets to `true` implies that the command must be executed with the superuser rights.
 
 ### Data description object
 
@@ -124,7 +128,7 @@ The Command object is data structure representing a command that must be executi
 
 #### Check/Generate/Execute
 
-## A simple commented example: the mouse sensor
+## A simple explained example: the mouse sensor
 
 ## Tutorial: Adding a sensor
 
@@ -165,5 +169,18 @@ As stated above, the repository contains a `sensors` folder wich contains all th
 		}
 	}
 
-## Further extension
+## How is this description file used by Manticore ?
+
+At the startup of Manticore, the program will try to detect the presence of sensors on the node. To achieve this goal, Manticore will browse the content of each folder in `sensors/`. Each of these folders are the working directories of a specific sensor and thus must contain a `description.js` file.
+
+This description file -- which content is described in the previous section -- will be parsed by Manticore (for those interested in the implementation, you can refer to the method `Core.prototype.detectSensors` in `manticore.js`).
+
+1.	The first element parsed is the `systems`. According to the node's platform and architecture, Manticore will determine which system aliases that the node is entitled.
+2.	Then Manticore will try detect the sensor on the current node. To do so, it parses the `bootstrap` element and browses the [Command]. For each [Command], Manticore checks its `systems` property for matches with the system aliases. If it success, then the `cmd` is executed with `parameters`. In terms of implementation, this is done in the Sensor constructor (see `sensor.js` file), if the `bootstrap` fails (either because the sensor is not entitled to the node's system or because ), then constructor should not return a new *Sensor* object. If it is a success, the Sensor is created and the Core singleton get aware of it in its own `sensors` property.
+
+
+
+## Further works and customization
+
+*	Find a way to create some JSON Schema and to validate the JSON description files, maybe see <http://json-schema.org/>
 
