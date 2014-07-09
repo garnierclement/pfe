@@ -164,7 +164,8 @@ core.on('mach', function(envelope, header, payload) {
 				if (dst === this.ip) dst = '127.0.0.1';
 				var opts = [dst, payload.port, header.src+'-'+payload.port+'.pd'];
 				var new_record = new Record(payload.data, 'active_resource', header.src, dst, payload.port);
-				sensor.request('default', opts, function(err, child) {
+				var mode = (mode in payload) ? payload.mode : 'default';
+				sensor.request(mode, opts, function(err, child) {
 					if (err === null) {
 						returnStatus = true;
 						if (child) {
