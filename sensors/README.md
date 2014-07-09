@@ -24,25 +24,25 @@ The main purpose of this project is to allow the use of sensors distributed over
 Each sensor must described by a JSON file called `description.json`. This file must be located at the root of the sensor working directory folder (i.e. each type of sensor have its own folder in the `sensors/` directory of the repository).
 
 *	`name`
-	+	String
+	+	*String*
 	+	**mandatory**
 	+	Name of the sensor and also the name of the folder containing the `description.json` file
 *	`systems`
-	+	Object containing [System] objects reference by an alias
-	+	**mandatory** (at leat one [Command] child)
-	+	Describe operating systems and architectures supported by the sensor. Each "system" is referenced by an alias used in the [Command] objects
+	+	*Object* containing *[System]* objects reference by an alias
+	+	**mandatory** (at leat one *[Command]* child)
+	+	Describe operating systems and architectures supported by the sensor. Each "system" is referenced by an alias used in the *[Command]* objects
 *	`bootstrap`
-	+ 	Array of [Command] objects
+	+ 	*Array* of *[Command]* objects
 	+ 	**mandatory**
 	+ 	Describe the command to be executing when Manticore starts in order to detect whether the sensor is present or not on the node
 *	`data`
-	+ 	Array
+	+ 	*Array* of *[Data]* objects
 	+ 	**mandatory** (at least one [Data] child)
 	+ 	Describe the data and the related OSC format provided by a sensor
 *	`request`
-	+	Object
+	+	*Object*
 	+	**mandatory**
-	+	Describe the [Request] procedure so that a node can request the sensors data. This procedure can have several *modes* and contains 3 mains steps *check* to check whether the sensor is still available, *generate* in the case that we need to generate a file and finally *execute* that will trigger the commands to send the data to some endpoint.
+	+	Describe the [Request] procedure so that a node can request the sensors data. This procedure can have several *modes* and contains 3 mains steps namely *check* to check whether the sensor is still available, *generate* in the case that we need to generate a file and finally *execute* that will trigger the commands to send the data to some endpoint.
 
 [Command]: #command-object
 [System]: #system-object
