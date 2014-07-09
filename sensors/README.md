@@ -20,7 +20,7 @@ In the following, we propose a standardized procedure to describe a sensor and w
   - [Set up the workspace](#set-up-the-workspace)
   - [Write the description file](#write-the-description-file)
 - [How is this description file used by Manticore ?](#how-is-this-description-file-used-by-manticore-)
-- [Further work and customization](#further-work-and-customization)
+- [Further works and customization](#further-works-and-customization)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -173,13 +173,14 @@ As stated above, the repository contains a `sensors` folder wich contains all th
 
 At the startup of Manticore, the program will try to detect the presence of sensors on the node. To achieve this goal, Manticore will browse the content of each folder in `sensors/`. Each of these folders are the working directories of a specific sensor and thus must contain a `description.js` file.
 
-This description file -- which content is described in the previous section -- will be parsed by Manticore (for those interested in the implementation, you can refer to the `Core.prototype.detectSensors` in `manticore.js`).
+This description file -- which content is described in the previous section -- will be parsed by Manticore (for those interested in the implementation, you can refer to the method `Core.prototype.detectSensors` in `manticore.js`).
 
-The first element parsed is the `systems`. According to the node's platform and architecture, Manticore will determine which system aliases that the node is entitled.
+1.	The first element parsed is the `systems`. According to the node's platform and architecture, Manticore will determine which system aliases that the node is entitled.
+2.	Then Manticore will try detect the sensor on the current node. To do so, it parses the `bootstrap` element and browses the [Command]. For each [Command], Manticore checks its `systems` property for matches with the system aliases. If it success, then the `cmd` is executed with `parameters`. In terms of implementation, this is done in the Sensor constructor (see `sensor.js` file), if the `bootstrap` fails (either because the sensor is not entitled to the node's system or because ), then constructor should not return a new *Sensor* object. If it is a success, the Sensor is created and the Core singleton get aware of it in its own `sensors` property.
 
 
 
-## Further work and customization
+## Further works and customization
 
 *	Find a way to create some JSON Schema and to validate the JSON description files, maybe see <http://json-schema.org/>
 
