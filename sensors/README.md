@@ -26,7 +26,7 @@ In the following, we propose a standardized procedure to describe a sensor and w
 
 ## Structure of `description.json`
 
-Each sensor **must** be described by a JSON file called `description.json`. This file **must** be located at the root of the sensor working directory folder (each sensor have its own folder in the `sensors/` directory of the repository).
+Each sensor **must** be described by a [JSON] file called `description.json`. This file **must** be located at the root of the sensor working directory folder (each sensor have its own folder in the `sensors/` directory of the repository).
 
 *	`name`
 	+	*String*
@@ -35,7 +35,7 @@ Each sensor **must** be described by a JSON file called `description.json`. This
 *	`systems`
 	+	*Object* containing *[System]* objects indexed by an alias
 	+	**mandatory** (at least one *[Command]* child)
-	+	Describe operating systems and architectures supported by the sensor. Each *[System]* is indexed by an alias that will be referenced in the *[Command]* objects
+	+	Describe operating systems and architectures supported by the sensor. Each *[System]* is indexed by an alias that will be referenced by the `systems`property` of the *[Command]* objects
 *	`bootstrap`
 	+ 	*Array* of *[Command]* objects
 	+ 	**mandatory**
@@ -54,6 +54,7 @@ Each sensor **must** be described by a JSON file called `description.json`. This
 [Request]: #request-procedure
 [Data]: #data-description-object
 [OSC]: http://opensoundcontrol.org/introduction-osc
+[JSON]: http://json.org/
 
 
 ### System object
@@ -65,11 +66,11 @@ A system object is a data structure that describes the operating systems and arc
 	  "arch": "architecture_of_system"
 	}
 
-*	The value of the `alias_of_system` can be anything that gives an understandable description the system such as `linux`, `osx` or even `my_own_pc`.
+*	The value of the `alias_of_system` can be anything that gives an understandable description to the system such as `linux`, `osx` or even `my_own_pc`.
 	+ 	Currently we use the following values `linux`, `pi`, `win` and `osx`
 	+ 	These aliases are custom-made and does not rely on Node.js API or terminology
-*	The `platform` property is **mandatory** and *must be equivalent* to the value returned by `require('os').platform()` in Node.js
-*	The `arch`property is optional and if set then it *must be equivalent* to the value returned by `require('os').arch()` in Node.js
+*	The `platform` property is **mandatory** and *must be equivalent* to a value returned by `require('os').platform()` in Node.js
+*	The `arch`property is optional and if set then it *must be equivalent* to a value returned by `require('os').arch()` in Node.js
 
 **Note**: for more information about the `OS` Node.js API, refer to <http://nodejs.org/api/os.html>
 
@@ -86,7 +87,7 @@ and
       "arch": "arm"
     }
 
-The first one will target all Linux operating systems (regardless of the architecture) whereas the second one only targets those that run on ARM processors (but not specifically Raspberry Pi, just implies it is for them).
+The first one will target all Linux operating systems (regardless of the architecture) whereas the second one only targets those that run on ARM processors (but not specifically Raspberry Pi, the alias just implies it).
 
 Here, we use the alias `pi` for because we use devices called Raspberry Pi. Nonetheless the alias `linux-arm` could also have been used because its meaning is more closely related to the platform and architecture description.
 
@@ -97,10 +98,10 @@ The important thing is to choose an alias that fits best to what you want to ach
 The Command object is data structure representing a command that must be executing to perform any action.
 
 	{
-	  "path": "subfolder/bin",
+	  "path": "subfolder/scripts",
       "cmd": "./my_script.sh",
       "parameters": [
-      	"-addr"
+      	"--addr"
         "$ADDRESS",
         "--port",
         "$PORT",
@@ -118,6 +119,11 @@ The Command object is data structure representing a command that must be executi
 	+	Parameters starting with a `$` (dollar sign) are variables, this means that there are going to be parsed and their value replaced by Manticore. For instance, the `$ADDRESS` and `$PORT` in the above example are variables.
 *	The `systems` property is an *Array* of aliases to [System] objects that specifies on which systems you can apply the command. This property is **mandatory**.
 *	The `sudo` property is optional and when sets to `true` implies that the command must be executed with the superuser rights.
+
+Thus, considering that we are in the sensor working directory, the result of the above example is equivalent to execute
+
+	$ cd subfolder/scripts
+	$ sudo ./myscript.sh --addr [$ADDRESS] --port [$PORT]
 
 ### Data description object
 
@@ -137,17 +143,56 @@ Remember that the OSC format must be in accordance with the program that is resp
 
 ### Request procedure
 
+The Request procedure corresponds to the ability for the 
+
+	"request": {
+      "default": {
+        "options": [
+ 			// some options
+        ],
+        "check": [
+        	// some Command objects
+        ],
+        "generate": [
+        	// some Command objects
+        ],
+        "execute": [
+        	// some Command objects
+        ],
+      }
+	}
+
+
+
 #### Mode
+
+As you can notice on the above excerpt of `request`, it has a property called `default`. We will refer in the following as the *mode* of the Request procedure. his will help us to give some granularity in the case of we need to consider different types of a procedure. 
+
+Usually, there will be only one `mode` called default is mandatory and obviously will be the default way of the procedure to be called.
 
 #### Options
 
-#### Check/Generate/Execute
+Each mode can have some options. These options corresponds to 
+
+The convention used here is to write them starting with a `$` (dollar sign)
+
+#### Steps: Check > Generate > Execute
+
+The 'default' mode of the Request procedure is divided into 3 steps that must be run one after another
+
+1. Check whether the sensor is still available
+2. Generate an executable or a script at runtime
+3. Execute an existing or previously generated executable/script that will send the data to the endpoint that requests the resource
+
+Each of these steps are just some arrays of [Command]. At each step, Manticore will monitor the exit code of the command. We use the standard C convention, 0 means that it is a success and so we can jump to the next step, any other value means that an error occurred a
+
+For those interested in the implementation, you can refer to the 
 
 ## A simple explained example: the mouse sensor
 
 ## Tutorial: Adding a sensor
 
-### Set up the workspace
+### Setting up the workspace
 
 As stated above, the repository contains a `sensors` folder wich contains all the sensors.
 
@@ -194,8 +239,39 @@ This description file -- which content is described in the previous section -- w
 2.	Then Manticore will try detect the sensor on the current node. To do so, it parses the `bootstrap` element and browses the [Command]. For each [Command], Manticore checks its `systems` property for matches with the system aliases. If it success, then the `cmd` is executed with `parameters`. In terms of implementation, this is done in the Sensor constructor (see `sensor.js` file), if the `bootstrap` fails (either because the sensor is not entitled to the node's system or because ), then constructor should not return a new *Sensor* object. If it is a success, the Sensor is created and the Core singleton get aware of it in its own `sensors` property.
 
 
+## Custom procedure
 
-## Further works and customization
+If you want to create a custom procedure for your sensor. We can look at the [Request] procedure or the skeleton below.
+
+	"procedure_name": {
+      "default": {
+        "options": [
+ 			// some options
+        ],
+        "step_1": [
+        	// some Command objects
+        ],
+        "step_2": [
+        	// some Command objects
+        ],
+      },
+      "custom_mode": {
+        "options": [
+ 			// some options
+        ],
+        "step_1": [
+        	// some Command objects
+        ],
+        "step_2": [
+        	// some Command objects
+        ],
+      },
+	}
+
+It is important to understand that any new procedure implies that some ad-hoc development must be done in Manticore in order to handle it. To implement, you should edit the constructor of the *Sensor* object (`sensor.js`) and implement a new method called `procedure_name`. Doing so, you will then be able to call it in a standard way `my_sensor.procedure_name(mode, [args])` with `mode` being either `default` or `custom_mode` and the array of arguments matching to the `options` property of the considered mode.
+
+## Further works
 
 *	Find a way to create some JSON Schema and to validate the JSON description files, maybe see <http://json-schema.org/>
+*	Automatic generation of methods regarding the custom procedure, we could parse all other procedure and get the method associated, that will use the `async` module to execute each step. The code will be then generated at runtime
 
