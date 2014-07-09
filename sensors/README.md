@@ -1,7 +1,7 @@
 # Sensors
 
 The main purpose of this project is to allow the use of sensors distributed over a network.
-In the following, we propose a standardized procedure to describe a sensor
+In the following, we propose a standardized procedure to describe a sensor and we also explain how this file is included within the framework.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -15,11 +15,12 @@ In the following, we propose a standardized procedure to describe a sensor
     - [Mode](#mode)
     - [Options](#options)
     - [Check/Generate/Execute](#checkgenerateexecute)
-- [A simple commented example: the mouse sensor](#a-simple-commented-example-the-mouse-sensor)
+- [A simple explained example: the mouse sensor](#a-simple-explained-example-the-mouse-sensor)
 - [Tutorial: Adding a sensor](#tutorial-adding-a-sensor)
   - [Set up the workspace](#set-up-the-workspace)
   - [Write the description file](#write-the-description-file)
-- [Further extension](#further-extension)
+- [How is this description file used by Manticore ?](#how-is-this-description-file-used-by-manticore-)
+- [Further work and customization](#further-work-and-customization)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -127,7 +128,7 @@ The Command object is data structure representing a command that must be executi
 
 #### Check/Generate/Execute
 
-## A simple commented example: the mouse sensor
+## A simple explained example: the mouse sensor
 
 ## Tutorial: Adding a sensor
 
@@ -178,5 +179,5 @@ The first element parsed is the `systems`. According to the node's platform and 
 
 
 
-## Further extension
+## Further work and customization
 
