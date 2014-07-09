@@ -35,38 +35,39 @@ Each sensor **must** be described by a JSON file called `description.json`. This
 *	`systems`
 	+	*Object* containing *[System]* objects indexed by an alias
 	+	**mandatory** (at least one *[Command]* child)
-	+	Describe operating systems and architectures supported by the sensor. Each "system" is indexed by an alias that will be referenced in the *[Command]* objects
+	+	Describe operating systems and architectures supported by the sensor. Each *[System]* is indexed by an alias that will be referenced in the *[Command]* objects
 *	`bootstrap`
 	+ 	*Array* of *[Command]* objects
 	+ 	**mandatory**
-	+ 	Describe the command to be executing when Manticore starts in order to detect whether the sensor is present or not on the node
+	+ 	Describe the commands to be executing when Manticore starts in order to detect whether the sensor is present or not on the node
 *	`data`
 	+ 	*Array* of *[Data]* objects
-	+ 	**mandatory** (at least one [Data] child)
-	+ 	Describe the data and the related OSC format provided by a sensor
+	+ 	**mandatory** (at least one *[Data]* child)
+	+ 	Describe the data and the related [OSC] format provided by a sensor
 *	`request`
 	+	*Object*
 	+	**mandatory**
-	+	Describe the [Request] procedure so that a node can request the sensors data. This procedure can have several *modes* and contains 3 mains steps namely *check* to check whether the sensor is still available, *generate* in the case that we need to generate a file and finally *execute* that will trigger the commands to send the data to some endpoint.
+	+	Describe the [Request] procedure so that a node can request the sensor's data. This procedure can have several *modes* and contains 3 main steps namely *check* to check whether the sensor is still available, *generate* in the case that we need to generate a file and finally *execute* that will trigger the commands to send the data to some endpoint.
 
 [Command]: #command-object
 [System]: #system-object
 [Request]: #request-procedure
 [Data]: #data-description-object
+[OSC]: http://opensoundcontrol.org/introduction-osc
 
 
 ### System object
 
-A system object is a data structure that describe the operating systems and architectures supported by a sensor. In a JSON file, that looks like the following :
+A system object is a data structure that describes the operating systems and architectures supported by a sensor. In the description file, that looks like the following :
 
 	"alias_of_system": {
-		"platform": "platform_of_system",
-		"arch": "architecture_of_system"
+	  "platform": "platform_of_system",
+	  "arch": "architecture_of_system"
 	}
 
 *	The value of the `alias_of_system` can be anything that gives an understandable description the system such as `linux`, `osx` or even `my_own_pc`.
 	+ 	Currently we use the following values `linux`, `pi`, `win` and `osx`
-	+ 	These aliases are custom-made and does not rely on Node.js reference
+	+ 	These aliases are custom-made and does not rely on Node.js API or terminology
 *	The `platform` property is **mandatory** and *must be equivalent* to the value returned by `require('os').platform()` in Node.js
 *	The `arch`property is optional and if set then it *must be equivalent* to the value returned by `require('os').arch()` in Node.js
 
@@ -85,11 +86,11 @@ and
       "arch": "arm"
     }
 
-The first one will target all Linux operating systems (regardless of the architecture) whereas the second one only targets those that run on ARM processors.  
+The first one will target all Linux operating systems (regardless of the architecture) whereas the second one only targets those that run on ARM processors (but not specifically Raspberry Pi, just implies it is for them).
 
 Here, we use the alias `pi` for because we use devices called Raspberry Pi. Nonetheless the alias `linux-arm` could also have been used because its meaning is more closely related to the platform and architecture description.
 
-The important thing is to choose an alias that fits best to what you want to achieve and to be consistent in the way of describing a specific platform or architecture within one `descritpion.json` file. Indeed, these system aliases are going to be used as a reference in the [Command] object (described in the next section).
+The important thing is to choose an alias that fits best to what you want to achieve and to be consistent in the way of describing a specific platform or architecture within one `description.json` file. Indeed, these system aliases are going to be used as a reference in the [Command] object (described in the next section).
 
 ### Command object
 
@@ -111,14 +112,28 @@ The Command object is data structure representing a command that must be executi
       "sudo": true
   	}
 
-*	The `path` property is the place where the subshell will be executed. This property is optional if the command is in the environnement variable `PATH` or if the command/program is in the same directory as the `description.json` file.
+*	The `path` property is the place where the subshell will be executed. This property is optional if the command is in the environment variable `PATH` or if the command/program is in the same directory as the `description.json` file.
 *	The `cmd` property is the command that will be executed. This property is obviously **mandatory**.
 *	The `parameters`is an *Array* of arguments that will be passed to the command specified in the `cmd` property
-	+	Parameters starting with a `$` (dollar sign) are variables, this means that there are going going to be parsed and their value replaced by Manticore. For instance the `$ADDRESS` and `$PORT` in the above example are variables.
+	+	Parameters starting with a `$` (dollar sign) are variables, this means that there are going to be parsed and their value replaced by Manticore. For instance, the `$ADDRESS` and `$PORT` in the above example are variables.
 *	The `systems` property is an *Array* of aliases to [System] objects that specifies on which systems you can apply the command. This property is **mandatory**.
 *	The `sudo` property is optional and when sets to `true` implies that the command must be executed with the superuser rights.
 
 ### Data description object
+
+The Data object gives a description of the data provided by the sensor. 
+
+	{
+      "description": "X position of the mouse",
+      "osc_format": "/mouse/x f"
+    }
+
+The object has a simple structure with 2 properties :
+
+*	The `descriptionn` property provides a simple text description of the data 
+*	The `osc_format` property shows the syntax of the OSC address pattern and type tag. For more information about OSC, refer to the specifications <http://opensoundcontrol.org/spec-1_0>
+
+Remember that the OSC format must be in accordance with the program that is responsible to forge the OSC packets and to send send (i.e. the program triggered by the *execute* step in [Request] procedure). 
 
 ### Request procedure
 
@@ -152,7 +167,7 @@ As stated above, the repository contains a `sensors` folder wich contains all th
 		"name": "my_new_sensor"
 	}
 
-3. Add the `systems` perperty that will contain objects describing the platform and architecture supported by the sensor. Here we target Linux, Mac OS X and Windows operating (regardless of system versions and architecture)
+3. Add the `systems` property that will contain objects describing the platform and architecture supported by the sensor. Here we target Linux, Mac OS X and Windows operating (regardless of system versions and architecture)
 
 	{
 		"name": "my_new_sensor",
