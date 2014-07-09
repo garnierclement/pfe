@@ -133,9 +133,9 @@ Thus, considering that we are in the sensor working directory, the result of the
 The Data object gives a description of the data provided by the sensor. 
 
 	{
-			"description": "X position of the mouse",
-			"osc_format": "/mouse/x f"
-		}
+		"description": "X position of the mouse",
+		"osc_format": "/mouse/x f"
+	}
 
 The object has a simple structure with 2 properties :
 
@@ -151,7 +151,7 @@ The Request procedure corresponds to the ability for the
 	"request": {
 			"default": {
 				"options": [
-			// some options
+					// some options
 				],
 				"check": [
 					// some Command objects
@@ -197,10 +197,23 @@ For those interested in the implementation, you can refer to the
 
 ### Setting up the workspace
 
-As stated above, the repository contains a `sensors` folder wich contains all the sensors.
+As stated above, the repository contains a `sensors` folder which contains all the sensors.
 
 	$ cd $REPO_ROOT/sensors
 	$ mkdir my_new_sensor
+
+You should now have the following tree view
+
+	$REPO_ROOT
+		|____sensors
+		| |____inertial
+		| | |____description.json
+		| | |____ ...
+		| |____mouse
+		| | |____description.json
+		| | |____ ...
+		| |____my_new_sensor
+		| | |____description.json
 
 ### Write the description file
 
