@@ -168,5 +168,15 @@ As stated above, the repository contains a `sensors` folder wich contains all th
 		}
 	}
 
+## How is this description file used by Manticore ?
+
+At the startup of Manticore, the program will try to detect the presence of sensors on the node. To achieve this goal, Manticore will browse the content of each folder in `sensors/`. Each of these folders are the working directories of a specific sensor and thus must contain a `description.js` file.
+
+This description file -- which content is described in the previous section -- will be parsed by Manticore (for those interested in the implementation, you can refer to the `Core.prototype.detectSensors` in `manticore.js`).
+
+The first element parsed is the `systems`. According to the node's platform and architecture, Manticore will determine which system aliases that the node is entitled.
+
+
+
 ## Further extension
 
