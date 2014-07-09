@@ -26,7 +26,7 @@ In the following, we propose a standardized procedure to describe a sensor and w
 
 ## Structure of `description.json`
 
-Each sensor must described by a JSON file called `description.json`. This file must be located at the root of the sensor working directory folder (i.e. each type of sensor have its own folder in the `sensors/` directory of the repository).
+Each sensor **must** be described by a JSON file called `description.json`. This file **must** be located at the root of the sensor working directory folder (each sensor have its own folder in the `sensors/` directory of the repository).
 
 *	`name`
 	+	*String*
@@ -180,4 +180,6 @@ The first element parsed is the `systems`. According to the node's platform and 
 
 
 ## Further work and customization
+
+*	Find a way to create some JSON Schema and to validate the JSON description files, maybe see <http://json-schema.org/>
 
