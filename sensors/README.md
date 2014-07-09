@@ -1,6 +1,7 @@
 # Sensors
 
-The main purpose of this project is to allow the use of sensors distributed over a network ...
+The main purpose of this project is to allow the use of sensors distributed over a network.
+In the following, we propose a standardized procedure to describe a sensor
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -11,6 +12,9 @@ The main purpose of this project is to allow the use of sensors distributed over
   - [Command object](#command-object)
   - [Data description object](#data-description-object)
   - [Request procedure](#request-procedure)
+    - [Mode](#mode)
+    - [Options](#options)
+    - [Check/Generate/Execute](#checkgenerateexecute)
 - [A simple commented example: the mouse sensor](#a-simple-commented-example-the-mouse-sensor)
 - [Tutorial: Adding a sensor](#tutorial-adding-a-sensor)
   - [Set up the workspace](#set-up-the-workspace)
@@ -28,9 +32,9 @@ Each sensor must described by a JSON file called `description.json`. This file m
 	+	**mandatory**
 	+	Name of the sensor and also the name of the folder containing the `description.json` file
 *	`systems`
-	+	*Object* containing *[System]* objects reference by an alias
-	+	**mandatory** (at leat one *[Command]* child)
-	+	Describe operating systems and architectures supported by the sensor. Each "system" is referenced by an alias used in the *[Command]* objects
+	+	*Object* containing *[System]* objects indexed by an alias
+	+	**mandatory** (at least one *[Command]* child)
+	+	Describe operating systems and architectures supported by the sensor. Each "system" is indexed by an alias that will be referenced in the *[Command]* objects
 *	`bootstrap`
 	+ 	*Array* of *[Command]* objects
 	+ 	**mandatory**
@@ -59,10 +63,11 @@ A system object is a data structure that describe the operating systems and arch
 		"arch": "architecture_of_system"
 	}
 
-*	The value of the `alias_of_system` can be anything that describe correctly the system such as `linux`, `osx` or even `my_own_pc`.
-	+ 	Currently the value used are `linux`, `pi`, `win` and `osx`.
-*	The `platform` property is **mandatory** and must be equivalent to the value returned by `require('os').platform()` in Node.js.
-*	The `arch`property is optional and if set then it must be equivalent to the value returned by `require('os').arch()` in Node.js.
+*	The value of the `alias_of_system` can be anything that gives an understandable description the system such as `linux`, `osx` or even `my_own_pc`.
+	+ 	Currently we use the following values `linux`, `pi`, `win` and `osx`
+	+ 	These aliases are custom-made and does not rely on Node.js reference
+*	The `platform` property is **mandatory** and *must be equivalent* to the value returned by `require('os').platform()` in Node.js
+*	The `arch`property is optional and if set then it *must be equivalent* to the value returned by `require('os').arch()` in Node.js
 
 **Note**: for more information about the `OS` Node.js API, refer to <http://nodejs.org/api/os.html>
 
@@ -83,11 +88,11 @@ The first one will target all Linux operating systems (regardless of the archite
 
 Here, we use the alias `pi` for because we use devices called Raspberry Pi. Nonetheless the alias `linux-arm` could also have been used because its meaning is more closely related to the platform and architecture description.
 
-The important thing is to choose an alias that fits best to what you want to achieve and to be consistent in the way of describing a specific platform or architecture within one `descritpion.json` file. Indeed, these system aliases are going to be used as a reference in the command object (described in the next section).
+The important thing is to choose an alias that fits best to what you want to achieve and to be consistent in the way of describing a specific platform or architecture within one `descritpion.json` file. Indeed, these system aliases are going to be used as a reference in the [Command] object (described in the next section).
 
 ### Command object
 
-The command object is data structure representing a command that must be executing to perform any action.
+The Command object is data structure representing a command that must be executing to perform any action.
 
 	{
 	  "path": "subfolder/bin",
@@ -106,12 +111,18 @@ The command object is data structure representing a command that must be executi
   	}
 
 *	The `path` property is the place where the subshell will be executed. This property is optional if the command is in the environnement variable `PATH` or if the command/program is in the same directory as the `description.json` file.
-*	The `cmd` property is the command that will be executed. This property is obviously mandatory.
+*	The `cmd` property is the command that will be executed. This property is obviously **mandatory**.
+*	The `parameters`is an *Array* of 
 
 ### Data description object
 
 ### Request procedure
 
+#### Mode
+
+#### Options
+
+#### Check/Generate/Execute
 
 ## A simple commented example: the mouse sensor
 
