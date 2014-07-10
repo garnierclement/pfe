@@ -161,13 +161,13 @@ If you forget it, then it will try to execute `myscript.sh` and therefore look t
 
 For each sensor, Manticore is responsible for parsing the `description.json` file and thus executing the commands described in the Command object.
 
-To achieve this goal, we are using the Child Processes module in Node.js API. This means that Manticore will execute the command in a child process and will monitor its life cycle.
+To achieve this goal, we are using the [Child Processes](http://nodejs.org/api/child_process.html) module in Node.js API. This means that Manticore will execute the command in a child process and will monitor its life cycle.
 
 Indeed, when the child process exits, Manticore will inspect the command return value (or). If it is a success then it will jump to the next command, otherwise an error/exception must be thrown.
 
 By convention, a **success** is denoted by the **`0` value**. As a consequence, any other value that defers from `0` will be considered as a failure.
 
-> In Unix-like shells, the exit code of the precedent command can be displayed with `echo $?`
+> In UNIX-like shells, the exit code of the precedent command can be displayed with `echo $?`
 
 
 ### Data description object
