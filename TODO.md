@@ -30,3 +30,5 @@
 - [ ] Move the messaging structure into a message.js file
 - [ ] Periodic publishing of node capabilities
 - [ ] handle properly the crash of manticore is another instance of manticore is already running (ports already bound)
+- [ ] implement the limitation on a specific mode of a specific procedure (number of maximum clients)
+- [ ] periodic detection of sensors (or continusly polling devices and then send a signal to manticore)
