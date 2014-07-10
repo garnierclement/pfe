@@ -14,8 +14,6 @@ pandoc ../sensors/README.md ../projects/manticore/README.md \
 # Use Pandoc to generate the HTML documentation
 pandoc ../sensors/README.md ../projects/manticore/README.md \
 	-o doc.html \
-	--tab-stop=2 -N \
-	-V title="\textbf{Manticore}" \
-	-V author="Homère \textsc{Faivre}" \
-	-V author="Clément \textsc{Garnier}" \
+	--tab-stop=2 -N -s \
+	-V title="Manticore" \
 	-V lang="en"
