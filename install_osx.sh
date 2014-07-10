@@ -2,7 +2,8 @@
 
 # Script directory
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
+success=0
+failure=1
 # Check if home brew is already installed.
 check_brew() {
 
@@ -75,6 +76,9 @@ install_java_libraries() {
 		sed -i "" '40c\
 		max.dynamic.class.dir '$DIR'/projects/MAX/max_externals/lib/\' 
 		/Applications/Max\ 6.1/Cycling\ \'74/java/max.java.config.txt
+	else
+		echo '[ERROR!] Please install Max 5 or 6 before continuing installation!'
+		exit $failure
 	fi
 }
 
@@ -123,6 +127,7 @@ add_launchd() {
 }
 
 install
+exit $success
 
 
 
