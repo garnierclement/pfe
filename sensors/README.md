@@ -261,9 +261,9 @@ The convention used here is to write them starting with a `$` (dollar sign).
 
 The Request procedure have 3 options (in `default` mode) :
 
-*	`$ADDRESS$` corresponds to the IP address of the endpoint
-*	`$PORT$` corresponds to the port of the endpoint
-*	`$GENERATED_PATCH$` corresponds to the name of a generated file that can be needed before triggering the execution
+*	`$ADDRESS` corresponds to the IP address of the endpoint
+*	`$PORT` corresponds to the port of the endpoint
+*	`$GENERATED_PATCH` corresponds to the name of a generated file that can be needed before triggering the execution
 
 The name of the option is just a way to remember and describe it. If your need to generate a script and not a patch, then you can call the third options `$MYSCRIPT` instead of `$GENERATED_PATCH` and use this name in your `description.json`. This will not affect the parsing of the file.
 
