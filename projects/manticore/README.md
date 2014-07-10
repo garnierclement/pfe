@@ -203,7 +203,7 @@ We distinguish 2 types of records :
 	+	the port that the client requested that we sent data on
 	+	the IP of the destination node that can provide the data (this is used as a commodity for the release resource procedure, so we do not need to look up the core.nodes[] and associated sensors[] to find the IP address)
 
-These records works in pairs and at any time if a `client_request` is a valid record in one node, you could fine an equivalent `active_resource` on another node of the network. This `active_resource` is matching to the previously initiated `client_request`.
+These records works in pairs and at any time if a `client_request` is a valid record in one node (i.e. the client), you could fine an equivalent `active_resource` on another node of the network (i.e. the server). This `active_resource` is matching to the previously initiated `client_request`.
 
 ### Inter-core messaging
 
