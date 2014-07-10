@@ -96,14 +96,14 @@ The first one targets all Linux operating systems (regardless of the architectur
 So if we have the following commands
 
 	{
-		"cmd": "command_for_unix_systems.sh",
+		"cmd": "./command_for_unix_systems.sh",
 		"systems": [
 			"linux",
 			"osx"
 		]
 	},
 	{
-		"cmd": "command_only_for_pi.sh",
+		"cmd": "./command_only_for_pi.sh",
 		"systems": [
 			"pi"
 		]	
