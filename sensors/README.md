@@ -8,21 +8,21 @@ In the following, we propose a standardized procedure to describe a sensor and w
 **Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
 
 - [Structure of `description.json`](#structure-of-descriptionjson)
-  - [System object](#system-object)
-  - [Command object](#command-object)
-    - [Command structure](#command-structure)
-    - [Command exit status](#command-exit-status)
-  - [Data description object](#data-description-object)
-  - [Bootstrap procedure](#bootstrap-procedure)
-  - [Request procedure](#request-procedure)
-    - [Mode](#mode)
-    - [Options](#options)
-    - [Steps: Check > Generate > Execute](#steps-check--generate--execute)
+	- [System object](#system-object)
+	- [Command object](#command-object)
+		- [Command structure](#command-structure)
+		- [Command exit status](#command-exit-status)
+	- [Data description object](#data-description-object)
+	- [Bootstrap procedure](#bootstrap-procedure)
+	- [Request procedure](#request-procedure)
+		- [Mode](#mode)
+		- [Options](#options)
+		- [Steps: Check > Generate > Execute](#steps-check--generate--execute)
 - [How is this description file used by Manticore ?](#how-is-this-description-file-used-by-manticore-)
 - [Tutorial: Adding a sensor](#tutorial-adding-a-sensor)
-  - [Setting up the workspace](#setting-up-the-workspace)
-  - [Write the description file](#write-the-description-file)
-  - [Write your scripts/programs](#write-your-scriptsprograms)
+	- [Setting up the workspace](#setting-up-the-workspace)
+	- [Write the description file](#write-the-description-file)
+	- [Write your scripts/programs](#write-your-scriptsprograms)
 - [Custom procedure](#custom-procedure)
 - [Further works](#further-works)
 
@@ -289,8 +289,8 @@ At the startup of Manticore, the program will try to detect the presence of sens
 
 This description file -- which content is described in the previous section -- will be parsed by Manticore (for those interested in the implementation, you can refer to the method `Core.prototype.detectSensors` in `manticore.js`).
 
-1.	The first element parsed is the `systems`. According to the node's platform and architecture, Manticore will determine which system aliases that the node is entitled.
-2.	Then Manticore will try detect the sensor on the current node. To do so, it parses the `bootstrap` element and browses the [Command]. For each [Command], Manticore checks its `systems` property for matches with the system aliases. If it success, then the `cmd` is executed with `parameters`. In terms of implementation, this is done in the *Sensor* constructor (see `sensor.js` file), if the `bootstrap` fails (either because the sensor is not entitled to the node's system or because ), then constructor should not return a new *Sensor* object and fail. If it is a success, the new *Sensor* object is created and the *Core* singleton gets aware of it in its own `sensors` property. Thereafter all the detected sensors are published across the network.
+1. The first element parsed is the `systems`. According to the node's platform and architecture, Manticore will determine which system aliases that the node is entitled.
+2. Then Manticore will try detect the sensor on the current node. To do so, it parses the `bootstrap` element and browses the [Command]. For each [Command], Manticore checks its `systems` property for matches with the system aliases. If it success, then the `cmd` is executed with `parameters`. In terms of implementation, this is done in the *Sensor* constructor (see `sensor.js` file), if the `bootstrap` fails (either because the sensor is not entitled to the node's system or because ), then constructor should not return a new *Sensor* object and fail. If it is a success, the new *Sensor* object is created and the *Core* singleton gets aware of it in its own `sensors` property. Thereafter all the detected sensors are published across the network.
 3. When the *Sensor* object is created. Not only it detects it and sets up its properties(identifier, name and associated data) but also automatically implements a method `request()` matching the instructions of the Request procedure in the description file. 
 	+	The prototype of this function is simple `request(mode, array_of_options)`. 
 	+	The `mode` will try match the one in the description file (if not set, automatically use `default`). 

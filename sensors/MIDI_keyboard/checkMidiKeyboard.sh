@@ -1,29 +1,14 @@
-MIDI_PD="/home/pi/Desktop/pdemo/MIDI.pd"
-LOG="/home/pi/log"
+#MIDI_PD="/home/pi/Desktop/pdemo/MIDI.pd"
+#LOG="/home/pi/log"
 MIDI_KEY="Midiman"
-
-while [ 1 ]
-do 
-
+echo "+[SCPT]\tChecking for MIDI-Keyboard..."
 	RES=`lsusb | grep $MIDI_KEY>/dev/null && echo yes`
-	PROC=`ps -e | grep pd-ex>/dev/null && echo true`
 	
 	if [ $RES ]
 	then
-		echo "Midi Keyboard is well!!"
-		
-		if [ -z $PROC ]
-		then
-			sleep 8
-			pd-extended -nogui  -oss -midiindev 1 -open $MIDI_PD  &>$LOG&
-		fi
+		echo "+[SCPT]\tMIDI-Keyboard detected!\c"
+		exit 0
 	else
-		echo "Kill everything!"
-		if [ $PROC ]
-		then
-			ps -e | grep pd-ex | awk '{print $1}' | xargs sudo kill
-		fi
+		exit 1
 	fi
 	
-	sleep 3
-done
