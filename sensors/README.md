@@ -13,6 +13,7 @@ In the following, we propose a standardized procedure to describe a sensor and w
     - [Command structure](#command-structure)
     - [Command exit status](#command-exit-status)
   - [Data description object](#data-description-object)
+  - [Bootstrap procedure](#bootstrap-procedure)
   - [Request procedure](#request-procedure)
     - [Mode](#mode)
     - [Options](#options)
@@ -29,7 +30,7 @@ In the following, we propose a standardized procedure to describe a sensor and w
 
 ## Structure of `description.json`
 
-Each sensor **must** be described by a [JSON] file called `description.json`. This file **must** be located at the root of the sensor working directory folder (each sensor have its own folder in the `sensors/` directory of the repository).
+Each sensor **must** be described by a [JSON] file called `description.json`. This file **must** be located at the root of the sensor working directory folder (each sensor have its own folder in the `sensors/` directory of the repository). The purpose of the file is to report the instructions that Manticore should follow to detect the presence of the sensor and to handle the request on it.
 
 *	`name`
 	+	*String*
@@ -92,13 +93,31 @@ and
 
 The first one targets all Linux operating systems (regardless of the architecture) whereas the second one only targets those that run on ARM processors (but not specifically Raspberry Pi, the alias just implies it).
 
+So if we have the following commands
+
+	{
+		"cmd": "./command_for_unix_systems.sh",
+		"systems": [
+			"linux",
+			"osx"
+		]
+	},
+	{
+		"cmd": "./command_only_for_pi.sh",
+		"systems": [
+			"pi"
+		]	
+	}
+
+On the Rapsberry Pi, Manticore will match on 2 aliases `linux` (because of the platform) and `pi` (because of the platform and architecture) and therefore execute both commands.
+
 Here, we use the alias `pi` for because we use devices called Raspberry Pi. Nonetheless the alias `linux-arm` could also have been used because its meaning is more closely related to the platform and architecture description.
 
-The important thing is to choose an alias that fits best to what you want to achieve and to be consistent in the way of describing a specific platform or architecture within one `description.json` file. Indeed, these system aliases are going to be used as a reference in `systems` property of the [Command] object (described in the next section).
+The important thing is to choose an alias that fits best to what you want to achieve and to be consistent in the way of describing a specific platform or architecture within one `description.json` file. Indeed, these system aliases are going to be used as a reference in the `systems` property of the [Command] object (described in the next section).
 
 ### Command object
 
-The Command object is data structure representing a command that must be executing to perform any action.
+The Command object is a data structure representing a command that must be executing to perform any action.
 
 #### Command structure
 
@@ -132,17 +151,23 @@ Thus, considering that we are in the sensor working directory, the result of the
 	
 Note that the variables `$ADDRESS` and `$PORT` have been respectively replaced by values `127.0.0.1` and `42424`.
 
+#### Note about the execution of the command
+
+You may notice that for a shell script the `cmd` often starts with `./myscript.sh`. This is because Manticore will create a subshell in the sensors folder and then execute the content `cmd` from there.
+
+If you forget it, then it will try to execute `myscript.sh` and therefore look the environment variable `PATH` for it. Of course, the sensor folder is not in the `PATH` and you will get an error like `myscript.sh: command not found` or `myscript.sh: No such file or directory`.
+
 #### Command exit status
 
 For each sensor, Manticore is responsible for parsing the `description.json` file and thus executing the commands described in the Command object.
 
-To achieve this goal, we are using the Child Processes module in Node.js API. This means that Manticore will execute the command in a child process and will monitor its life cycle.
+To achieve this goal, we are using the [Child Processes](http://nodejs.org/api/child_process.html) module in Node.js API. This means that Manticore will execute the command in a child process and will monitor its life cycle.
 
-Indeed, when the child process exits, Manticore will inspect the command return value (or). If it is a success then it will jump to the next command, otherwise an error/exception must be thrown.
+Indeed, when the child process exits, Manticore will inspect the command return value (or exit code). If it is a success then it will jump to the next command, otherwise an error/exception must be thrown.
 
 By convention, a **success** is denoted by the **`0` value**. As a consequence, any other value that defers from `0` will be considered as a failure.
 
-> In Unix-like shells, the exit code of the precedent command can be displayed with `echo $?`
+> In UNIX-like shells, the exit code of the precedent command can be displayed with `echo $?`
 
 
 ### Data description object
@@ -158,11 +183,34 @@ The object has a simple structure with 2 properties :
 
 *	The `description` property provides a simple text description of the data 
 *	The `osc_format` property shows the syntax of the OSC address pattern and type tag.
-	+	In the above example, `/mouse/x` is the OSC address and `f` the type tag for floating point numbers
+	+	In the above example, `/mouse/x` is the OSC address and `f` the type tag for floating-point numbers
 
 >  For more information about OSC, refer to the [specification](http://opensoundcontrol.org/spec-1_0)
 
 Remember that the OSC format must be in accordance with the program that is responsible to forge the OSC packets and to send send (i.e. the program triggered by the *execute* step in [Request] procedure). 
+
+### Bootstrap procedure
+
+The Bootstrap procedure corresponds to the commands that must be executed to detect the sensor on a node.
+
+The structure is quite simple and is a simple array of [Command] objects for all supported systems
+
+	"bootstrap": [
+		{
+			"cmd": "./detectionScript-osx.sh",
+			"systems": [
+				"osx"
+			]
+		},
+		{
+			"cmd": "./detectionScript-linux.sh",
+			"systems": [
+				"linux"
+			]
+		}
+	]
+
+When Manticore starts up, it will execute these commands to detect the presence of the sensor on the node. If it is a success then, the sensor's presence will be published across the network.
 
 ### Request procedure
 
@@ -234,7 +282,8 @@ At the startup of Manticore, the program will try to detect the presence of sens
 This description file -- which content is described in the previous section -- will be parsed by Manticore (for those interested in the implementation, you can refer to the method `Core.prototype.detectSensors` in `manticore.js`).
 
 1.	The first element parsed is the `systems`. According to the node's platform and architecture, Manticore will determine which system aliases that the node is entitled.
-2.	Then Manticore will try detect the sensor on the current node. To do so, it parses the `bootstrap` element and browses the [Command]. For each [Command], Manticore checks its `systems` property for matches with the system aliases. If it success, then the `cmd` is executed with `parameters`. In terms of implementation, this is done in the Sensor constructor (see `sensor.js` file), if the `bootstrap` fails (either because the sensor is not entitled to the node's system or because ), then constructor should not return a new *Sensor* object. If it is a success, the Sensor is created and the Core singleton gets aware of it in its own `sensors` property.
+2.	Then Manticore will try detect the sensor on the current node. To do so, it parses the `bootstrap` element and browses the [Command]. For each [Command], Manticore checks its `systems` property for matches with the system aliases. If it success, then the `cmd` is executed with `parameters`. In terms of implementation, this is done in the *Sensor* constructor (see `sensor.js` file), if the `bootstrap` fails (either because the sensor is not entitled to the node's system or because ), then constructor should not return a new *Sensor* object and fail. If it is a success, the new *Sensor* object is created and the *Core* singleton gets aware of it in its own `sensors` property. Thereafter all the detected sensors are published across the network.
+3. When the *Sensor* object is created. Not only it detects it and sets up its properties(identifier, name and associated data) but also automatically implements a method `request()` matching the instructions of the Request procedure in the description file.
 
 > unfinished explanation
 

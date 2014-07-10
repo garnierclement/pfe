@@ -9,6 +9,8 @@ var path = require('path');
 
 /**
  * Sensor object
+ * @param {Object} desc    Object representing the description.json file
+ * @param {Array} systems  Array of all system aliases matching
  */
 function Sensor (desc, systems)
 {
@@ -95,6 +97,17 @@ function Sensor (desc, systems)
 
 module.exports = Sensor;
 
+/**
+ * Parse the content of an array of Command objects from the description.json file
+ * Execute the command if one of the system aliases match
+ * Finally use the callback to return the child process
+ * 
+ * @param  {String}		sensor_name [description]
+ * @param  {Array}		cmd_array   [description]
+ * @param  {Array}		systems     [description]
+ * @param  {Array}		options     [description]
+ * @param  {Function} callback    Error-first callback 
+ */
 function parseAndExecute(sensor_name, cmd_array, systems, options, callback) {
 	_.each(cmd_array, function(command, key) {
 		var intersect = _.intersection(command.systems, systems);
@@ -120,6 +133,17 @@ function parseAndExecute(sensor_name, cmd_array, systems, options, callback) {
 	});
 }
 
+/**
+ * Parse the content of an array of Command objects from the description.json file
+ * Execute the command if one of the system aliases match
+ * When the child process exits, use the callback to return its exit code
+ * 
+ * @param  {String}		sensor_name [description]
+ * @param  {Array}		cmd_array   [description]
+ * @param  {Array}		systems     [description]
+ * @param  {Array}		options     [description]
+ * @param  {Function} callback    Error-first callback 
+ */
 function parseExecuteAndDie(sensor_name, cmd_array, systems, options, callback) {
 	_.each(cmd_array, function(command, key) {
 		var intersect = _.intersection(command.systems, systems);
@@ -165,6 +189,12 @@ Sensor.prototype.addData = function(_name, osc_string) {
 	this.data.push({name: _name, osc: osc_string});
 };
 
+/**
+ * Simple wrapper around the exec function of module Child Process in the Node.js API
+ * @param  {String}   cmd      Full command to be executed (with arguments)
+ * @param  {Object}		opts     Options for the exec command (cwd for changing the current working directory)
+ * @param  {Function} callback Return stdout and stderr
+ */
 function executeCommand(cmd, opts, callback) {
 	try {
 		var child = exec(cmd, opts, function(err, stdout, stderr){
