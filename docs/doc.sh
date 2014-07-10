@@ -10,3 +10,12 @@ pandoc ../sensors/README.md ../projects/manticore/README.md \
 	-V geometry="margin=1.2in" \
 	-V date="\today" \
 	-V papersize="a4paper"
+
+# Use Pandoc to generate the HTML documentation
+pandoc ../sensors/README.md ../projects/manticore/README.md \
+	-o doc.html \
+	--tab-stop=2 -N \
+	-V title="\textbf{Manticore}" \
+	-V author="Homère \textsc{Faivre}" \
+	-V author="Clément \textsc{Garnier}" \
+	-V lang="en"

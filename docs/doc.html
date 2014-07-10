@@ -1,0 +1,862 @@
+<h1 id="sensors"><span class="header-section-number">1</span> Sensors</h1>
+<p>The main purpose of this project is to allow the use of sensors distributed over a network. In the following, we propose a standardized procedure to describe a sensor and we also explain how it is incorporated within the framework.</p>
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<p><strong>Table of Contents</strong> <em>generated with <a href="http://doctoc.herokuapp.com/">DocToc</a></em></p>
+<ul>
+<li><a href="#structure-of-descriptionjson">Structure of <code>description.json</code></a>
+<ul>
+<li><a href="#system-object">System object</a></li>
+<li><a href="#command-object">Command object</a>
+<ul>
+<li><a href="#command-structure">Command structure</a></li>
+<li><a href="#command-exit-status">Command exit status</a></li>
+</ul></li>
+<li><a href="#data-description-object">Data description object</a></li>
+<li><a href="#bootstrap-procedure">Bootstrap procedure</a></li>
+<li><a href="#request-procedure">Request procedure</a>
+<ul>
+<li><a href="#mode">Mode</a></li>
+<li><a href="#options">Options</a></li>
+<li><a href="#steps-check--generate--execute">Steps: Check &gt; Generate &gt; Execute</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#how-is-this-description-file-used-by-manticore-">How is this description file used by Manticore ?</a></li>
+<li><a href="#tutorial-adding-a-sensor">Tutorial: Adding a sensor</a>
+<ul>
+<li><a href="#setting-up-the-workspace">Setting up the workspace</a></li>
+<li><a href="#write-the-description-file">Write the description file</a></li>
+<li><a href="#write-your-scriptsprograms">Write your scripts/programs</a></li>
+</ul></li>
+<li><a href="#custom-procedure">Custom procedure</a></li>
+<li><a href="#further-works">Further works</a></li>
+</ul>
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+<h2 id="structure-of-description.json"><span class="header-section-number">1.1</span> Structure of <code>description.json</code></h2>
+<p>Each sensor <strong>must</strong> be described by a <a href="http://json.org/">JSON</a> file called <code>description.json</code>. This file <strong>must</strong> be located at the root of the sensor working directory folder (each sensor has its own folder in the <code>sensors/</code> directory of the repository). The purpose of the file is to report the instructions that Manticore should follow to detect the presence of the sensor and to handle the request on it.</p>
+<ul>
+<li><code>name</code>
+<ul>
+<li><em>String</em></li>
+<li><strong>mandatory</strong></li>
+<li>Name of the sensor and also the name of the folder containing the <code>description.json</code> file</li>
+</ul></li>
+<li><code>systems</code>
+<ul>
+<li><em>Object</em> containing <em><a href="#system-object">System</a></em> objects indexed by an alias</li>
+<li><strong>mandatory</strong> (at least one <em><a href="#command-object">Command</a></em> child)</li>
+<li>Describes operating systems and architectures supported by the sensor. Each <em><a href="#system-object">System</a></em> is indexed by an alias that will be referenced by the <code>systems</code>property` of the <em><a href="#command-object">Command</a></em> objects</li>
+</ul></li>
+<li><code>bootstrap</code>
+<ul>
+<li><em>Array</em> of <em><a href="#command-object">Command</a></em> objects</li>
+<li><strong>mandatory</strong></li>
+<li>Describes the commands to be executing when Manticore starts in order to detect whether the sensor is present or not on the node</li>
+</ul></li>
+<li><code>data</code>
+<ul>
+<li><em>Array</em> of <em><a href="#data-description-object">Data</a></em> objects</li>
+<li><strong>mandatory</strong> (at least one <em><a href="#data-description-object">Data</a></em> child)</li>
+<li>Describes the data and the related <a href="http://opensoundcontrol.org/introduction-osc">OSC</a> format provided by a sensor</li>
+</ul></li>
+<li><code>request</code>
+<ul>
+<li><em>Object</em></li>
+<li><strong>mandatory</strong></li>
+<li>Describes the <a href="#request-procedure">Request</a> procedure so that a node can request the sensor's data. This procedure can have several <em>modes</em> and contains 3 main steps namely <em>check</em> to check whether the sensor is still available, <em>generate</em> in the case that we need to generate a file and finally <em>execute</em> that will trigger the commands to send the data to the requester's endpoint.</li>
+</ul></li>
+</ul>
+<h3 id="system-object"><span class="header-section-number">1.1.1</span> System object</h3>
+<p>A system object is a data structure that describes the operating systems and architectures supported by a sensor. In the description file, that looks like the following :</p>
+<pre><code>&quot;alias_of_system&quot;: {
+  &quot;platform&quot;: &quot;platform_of_system&quot;,
+  &quot;arch&quot;: &quot;architecture_of_system&quot;
+}</code></pre>
+<ul>
+<li>The value of the <code>alias_of_system</code> can be anything that gives an understandable description to the system such as <code>linux</code>, <code>osx</code> or even <code>my_own_pc</code>.
+<ul>
+<li>Currently we use the following values <code>linux</code>, <code>pi</code>, <code>win</code> and <code>osx</code></li>
+<li>These aliases are custom-made and do not rely on Node.js API or terminology</li>
+</ul></li>
+<li>The <code>platform</code> property is <strong>mandatory</strong> and <strong>must be equivalent</strong> to a value returned by <code>require('os').platform()</code> in Node.js</li>
+<li>The <code>arch</code>property is optional and if set then it <strong>must be equivalent</strong> to a value returned by <code>require('os').arch()</code> in Node.js</li>
+</ul>
+<blockquote>
+<p>For more information, refer to the <a href="http://nodejs.org/api/os.html">OS module</a> in Node.js API</p>
+</blockquote>
+<p>Pay attention to the difference between</p>
+<pre><code>&quot;linux&quot;: {
+    &quot;platform&quot;: &quot;linux&quot;
+  }</code></pre>
+<p>and</p>
+<pre><code>&quot;pi&quot;: {
+    &quot;platform&quot;: &quot;linux&quot;,
+    &quot;arch&quot;: &quot;arm&quot;
+  }</code></pre>
+<p>The first one targets all Linux operating systems (regardless of the architecture) whereas the second one only targets those that run on ARM processors (but not specifically Raspberry Pi, the alias just implies it).</p>
+<p>So if we have the following commands</p>
+<pre><code>{
+  &quot;cmd&quot;: &quot;./command_for_unix_systems.sh&quot;,
+  &quot;systems&quot;: [
+    &quot;linux&quot;,
+    &quot;osx&quot;
+  ]
+},
+{
+  &quot;cmd&quot;: &quot;./command_only_for_pi.sh&quot;,
+  &quot;systems&quot;: [
+    &quot;pi&quot;
+  ] 
+}</code></pre>
+<p>On the Rapsberry Pi, Manticore will match on 2 aliases <code>linux</code> (because of the platform) and <code>pi</code> (because of the platform and architecture) and therefore execute both commands.</p>
+<p>Here, we use the alias <code>pi</code> for because we use devices called Raspberry Pi. Nonetheless the alias <code>linux-arm</code> could also have been used because its meaning is more closely related to the platform and architecture description.</p>
+<p>The important thing is to choose an alias that fits best to what you want to achieve and to be consistent in the way of describing a specific platform or architecture within one <code>description.json</code> file. Indeed, these system aliases are going to be used as a reference in the <code>systems</code> property of the <a href="#command-object">Command</a> object (described in the next section).</p>
+<h3 id="command-object"><span class="header-section-number">1.1.2</span> Command object</h3>
+<p>The Command object is a data structure representing a command that must be executed to perform any action.</p>
+<h4 id="command-structure"><span class="header-section-number">1.1.2.1</span> Command structure</h4>
+<pre><code>{
+  &quot;path&quot;: &quot;subfolder/scripts&quot;,
+  &quot;cmd&quot;: &quot;./my_script.sh&quot;,
+  &quot;parameters&quot;: [
+    &quot;--addr&quot;
+    &quot;$ADDRESS&quot;,
+    &quot;--port&quot;,
+    &quot;$PORT&quot;,
+  ],
+  &quot;systems&quot;: [
+    &quot;osx&quot;,
+    &quot;linux&quot;
+  ],
+  &quot;sudo&quot;: true
+}</code></pre>
+<ul>
+<li>The <code>path</code> property is the place where the subshell will be executed. This property is optional if the command is in the environment variable <code>PATH</code> or if the command/program is in the same directory as the <code>description.json</code> file.</li>
+<li>The <code>cmd</code> property is the command that will be executed. This property is obviously <strong>mandatory</strong>.</li>
+<li>The <code>parameters</code>is an <em>Array</em> of arguments that will be passed to the command specified in the <code>cmd</code> property
+<ul>
+<li>Parameters starting with a <code>$</code> (dollar sign) are variables. This means that they are going to be parsed and their value replaced by Manticore. For instance, the <code>$ADDRESS</code> and <code>$PORT</code> in the above example are variables.</li>
+</ul></li>
+<li>The <code>systems</code> property is an <em>Array</em> of aliases to <a href="#system-object">System</a> objects that specifies on which systems you can apply the command. This property is <strong>mandatory</strong>.</li>
+<li>The <code>sudo</code> property is optional and when sets to <code>true</code> implies that the command must be executed with superuser rights.</li>
+</ul>
+<p>Thus, considering that we are in the sensor working directory, the result of the above example is equivalent to execute</p>
+<pre><code>$ cd subfolder/scripts
+$ sudo ./myscript.sh --addr 127.0.0.1 --port 42424</code></pre>
+<p>Note that the variables <code>$ADDRESS</code> and <code>$PORT</code> have been respectively replaced by values <code>127.0.0.1</code> and <code>42424</code>.</p>
+<h4 id="note-about-the-execution-of-the-command"><span class="header-section-number">1.1.2.2</span> Note about the execution of the command</h4>
+<p>You may notice that for a shell script the <code>cmd</code> often starts with <code>./myscript.sh</code>. This is because Manticore will create a subshell in the sensors folder and then execute the content <code>cmd</code> from there.</p>
+<p>If you forget the './', then it will try to execute <code>myscript.sh</code> and therefore look for the environment variable <code>PATH</code> for it. Of course, the sensor folder is not in the <code>PATH</code> and you will get an error like <code>myscript.sh: command not found</code> or <code>myscript.sh: No such file or directory</code>.</p>
+<h4 id="command-exit-status"><span class="header-section-number">1.1.2.3</span> Command exit status</h4>
+<p>For each sensor, Manticore is responsible for parsing the <code>description.json</code> file and thus executing the commands described in the Command object.</p>
+<p>To achieve this goal, we are using the <a href="http://nodejs.org/api/child_process.html">Child Processes</a> module in Node.js API. This means that Manticore will execute the command in a child process and will monitor its life cycle.</p>
+<p>Indeed, when the child process exits, Manticore will inspect the command return value (or exit code). If it is a success then it will jump to the next command, otherwise an error/exception must be thrown.</p>
+<p>By convention, a <strong>success</strong> is denoted by the <strong><code>0</code> value</strong>. As a consequence, any other value that defers from <code>0</code> will be considered as a failure.</p>
+<blockquote>
+<p>In UNIX-like shells, the exit code of the precedent command can be displayed with <code>echo $?</code></p>
+</blockquote>
+<h3 id="data-description-object"><span class="header-section-number">1.1.3</span> Data description object</h3>
+<p>The Data object gives a description of the data provided by a sensor.</p>
+<pre><code>{
+  &quot;description&quot;: &quot;X position of the mouse&quot;,
+  &quot;osc_format&quot;: &quot;/mouse/x f&quot;
+}</code></pre>
+<p>The object has a simple structure with 2 properties :</p>
+<ul>
+<li>The <code>description</code> property provides a simple text description of the data</li>
+<li>The <code>osc_format</code> property shows the syntax of the OSC address pattern and type tag.
+<ul>
+<li>In the above example, <code>/mouse/x</code> is the OSC address and <code>f</code> the type tag for floating-point numbers</li>
+</ul></li>
+</ul>
+<blockquote>
+<p>For more information about OSC, refer to the <a href="http://opensoundcontrol.org/spec-1_0">specification</a></p>
+</blockquote>
+<p>Remember that the OSC format must be in accordance with the program that is responsible to forge the OSC packets and to send (i.e. the program triggered by the <em>execute</em> step in <a href="#request-procedure">Request</a> procedure).</p>
+<h3 id="bootstrap-procedure"><span class="header-section-number">1.1.4</span> Bootstrap procedure</h3>
+<p>The Bootstrap procedure corresponds to the commands that must be executed to detect the sensor on a node.</p>
+<p>The structure is quite simple and is a simple array of <a href="#command-object">Command</a> objects for all supported systems</p>
+<pre><code>&quot;bootstrap&quot;: [
+  {
+    &quot;cmd&quot;: &quot;./detectionScript-osx.sh&quot;,
+    &quot;systems&quot;: [
+      &quot;osx&quot;
+    ]
+  },
+  {
+    &quot;cmd&quot;: &quot;./detectionScript-linux.sh&quot;,
+    &quot;systems&quot;: [
+      &quot;linux&quot;
+    ]
+  }
+]</code></pre>
+<p>When Manticore starts up, it will execute these commands to detect the presence of the sensor on the node. If it is a success then, the sensor's presence will be published across the network.</p>
+<h3 id="request-procedure"><span class="header-section-number">1.1.5</span> Request procedure</h3>
+<p>The Request procedure corresponds to the ability to send the sensor's data in OSC format to another node that have requested it.</p>
+<pre><code>&quot;request&quot;: {
+    &quot;default&quot;: {
+      &quot;options&quot;: [
+        &quot;$ADDRESS&quot;,
+        &quot;$PORT&quot;,
+        &quot;$GENERATED_PATCH&quot;
+      ],
+      &quot;check&quot;: [
+        // some Command objects
+      ],
+      &quot;generate&quot;: [
+        // some Command objects
+      ],
+      &quot;execute&quot;: [
+        // some Command objects
+      ],
+    }
+}</code></pre>
+<p>The request procedure is already implemented into Manticore, so it means that you can create new sensors and therefore no ad-hoc development should be required to make the request of the sensor's data available to other nodes. Everything is defined here in the description file.</p>
+<h4 id="mode"><span class="header-section-number">1.1.5.1</span> Mode</h4>
+<p>As you can notice on the above excerpt of <code>request</code>, it has a property called <code>default</code>. We will refer in the following as the <em>mode</em> of the Request procedure. This will help us to give some granularity in the request procedure.<br />Usually, there will only be one <code>mode</code> called <code>default</code>. Therefore the <code>default</code> mode is <strong>mandatory</strong>, others are optional.</p>
+<p>How is this <em>mode</em> hierarchy be useful ? Let's consider a situation where we might want a slightly different type of the Request procedure. It is easy to implement it by just adding a new property after <code>default</code>.<br />As previously defined, the <code>default</code> procedure objective is <em>to send the sensor's data in OSC format to some other node</em>. Here, we can think of other <em>modes</em> that can be <em>send the sensor's data with another type of format</em> or <em>to send the data over TCP (instead of UDP)</em>.</p>
+<h4 id="limitation"><span class="header-section-number">1.1.5.2</span> Limitation</h4>
+<p>The <code>limitation</code> property of the <code>default</code> mode of the Request procedure sets the maximum of concurrent clients that can request the data of a sensor.</p>
+<p>This is to take in account the limitation of some sensors or drivers</p>
+<blockquote>
+<p>WARNING, this is a new specification that is not yet implemented in Manticore</p>
+</blockquote>
+<h4 id="options"><span class="header-section-number">1.1.5.3</span> Options</h4>
+<p>Each mode can have some options. These options corresponds to variables that will be set by Manticore at runtime.</p>
+<p>The convention used here is to write them starting with a <code>$</code> (dollar sign).</p>
+<p>The Request procedure have 3 options (in <code>default</code> mode) :</p>
+<ul>
+<li><code>$ADDRESS</code> corresponds to the IP address of the endpoint</li>
+<li><code>$PORT</code> corresponds to the port of the endpoint</li>
+<li><code>$GENERATED_PATCH</code> corresponds to the name of a generated file that can be needed before triggering the execution</li>
+</ul>
+<p>The name of the option is just a way to remember and describe it. If your need to generate a script and not a patch, then you can call the third options <code>$MYSCRIPT</code> instead of <code>$GENERATED_PATCH</code> and use this name in your <code>description.json</code>. This will not affect the parsing of the file.</p>
+<p>However the order is very important because Manticore will process these variables in the same order that are they described above (first the address, then the port and finally the generated file name). This means that for each <em>mode</em> of a certain procedure, the order and the number of the options must be consistent across all sensors' description files.</p>
+<h4 id="steps-check-generate-execute"><span class="header-section-number">1.1.5.4</span> Steps: Check &gt; Generate &gt; Execute</h4>
+<p>The <code>default</code> mode of the Request procedure is divided into 3 steps that must be run one after another</p>
+<ol style="list-style-type: decimal">
+<li><code>check</code> Check whether the sensor is still available</li>
+<li><code>generate</code> Generate an executable or a script at runtime (optional step)</li>
+<li><code>execute</code> Execute an existing or previously generated executable/script that will send the data to the endpoint that requests the resource</li>
+</ol>
+<p>Each of the above mentioned steps are just arrays of <a href="#command-object">Command</a> objects that are going to be executed in order in regards of the <code>systems</code> property.<br />For the two first steps, Manticore will monitor the exit code checking whether the <code>check</code> and <code>generate</code> steps were a success. For the <code>execute</code> step, Manticore will run the command indefinitely until he gets a request for releasing the resource.</p>
+<blockquote>
+<p>For more details, you can look at the implementation in the <em>Sensor</em> constructor in <code>sensor.js</code> and especially the method <code>request()</code> and the functions <code>executeCommand()</code>, <code>parseAndExecute()</code>, <code>parseExecuteAndDie()</code>.</p>
+</blockquote>
+<h2 id="how-is-this-description-file-used-by-manticore"><span class="header-section-number">1.2</span> How is this description file used by Manticore ?</h2>
+<p>At the startup of Manticore, the program will try to detect the presence of sensors on the node. To achieve this goal, Manticore will browse the content of each folder in <code>sensors/</code>. Each of these folders are the working directories of a specific sensor and thus must contain a <code>description.js</code> file.</p>
+<p>This description file -- which content is described in the previous section -- will be parsed by Manticore (for those interested in the implementation, you can refer to the method <code>Core.prototype.detectSensors</code> in <code>manticore.js</code>).</p>
+<ol style="list-style-type: decimal">
+<li>The first element parsed is the <code>systems</code>. According to the node's platform and architecture, Manticore will determine which system aliases that the node is entitled.</li>
+<li>Then Manticore will try detect the sensor on the current node. To do so, it parses the <code>bootstrap</code> element and browses the <a href="#command-object">Command</a>. For each <a href="#command-object">Command</a>, Manticore checks its <code>systems</code> property for matches with the system aliases. If it success, then the <code>cmd</code> is executed with <code>parameters</code>. In terms of implementation, this is done in the <em>Sensor</em> constructor (see <code>sensor.js</code> file), if the <code>bootstrap</code> fails (either because the sensor is not entitled to the node's system or because ), then constructor should not return a new <em>Sensor</em> object and fail. If it is a success, the new <em>Sensor</em> object is created and the <em>Core</em> singleton gets aware of it in its own <code>sensors</code> property. Thereafter all the detected sensors are published across the network.</li>
+<li>When the <em>Sensor</em> object is created. Not only it detects it and sets up its properties(identifier, name and associated data) but also automatically implements a method <code>request()</code> matching the instructions of the Request procedure in the description file.
+<ul>
+<li>The prototype of this function is simple <code>request(mode, array_of_options)</code>.</li>
+<li>The <code>mode</code> will try match the one in the description file (if not set, automatically use <code>default</code>).</li>
+<li>The <code>array_of_options</code> are parameters set up by Manticore (e.g. after a request by another node) and therefore matched to the <code>options</code> in the description file.</li>
+</ul></li>
+<li>Then Manticore will execute each step of the procedure one after another. The next step cannot be triggered if the previous step has not finished successfully. If one step fails then the procedure cannot come to a successful conclusion and an error is triggered.</li>
+</ol>
+<blockquote>
+<p>In the implementation, in order to avoid a callback hell and to give some modularity in the code, we are using the <a href="https://github.com/caolan/async">async</a> module to execute the steps one after another</p>
+</blockquote>
+<h2 id="tutorial-adding-a-sensor"><span class="header-section-number">1.3</span> Tutorial: Adding a sensor</h2>
+<h3 id="setting-up-the-workspace"><span class="header-section-number">1.3.1</span> Setting up the workspace</h3>
+<p>As stated above, the repository contains a <code>sensors</code> folder which contains all the sensors.</p>
+<pre><code>$ cd $REPO_ROOT/sensors
+$ mkdir my_new_sensor</code></pre>
+<p>You should now have the following tree view</p>
+<pre><code>$REPO_ROOT
+  |____sensors
+  | |____inertial
+  | | |____description.json
+  | | |____ ...
+  | |____mouse
+  | | |____description.json
+  | | |____ ...
+  | |____my_new_sensor
+  | | |____description.json</code></pre>
+<h3 id="write-the-description-file"><span class="header-section-number">1.3.2</span> Write the description file</h3>
+<ol style="list-style-type: decimal">
+<li><p>Create a <code>description.json</code> file with an empty object</p>
+<pre><code>{
+}</code></pre></li>
+<li><p>Add the <code>name</code> property and sets its value to the name of sensor (which must also be the name of the folder containing the description file)</p>
+<pre><code>{
+  &quot;name&quot;: &quot;my_new_sensor&quot;
+}</code></pre></li>
+<li><p>Add the <code>systems</code> property that will contain objects describing the platform and architecture supported by the sensor. Here we target Linux, Mac OS X and Windows operating (regardless of system versions and architecture)</p>
+<pre><code>{
+  &quot;name&quot;: &quot;my_new_sensor&quot;,
+  &quot;systems&quot;: {
+    &quot;linux&quot;: {
+      &quot;platform&quot;: &quot;linux&quot;
+    },
+    &quot;osx&quot;: {
+      &quot;platform&quot;: &quot;darwin&quot;
+    },
+    &quot;win&quot;: {
+      &quot;platform&quot;: &quot;win32&quot;
+    }
+  }
+}</code></pre></li>
+<li><p>Add the <code>data</code> description object that will describe the type of data provided by the sensor</p>
+<pre><code>{
+  &quot;name&quot;: &quot;my_new_sensor&quot;,
+  &quot;systems&quot;: { ... },
+  &quot;data&quot;: [
+    {
+      &quot;description&quot;: &quot;some data float value&quot;,
+      &quot;osc_format&quot;: &quot;/sensor/data f&quot;
+    },
+    {
+      &quot;description&quot;: &quot;some button on/off&quot;,
+      &quot;osc_format&quot;: &quot;/sensor/button i&quot;
+    }
+  ]
+}</code></pre></li>
+<li><p>Describe the <code>bootstrap</code> procedure (i.e. the command used by Manticore at startup to detect the sensor). As we have stated above that the sensor is available on Linux, Mac OS X and Windows, we need to describe the commands accordingly.</p>
+<pre><code>{
+  &quot;name&quot;: &quot;my_new_sensor&quot;,
+  &quot;systems&quot;: { ... },
+  &quot;data&quot;: [ ... ],
+  &quot;bootstrap&quot;: [
+    {
+      &quot;cmd&quot;: &quot;./checkMySensor-unixlike.sh&quot;,
+      &quot;systems&quot;: [
+        &quot;osx&quot;,
+        &quot;linux&quot;
+      ]
+    },
+    {
+      &quot;cmd&quot;: &quot;checkMySensor-windows.bat&quot;,
+      &quot;systems&quot;: [
+        &quot;win&quot;
+      ]
+    }
+  ]
+}</code></pre></li>
+<li><p>Describe the <code>request</code> procedure and add a <code>default</code> mode (it's mandatory, at least one mode)</p>
+<pre><code>{
+  &quot;name&quot;: &quot;my_new_sensor&quot;,
+  &quot;systems&quot;: { ... },
+  &quot;data&quot;: [ ... ],
+  &quot;bootstrap&quot;: [ ... ],
+  &quot;request&quot;: {
+    &quot;default&quot;: {
+    }
+  }
+}</code></pre></li>
+<li><p>The <code>request</code> procedure is standardized with 3 options: the address of the endpoint (<code>$ADDRESS</code>), the port of the endpoint (<code>$PORT</code>) and a name for the generated script/executable if needed (<code>$GENERATED_PATCH</code>).</p>
+<pre><code>{
+  &quot;name&quot;: &quot;my_new_sensor&quot;,
+  &quot;systems&quot;: { ... },
+  &quot;data&quot;: [ ... ],
+  &quot;bootstrap&quot;: [ ... ],
+  &quot;request&quot;: {
+    &quot;default&quot;: {
+      &quot;options&quot;: [
+        &quot;$ADDRESS&quot;,
+        &quot;$PORT&quot;,
+        &quot;$GENERATED_PATCH&quot;
+      ],
+    }
+  }
+}</code></pre></li>
+<li><p>For the <code>check</code> step, we will use the same scripts previously used in the <code>bootstrap</code> procedure</p>
+<pre><code>{
+  &quot;name&quot;: &quot;my_new_sensor&quot;,
+  &quot;systems&quot;: { ... },
+  &quot;data&quot;: [ ... ],
+  &quot;bootstrap&quot;: [ ... ],
+  &quot;request&quot;: {
+    &quot;default&quot;: {
+      &quot;options&quot;: [ ... ],
+      &quot;check&quot;: [
+        {
+          &quot;cmd&quot;: &quot;./checkMySensor-unixlike.sh&quot;,
+          &quot;systems&quot;: [
+            &quot;osx&quot;,
+            &quot;linux&quot;
+          ]
+        },
+        {
+          &quot;cmd&quot;: &quot;checkMySensor-windows.bat&quot;,
+          &quot;systems&quot;: [
+            &quot;win&quot;
+          ]
+        }
+      ]
+    }
+  }
+}</code></pre></li>
+<li><p>For the <code>generate</code> step, we will assume that no generation is required here (for instance, the mouse sensor need a Pure Data patch whereas the inertial sensor does not need anything)</p>
+<pre><code>{
+  &quot;name&quot;: &quot;my_new_sensor&quot;,
+  &quot;systems&quot;: { ... },
+  &quot;data&quot;: [ ... ],
+  &quot;bootstrap&quot;: [ ... ],
+  &quot;request&quot;: {
+    &quot;default&quot;: {
+      &quot;options&quot;: [ ... ],
+      &quot;check&quot;: [ ... ],
+      &quot;generate&quot;: [
+        // empty !
+      ]
+    }
+  }
+}</code></pre></li>
+<li><p>For the <code>execute</code> step, we will use some parameters that are variables.</p>
+<pre><code>{
+  &quot;name&quot;: &quot;my_new_sensor&quot;,
+  &quot;systems&quot;: { ... },
+  &quot;data&quot;: [ ... ],
+  &quot;bootstrap&quot;: [ ... ],
+  &quot;request&quot;: {
+    &quot;default&quot;: {
+      &quot;options&quot;: [ ... ],
+      &quot;check&quot;: [ ... ],
+      &quot;generate&quot;: [],
+      &quot;execute&quot;: [
+        {
+          &quot;cmd&quot;: &quot;./sendData-unixlike.sh&quot;,
+          &quot;parameters&quot;: [
+            &quot;$ADDRESS&quot;,
+            &quot;$PORT&quot;
+          ],
+          &quot;systems&quot;: [
+            &quot;osx&quot;,
+            &quot;linux&quot;
+          ]
+        },
+        {
+          &quot;cmd&quot;: &quot;sendData-windows.bat&quot;,
+          &quot;parameters&quot;: [
+            &quot;$ADDRESS&quot;,
+            &quot;$PORT&quot;
+          ],
+          &quot;systems&quot;: [
+            &quot;win&quot;
+          ]
+        }
+      ]
+    }
+  }
+}</code></pre></li>
+</ol>
+<h3 id="write-your-scriptsprograms"><span class="header-section-number">1.3.3</span> Write your scripts/programs</h3>
+<p>According to the written <code>description.json</code> file, now you should write your scripts or dedicated programs and drivers.</p>
+<p>For the <code>bootstrap</code> procedure and the <code>check</code> step of the <code>request</code> procedure</p>
+<ul>
+<li><code>checkMySensor-unixlike.sh</code></li>
+<li><code>checkMySensor-windows.bat</code></li>
+</ul>
+<p>Both of these scripts must return an exit code <code>0</code> if the test is a success.</p>
+<p>For the <code>execute</code> step of the <code>request</code> procedure</p>
+<ul>
+<li><code>sendData-unixlike.sh</code> that takes 2 arguments (address and port)</li>
+<li><code>sendData-windows.bat</code> that takes 2 arguments (address and port)</li>
+</ul>
+<p>Both of these scripts must trigger a program that will send OSC data to the endpoint</p>
+<h2 id="custom-procedure"><span class="header-section-number">1.4</span> Custom procedure</h2>
+<p>If you want to create a custom procedure for your sensor. We can look at the <a href="#request-procedure">Request</a> procedure or the skeleton below.</p>
+<pre><code>&quot;procedure_name&quot;: {
+    &quot;default&quot;: {
+      &quot;options&quot;: [
+    // some options
+      ],
+      &quot;step_1&quot;: [
+        // some Command objects
+      ],
+      &quot;step_2&quot;: [
+        // some Command objects
+      ],
+    },
+    &quot;custom_mode&quot;: {
+      &quot;options&quot;: [
+    // some options
+      ],
+      &quot;step_1&quot;: [
+        // some Command objects
+      ],
+      &quot;step_2&quot;: [
+        // some Command objects
+      ],
+    },
+}</code></pre>
+<p>It is important to understand that -- contrary to the Request procedure -- any new procedure implies that some ad-hoc development must be done in Manticore in order to handle it.<br />To implement, you should edit the constructor of the <em>Sensor</em> object (<code>sensor.js</code>) and implement a new method called <code>procedure_name()</code>. Doing so, you will then be able to call it in a standard way <code>my_sensor.procedure_name(mode, [args])</code> with <code>mode</code> being either <code>default</code> or <code>custom_mode</code> and the array of arguments matching to the <code>options</code> property of the considered mode.</p>
+<h2 id="further-works"><span class="header-section-number">1.5</span> Further works</h2>
+<ul>
+<li>Find a way to create some JSON Schema and to validate the JSON description files, maybe see <a href="http://json-schema.org/">http://json-schema.org/</a></li>
+<li>Automatic generation of methods regarding the custom procedure, we could parse all other procedure and get the method associated, that will use the <code>async</code> module to execute each step. The code will be then generated at runtime</li>
+<li>We can think to develop a workaround for the limitation of some sensors driver in the case of multiples concurrent client requests. To do so, the data would always be sent to Manticore and Manticore would be responsible to duplicate the OSC data and to send them to multiple client at the same time. However, this means that we need to change the way Manticore handles and respond to requests</li>
+</ul>
+<h1 id="manticore"><span class="header-section-number">2</span> Manticore</h1>
+<p>In the following, the words <em>core</em> and <em>manticore</em> with/without a capital letter are used indistinctly and refer to the same program.</p>
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<p><strong>Table of Contents</strong> <em>generated with <a href="http://doctoc.herokuapp.com/">DocToc</a></em></p>
+<ul>
+<li><a href="#getting-started">Getting started</a></li>
+<li><a href="#guide">Guide</a>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#objectives">Objectives</a>
+<ul>
+<li><a href="#what-we-want-to-achieve-">What we want to achieve ?</a></li>
+<li><a href="#how-does-it-work-">How does it work ?</a></li>
+<li><a href="#note-about-the-use-of-zeromq-sockets">Note about the use of ZeroMQ Sockets</a></li>
+<li><a href="#note-about-the-use-of-mdns">Note about the use of mDNS</a></li>
+<li><a href="#use-cases">Use cases</a></li>
+</ul></li>
+<li><a href="#interactive-commands">Interactive commands</a></li>
+<li><a href="#events">Events</a></li>
+<li><a href="#core-commands">Core commands</a></li>
+<li><a href="#source-files">Source files</a></li>
+<li><a href="#data-structures">Data structures</a>
+<ul>
+<li><a href="#record">Record</a></li>
+</ul></li>
+<li><a href="#inter-core-messaging">Inter-core messaging</a>
+<ul>
+<li><a href="#message-structure">Message structure</a></li>
+<li><a href="#message-command-and-associated-payload">Message command and associated payload</a></li>
+</ul></li>
+<li><a href="#external-messaging">External messaging</a></li>
+<li><a href="#reading-the-log">Reading the log</a></li>
+<li><a href="#http-web-user-interface">HTTP Web user interface</a>
+<ul>
+<li><a href="#jade">Jade</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#installation">Installation</a>
+<ul>
+<li><a href="#prerequisites">Prerequisites</a>
+<ul>
+<li><a href="#prerequisites-on-mac-os-x">Prerequisites on Mac OS X</a></li>
+<li><a href="#prerequisites-on-raspbian-raspberry-pi">Prerequisites on Raspbian (Raspberry Pi)</a></li>
+<li><a href="#prerequisites-on-windows">Prerequisites on Windows</a></li>
+</ul></li>
+<li><a href="#nodejs-module-dependencies">Node.js module dependencies</a></li>
+<li><a href="#lets-go">Let's go</a></li>
+</ul></li>
+<li><a href="#known-issues">Known issues</a>
+<ul>
+<li><a href="#avahi-warning-on-linux">Avahi warning on Linux</a></li>
+<li><a href="#auto-detection-on-multiple-interfaces">Auto-detection on multiple interfaces</a></li>
+</ul></li>
+</ul>
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+<h2 id="getting-started"><span class="header-section-number">2.1</span> Getting started</h2>
+<p>To start Manticore, you can either use node</p>
+<pre><code>$ node app.js</code></pre>
+<p>or npm</p>
+<pre><code>$ npm start</code></pre>
+<p>on Windows, use <code>node.exe</code></p>
+<pre><code>&gt; node.exe app.js</code></pre>
+<h2 id="guide"><span class="header-section-number">2.2</span> Guide</h2>
+<h3 id="introduction"><span class="header-section-number">2.2.1</span> Introduction</h3>
+<blockquote>
+<p>// TODO : simply detail use case and present the associated objectives</p>
+</blockquote>
+<h3 id="objectives"><span class="header-section-number">2.2.2</span> Objectives</h3>
+<h4 id="what-we-want-to-achieve"><span class="header-section-number">2.2.2.1</span> What we want to achieve ?</h4>
+<ul>
+<li><strong>Discovery</strong><br /> How do we learn about other nodes on the network ?</li>
+<li><strong>Presence</strong><br /> How do we track when others nodes come and go ?</li>
+<li><strong>Connectivity</strong><br /> How do we connect one node to another ?</li>
+<li><strong>Group messaging</strong> (a.k.a. multicast)<br /> How do we send a message from one node to a group of other nodes ?</li>
+<li><strong>Point-to-point messaging</strong><br /> How do we send a message from one node to another ?</li>
+<li><strong>External communication</strong><br /> How does a node communicate with process that are not <em>network nodes</em> ?</li>
+<li><strong>Content distribution</strong><br /> How do we provide the requested resource data ? How do we send the data ?</li>
+</ul>
+<h4 id="how-does-it-work"><span class="header-section-number">2.2.2.2</span> How does it work ?</h4>
+<ul>
+<li>At startup, a node <strong>advertise</strong> its <strong>presence</strong> by broadcasting a <code>_node._tcp</code> service on <strong>Zeroconf</strong>. Doing so, other nodes can simply browse this service to dynamically discover its presence.</li>
+<li>We assume that all the nodes are on the <strong>same network segment</strong> (i.e in the same subnet). Thus we can infer that they can directly address other nodes using the recipient IP address.</li>
+<li>Each node provides different <strong>communication channels</strong> relying on a specific pattern : <strong>uni-</strong> or <strong>bidirectional</strong>, <strong>synchronous</strong> or <strong>asynchronous</strong>.</li>
+<li>The <strong>group messaging</strong> is achieved by a communication channel called <em>Information Channel (InCh)</em> implementing the publisher/subscriber network pattern. Hence, each node has 2 sockets :
+<ul>
+<li>the publisher socket solely used to send information to all its subscribers.</li>
+<li>the subscriber socket solely used to receive information from all other nodes.</li>
+</ul></li>
+<li>The <strong>point-to-point messaging</strong> is achieved by another communication channel called <em>Main Channel (MaCh)</em> implementing the request/reply network pattern. According to the situation, this request/reply can either be synchronous (an immediate reply is requested and thus will block the execution) or asynchronous (we expect a response but not urgently).</li>
+<li>To communicate with <strong>external processes</strong>, a HTTP server is embedded in each node and can provide a <strong>web API</strong>, accepting GET request and serving JSON file or plain text status.</li>
+<li>The <strong>distribution of the resource</strong> data is made using <strong>OSC packets</strong> on UDP datagrams. The main use case is a client that desire a resource provided on a specific node of the network. To achieve a proper delivery of the dynamic OSC data stream to this client, we use the information collected on both InCh and MaCh and execute the following procedure :
+<ol style="list-style-type: decimal">
+<li>A client issue a request on a local core to know the network status and resources available</li>
+<li>The server sends back a list of network nodes with its capabilities (this list is known by the core through 1. Browsing of <code>_node._tcp</code> service and 2. Listening on any published event on InCh)</li>
+<li>The client issue a request on a resource, binds an UDP reception socket and wait for the core's response</li>
+<li>The local core knows which node to ask and issue in turn a synchronous request using MaCh. This is a synchronous request, meaning that it will waits for a reply.</li>
+<li>The recipient core handles this request, check the availability of the requested resource, if so it sends a positive reply to the requester core. At the same time, it may generate a file and execute a program/driver that will send the data to the requester client.</li>
+<li>The local core receives the response, process it and can now answer the client.</li>
+<li>A OSC stream over UDP must now be flowing between from the node with the requested to resource to the client</li>
+</ol></li>
+</ul>
+<p><strong>Note</strong>: Both <em>MaCh</em> and <em>InCh</em> need to be reliable communication channels and thus use TCP as transport protocol.<br /><strong>Note 2</strong>: These channels are solely used to inter-core communication. That is to say that any external communication with a core must use the built-in HTTP server.</p>
+<h4 id="note-about-the-use-of-zeromq-sockets"><span class="header-section-number">2.2.2.3</span> Note about the use of ZeroMQ Sockets</h4>
+<ul>
+<li>PUB to publish data</li>
+<li>SUB to subscribe to a PUB socket</li>
+<li>REQ to issue a synchronous request</li>
+<li>REP to issue a synchronous reply (not used actually, see ROUTER)</li>
+<li>ROUTER to issue asynchronous replies</li>
+<li>DEALER to issue asynchronous requests</li>
+</ul>
+<p>We can think of REQ and DEALER soscket sas &quot;clients&quot; and ROUTER sockets as &quot;servers&quot;. That is why we bind the ROUTER sockets and connect REQ and DEALER sockets to them.</p>
+<blockquote>
+<p>//TODO: write about 0MQ sockets and pattern Node: see bind/connect mechanism in UNIX sockets</p>
+</blockquote>
+<h4 id="note-about-the-use-of-mdns"><span class="header-section-number">2.2.2.4</span> Note about the use of mDNS</h4>
+<p>We use the mdns module for Node.js.</p>
+<p>See the documentation : <a href="http://agnat.github.io/node_mdns/user_guide.html">http://agnat.github.io/node_mdns/user_guide.html</a></p>
+<h4 id="use-cases"><span class="header-section-number">2.2.2.5</span> Use cases</h4>
+<ul>
+<li><code>PUB[1] --remote--&gt; SUB[N] | ROUTER[N] --output--&gt; DEALER[1] --ack--&gt; ROUTER[N]</code><br /> (mixing InCh + MaCh and used for remote command execution)</li>
+<li><code>REQ[1] --request--&gt; ROUTER[2] --ack|noack--&gt; REQ[1]</code><br /> (using MaCh to request a resource)</li>
+</ul>
+<blockquote>
+<p>// TODO : detail the procedure</p>
+</blockquote>
+<h3 id="interactive-commands"><span class="header-section-number">2.2.3</span> Interactive commands</h3>
+<p>The following commands are available</p>
+<ul>
+<li><code>debug</code> show core.nodes</li>
+<li><code>eval [js]</code> use eval() javascript function to imitate REPL mechanism</li>
+<li><code>log [js]</code> same as eval but will also show the result on stdout using console.log()</li>
+<li><code>send [msg]</code> send a the string <code>msg</code> to publish socket</li>
+<li><code>remote [cmd]</code> ask remote execution of <code>cmd</code> command</li>
+<li><code>emit [event]</code> is equivalent to core.emit('event'), used for debug purpose only</li>
+<li><code>exec [cmd]</code> execute a command in the shell (no need to quit the program or to open a new ssh session)<br /></li>
+<li><code>exit</code> gracefully close sockets and exit (equivalent to Ctrl+C)</li>
+<li><code>request</code></li>
+</ul>
+<h3 id="events"><span class="header-section-number">2.2.4</span> Events</h3>
+<ul>
+<li><code>ready</code> is triggered when <strong>initialization finishes</strong></li>
+<li><code>inch</code> is triggered when the <strong>subscriber</strong> socket <strong>receives</strong> some data (meaning <em>I've just received some data on the information channel</em> or <em>Another node just published some information</em>)</li>
+<li><code>mach</code> is triggered when a <strong>request</strong> is <strong>received</strong> on MaCh (meaning <em>I've just received a request</em>)</li>
+<li><code>reply</code> is triggered when a <strong>response</strong> to <strong>previous request</strong> is received</li>
+<li><code>died</code> is triggered when we discover that a <strong>node disapears</strong> from the network</li>
+<li><code>test</code> (for testing purpose only)</li>
+</ul>
+<h3 id="core-commands"><span class="header-section-number">2.2.5</span> Core commands</h3>
+<p>These are the methods used by the Core singleton to interact with its state and its communication channels.</p>
+<ul>
+<li><code>init()</code> will start mDNS advertising and browsing of <code>_node.tcp</code> service, bind sockets</li>
+<li><code>publish()</code> will trigger a <code>inch</code> event on all subscribers</li>
+<li><code>send()</code> will trigger a <code>mach</code> event on the recipient</li>
+<li><code>syncSend()</code> will also trigger a <code>mach</code></li>
+<li><code>reply()</code></li>
+<li><code>close()</code></li>
+</ul>
+<blockquote>
+<p>// TODO : add commented examples</p>
+</blockquote>
+<h3 id="source-files"><span class="header-section-number">2.2.6</span> Source files</h3>
+<ul>
+<li><code>app.js</code> is the main entry point of the program</li>
+<li><code>manticore.js</code> is the module containing the core singleton</li>
+<li><code>node.js</code> is the Node class</li>
+<li><code>interactive.js</code> contains code for interactive commands in the shell</li>
+<li><code>trigger.js</code> contains code for generating and executing processes</li>
+</ul>
+<h3 id="data-structures"><span class="header-section-number">2.2.7</span> Data structures</h3>
+<ul>
+<li>Message</li>
+<li>Node</li>
+<li>Sensor</li>
+<li>Record</li>
+</ul>
+<h4 id="record"><span class="header-section-number">2.2.7.1</span> Record</h4>
+<p>The Record class is used to keep track of requests, states and history of the core activity and communication.</p>
+<p>The implementation of the Record class is located in <code>record.js</code> and used either in the main application <code>app.js</code> and the Core <code>manticore.js</code>.</p>
+<p>We distinguish 2 types of records :</p>
+<ul>
+<li><code>active_resource</code> : these records track every resource that have been requested by another core node and are aware of :
+<ul>
+<li>the time of the reception of the <code>request</code> command on MaCh</li>
+<li>the core node id which requested the resource (so he can identify it in <code>core.nodes[]</code>)</li>
+<li>the IP address and port of the endpoint where to send the sensor data (namely OSC packets)</li>
+<li>ulimately if the core node that requested the resource is on the same machine as the client the IP address of the endpoint should match the IP of the node id (but this is not mandatory)</li>
+</ul></li>
+<li><code>client_request</code> : these records track every request issued by a local client and is aware of :
+<ul>
+<li>the time of the reception of the method GET <code>/request/[id]?[port]</code> on the built in HTTP server</li>
+<li>the IP address of the client (if local client, then 127.0.0.1)</li>
+<li>the port that the client requested that we sent data on</li>
+<li>the IP of the destination node that can provide the data (this is used as a commodity for the release resource procedure, so we do not need to look up the core.nodes[] and associated sensors[] to find the IP address)</li>
+</ul></li>
+</ul>
+<p>These records works in pairs and at any time if a <code>client_request</code> is a valid record in one node (i.e. the client), you could fine an equivalent <code>active_resource</code> on another node of the network (i.e. the server). This <code>active_resource</code> is matching to the previously initiated <code>client_request</code>.</p>
+<h3 id="inter-core-messaging"><span class="header-section-number">2.2.8</span> Inter-core messaging</h3>
+<h4 id="message-structure"><span class="header-section-number">2.2.8.1</span> Message structure</h4>
+<p>The message exchanged on the communication channels (InCh and MaCh) are JSON files and have the following structure :</p>
+<pre><code>{
+  &quot;header&quot;: {
+    &quot;src&quot;: &quot;4626ca80-f211-11e3-8ad9-4df458080716&quot;,
+    &quot;name&quot;: &quot;clementpi&quot;,
+    &quot;ip&quot;: &quot;192.168.1.171&quot;,
+    &quot;type&quot;: &quot;raw&quot;
+  },
+  &quot;payload&quot;: {}
+}</code></pre>
+<p>It is simply a Javascript object with 2 main parts :</p>
+<ul>
+<li><code>header</code> contains the type of message and some information about the sender (uuid, hostname and IP address)</li>
+<li><code>payload</code> can be any Javascript primitive data types (i.e. <code>String</code>, <code>Boolean</code> or <code>Number</code>), composite data types (i.e. <code>Object</code> or <code>Array</code>) or special data types (i.e. <code>null</code> or <code>undefined</code>). In the case of composite types, its structure will be related to the type of message specified in the header.</li>
+</ul>
+<blockquote>
+<p>// TODO : need to write about ZeroMQ Frame and envelope</p>
+</blockquote>
+<h4 id="message-command-and-associated-payload"><span class="header-section-number">2.2.8.2</span> Message command and associated payload</h4>
+<ul>
+<li><code>raw</code></li>
+<li><code>request</code></li>
+<li><code>release</code></li>
+<li><code>ack</code></li>
+</ul>
+<h3 id="external-messaging"><span class="header-section-number">2.2.9</span> External messaging</h3>
+<p>Inspired by REST API Using GET HTTP request</p>
+<h3 id="reading-the-log"><span class="header-section-number">2.2.10</span> Reading the log</h3>
+<blockquote>
+<p>// TODO write about conventions used in logging</p>
+</blockquote>
+<p>The logging have the following structure</p>
+<pre><code>&lt;symbol&gt;[&lt;subject&gt;] &lt;message&gt;</code></pre>
+<p>Like this (starting procedure)</p>
+<pre><code>+[CORE] Core starting on macbook-cgarnier.local
++[CORE] Core id 506243e0-02b9-11e4-87f0-8dea239e7eaf
++[HTTP] Listening on 3000
++[UDP]  UDP socket listening on 0.0.0.0:42424
++[PUB]  Publisher socket listening on 32323
++[CORE] Advertising _node._tcp on 32323
++[mDNS] Start browsing for _node._tcp services
++[MACH] Socket listening on 45454</code></pre>
+<p>The <code>&lt;symbol&gt;</code>can be</p>
+<ul>
+<li><code>+</code> used for any relevant information</li>
+<li><code>&gt;</code> used for incoming message</li>
+<li><code>!</code> used for errors</li>
+<li><code>-</code> used for the disapperance of a node</li>
+</ul>
+<p>The <code>&lt;subject&gt;</code> can be</p>
+<ul>
+<li><code>CORE</code></li>
+<li><code>HTTP</code> for any connection or event related to the Web user interface</li>
+<li><code>UDP</code> for the creation and the reception on the built-in UDP socket</li>
+<li><code>mDNS</code> for anything related to the mdns module (browsing and advertising)</li>
+<li><code>MACH</code> for any message on the main channel (MaCh)</li>
+<li><code>INCH</code> for any message on the information channel (InCh)</li>
+<li><code>SYNC</code> for any synchronous request</li>
+<li><code>ASYN</code> for any asynchronous request</li>
+<li><code>RELR</code> for the Release Resource procedure</li>
+<li><code>REQR</code> for the Request Resource procedure</li>
+<li><code>REQ</code> for anything related to a request (either synchronous or asynchronous)</li>
+<li><code>REP</code> for anything related to a reply</li>
+<li><code>PUB</code> for anything related to the publisher socket (used by InCh)</li>
+<li><code>SUB</code> for anything relted to the subscriber socket (used by InCh)</li>
+</ul>
+<h3 id="http-web-user-interface"><span class="header-section-number">2.2.11</span> HTTP Web user interface</h3>
+<h4 id="jade"><span class="header-section-number">2.2.11.1</span> Jade</h4>
+<blockquote>
+<p>// TODO Jade templating engine // Add a screenshot</p>
+</blockquote>
+<h2 id="installation"><span class="header-section-number">2.3</span> Installation</h2>
+<h3 id="prerequisites"><span class="header-section-number">2.3.1</span> Prerequisites</h3>
+<p>Manticore is based on Node.js and exploits ZeroMQ and Zeroconf/Bonjour.</p>
+<h4 id="prerequisites-on-mac-os-x"><span class="header-section-number">2.3.1.1</span> Prerequisites on Mac OS X</h4>
+<p>Clone this repository</p>
+<pre><code>$ git clone https://github.com/garnierclement/pfe</code></pre>
+<p>Install the package manager <a href="http://brew.sh/">Homebrew</a></p>
+<pre><code>$ ruby -e &quot;$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)&quot;
+$ brew update</code></pre>
+<p>Install <a href="http://nodejs.org/">Node.js</a> v0.10.28</p>
+<pre><code>$ brew install nodejs</code></pre>
+<p>Install <a href="http://zeromq.org/">ZeroMQ</a> 4.0.4</p>
+<pre><code>$ brew install zeromq</code></pre>
+<p><strong>Note</strong> : pkg-config may be required too (<code>brew install pkg-config</code>)</p>
+<h4 id="prerequisites-on-raspbian-raspberry-pi"><span class="header-section-number">2.3.1.2</span> Prerequisites on Raspbian (Raspberry Pi)</h4>
+<p>Clone this repository</p>
+<pre><code>$ git clone https://github.com/garnierclement/pfe</code></pre>
+<p>Update package manager</p>
+<pre><code>$ sudo apt-get update</code></pre>
+<p>Install <a href="http://avahi.org/">Avahi</a> daemon and its tools</p>
+<pre><code>$ sudo apt-get install avahi-daemon libnss-mdns
+$ sudo apt-get install avahi-utils</code></pre>
+<p>Install <a href="http://puredata.info/">Pure Data</a></p>
+<pre><code>$ sudo apt-get install puredata</code></pre>
+<p>Compile and install <a href="http://nodejs.org/">Node.js</a> v0.10.28 from source tarball (<strong>on the Raspberry Pi, it takes around 2 hours !</strong>)</p>
+<pre><code>$ wget http://nodejs.org/dist/v0.10.28/node-v0.10.28.tar.gz
+$ tar xvzf node-v0.10.28.tar.gz
+$ cd node-v0.10.28
+$ ./configure
+$ make
+$ sudo make install
+$ sudo ldconfig
+$ rm zeromq-node-v0.10.28.tar.gz
+$ rm -rf node-v0.10.28</code></pre>
+<p>Alternatively, if you have already compiled it once (i.e. <code>make</code>) on a <a href="http://www.raspberrypi.org/">Raspberry Pi</a>, you can directly do the following</p>
+<pre><code>$ cd node-v0.10.28
+$ ln -fs out/Release/node node
+$ sudo /usr/bin/python tools/install.py install
+$ node -v         # must display v.0.10.28
+$ npm -v        # must display v1.4.9 </code></pre>
+<p>Compile and install <a href="http://zeromq.org/">ZeroMQ</a> v4.0.4 from source tarball (it also requires libtool, autoconf and automake, but they are provided by Rapsbian)</p>
+<pre><code>$ sudo apt-get install uuid-dev
+$ wget http://download.zeromq.org/zeromq-4.0.4.tar.gz
+$ tar xvzf zeromq-4.0.4.tar.gz
+$ cd zeromq-4.0.4
+$ ./configure --with-pgm
+$ make
+$ sudo make install
+$ sudo ldconfig
+$ rm zeromq-4.0.4.tar.gz
+$ rm -rf zeromq-4.0.4</code></pre>
+<h4 id="prerequisites-on-windows"><span class="header-section-number">2.3.1.3</span> Prerequisites on Windows</h4>
+<p>This is experimental and only tested on Windows 7 x64.</p>
+<ol style="list-style-type: decimal">
+<li>You need to dowload and install
+<ul>
+<li><a href="http://nodejs.org/">Node.js</a> v0.10.x<br /></li>
+<li><a href="https://developer.apple.com/downloads/index.action?q=Bonjour%20SDK%20for%20Windows#">Bonjour SDK for Windows</a><br /> To download the SDK, you need to have an Apple Developer ID (it's free)<br /> Bonjour SDK is required for the dns_sd.h header file used by the mdns module for Node.js<br /> At the time of writing version 2.0.4 is the latest available<br /></li>
+<li><a href="https://www.python.org/download/windows">Python 2.7</a><br /> Python is required when installing the zmq module for Node.js<br /> During the installation, check the box <em>add python.exe to PATH</em><br /></li>
+<li><a href="http://zeromq.org/distro:microsoft-windows">ZeroMQ 4.0.4</a><br /> During the installation, choose the full installation (with source code and compiled librairies)<br /> <a href="http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x64.exe">Direct link for Windows x64</a><br /> <a href="http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x86.exe">Direct link for Windows x86</a><br /></li>
+<li><a href="http://git-scm.com/download/win">Git</a> or <a href="https://windows.github.com/">GitHub for Windows</a> (optional)</li>
+</ul></li>
+<li>Reboot your system</li>
+</ol>
+<h3 id="node.js-module-dependencies"><span class="header-section-number">2.3.2</span> Node.js module dependencies</h3>
+<p>Install Node.js module dependencies (<a href="https://www.npmjs.org/package/mdns">mdns</a> and <a href="https://www.npmjs.org/package/zmq">zmq</a>) with<br />(see <code>package.json</code> for more information about versions)</p>
+<pre><code>$ npm install</code></pre>
+<p>If you encounter any issue with the automatic npm installation, you can manually install them one by one.</p>
+<pre><code>$ npm install mdns
+$ npm install zmq
+$ npm install express
+$ npm install jade
+$ npm install uuid
+$ npm install underscore
+$ npm install async</code></pre>
+<p><strong>Note</strong>: depending on the operating system <a href="https://www.npmjs.org/package/zmq">zmq</a> and <a href="https://www.npmjs.org/package/mdns">mdns</a> have other requirements (see the Prerequisites for your system above).</p>
+<h3 id="lets-go"><span class="header-section-number">2.3.3</span> Let's go</h3>
+<p>Now that everything is set up, you can move up to <a href="#getting-started">Getting started</a></p>
+<h2 id="known-issues"><span class="header-section-number">2.4</span> Known issues</h2>
+<h3 id="avahi-warning-on-linux"><span class="header-section-number">2.4.1</span> Avahi warning on Linux</h3>
+<p>On Linux distributions, we can see the following warning when executing the program</p>
+<pre><code>*** WARNING *** The program &#39;node&#39; uses the Apple Bonjour compatibility layer of Avahi.
+*** WARNING *** Please fix your application to use the native API of Avahi!
+*** WARNING *** For more information see &lt;http://0pointer.de/avahi-compat?s=libdns_sd&amp;e=node&gt;
+*** WARNING *** The program &#39;node&#39; called &#39;DNSServiceRegister()&#39; which is not supported (or only supported partially) in the Apple Bonjour compatibility layer of Avahi.
+*** WARNING *** Please fix your application to use the native API of Avahi!
+*** WARNING *** For more information see &lt;http://0pointer.de/avahi-compat?s=libdns_sd&amp;e=node&amp;f=DNSServiceRegister&gt;</code></pre>
+<p>This must not be harmful and the warning can be hidden with the following environment variable</p>
+<pre><code>$ export AVAHI_COMPAT_NOWARN=1</code></pre>
+<p>For further investigation, enquire <a href="http://0pointer.de/avahi-compat?s=libdns_sd&amp;e=node">http://0pointer.de/avahi-compat?s=libdns_sd&amp;e=node</a></p>
+<h3 id="auto-detection-on-multiple-interfaces"><span class="header-section-number">2.4.2</span> Auto-detection on multiple interfaces</h3>
+<p>Because a node advertises a <em>node.</em>tcp service and at the same time browses/discovers any node advertising the same <em>node.</em>tcp service, it is ultimately going to see multiple instance of itself.</p>
+<p>Currently we only care about the first one it sees (but maybe it is not the one we want) and for the others, the log will show something like</p>
+<pre><code>+[mDNS] Service up: macbook-cgarnier at 192.168.190.1 (vmnet1)
+![CORE] Node id 506243e0-02b9-11e4-87f0-8dea239e7eaf is already present</code></pre>
+<p>So when a computer have multiples network interfaces, it is going to see itself multiple time.</p>
+<p>Note that this behavior is also shown with virtual interfaces such as <code>vmnet1</code> or <code>vmnet8</code> used by VMware.</p>
