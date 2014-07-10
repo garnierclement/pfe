@@ -13,6 +13,7 @@ In the following, we propose a standardized procedure to describe a sensor and w
     - [Command structure](#command-structure)
     - [Command exit status](#command-exit-status)
   - [Data description object](#data-description-object)
+  - [Bootstrap procedure](#bootstrap-procedure)
   - [Request procedure](#request-procedure)
     - [Mode](#mode)
     - [Options](#options)
@@ -163,6 +164,10 @@ The object has a simple structure with 2 properties :
 >  For more information about OSC, refer to the [specification](http://opensoundcontrol.org/spec-1_0)
 
 Remember that the OSC format must be in accordance with the program that is responsible to forge the OSC packets and to send send (i.e. the program triggered by the *execute* step in [Request] procedure). 
+
+### Bootstrap procedure
+
+> to be done
 
 ### Request procedure
 
