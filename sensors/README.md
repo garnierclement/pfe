@@ -113,11 +113,11 @@ On the Rapsberry Pi, Manticore will match on 2 aliases `linux` (because of the p
 
 Here, we use the alias `pi` for because we use devices called Raspberry Pi. Nonetheless the alias `linux-arm` could also have been used because its meaning is more closely related to the platform and architecture description.
 
-The important thing is to choose an alias that fits best to what you want to achieve and to be consistent in the way of describing a specific platform or architecture within one `description.json` file. Indeed, these system aliases are going to be used as a reference in `systems` property of the [Command] object (described in the next section).
+The important thing is to choose an alias that fits best to what you want to achieve and to be consistent in the way of describing a specific platform or architecture within one `description.json` file. Indeed, these system aliases are going to be used as a reference in the `systems` property of the [Command] object (described in the next section).
 
 ### Command object
 
-The Command object is data structure representing a command that must be executing to perform any action.
+The Command object is a data structure representing a command that must be executing to perform any action.
 
 #### Command structure
 
@@ -155,7 +155,7 @@ Note that the variables `$ADDRESS` and `$PORT` have been respectively replaced b
 
 You may notice that for a shell script the `cmd` often starts with `./myscript.sh`. This is because Manticore will create a subshell in the sensors folder and then execute the content `cmd` from there.
 
-If you forget it, then it will try to execute `myscript.sh` and therefore look the environment variable `PATH` for it. Of course, the sensor folder is not in the `PATH` and you will get an error like `myscript.sh: command not find` or `myscript.sh: No such file or directory`.
+If you forget it, then it will try to execute `myscript.sh` and therefore look the environment variable `PATH` for it. Of course, the sensor folder is not in the `PATH` and you will get an error like `myscript.sh: command not found` or `myscript.sh: No such file or directory`.
 
 #### Command exit status
 
@@ -183,7 +183,7 @@ The object has a simple structure with 2 properties :
 
 *	The `description` property provides a simple text description of the data 
 *	The `osc_format` property shows the syntax of the OSC address pattern and type tag.
-	+	In the above example, `/mouse/x` is the OSC address and `f` the type tag for floating point numbers
+	+	In the above example, `/mouse/x` is the OSC address and `f` the type tag for floating-point numbers
 
 >  For more information about OSC, refer to the [specification](http://opensoundcontrol.org/spec-1_0)
 
@@ -282,7 +282,8 @@ At the startup of Manticore, the program will try to detect the presence of sens
 This description file -- which content is described in the previous section -- will be parsed by Manticore (for those interested in the implementation, you can refer to the method `Core.prototype.detectSensors` in `manticore.js`).
 
 1.	The first element parsed is the `systems`. According to the node's platform and architecture, Manticore will determine which system aliases that the node is entitled.
-2.	Then Manticore will try detect the sensor on the current node. To do so, it parses the `bootstrap` element and browses the [Command]. For each [Command], Manticore checks its `systems` property for matches with the system aliases. If it success, then the `cmd` is executed with `parameters`. In terms of implementation, this is done in the Sensor constructor (see `sensor.js` file), if the `bootstrap` fails (either because the sensor is not entitled to the node's system or because ), then constructor should not return a new *Sensor* object. If it is a success, the Sensor is created and the Core singleton gets aware of it in its own `sensors` property.
+2.	Then Manticore will try detect the sensor on the current node. To do so, it parses the `bootstrap` element and browses the [Command]. For each [Command], Manticore checks its `systems` property for matches with the system aliases. If it success, then the `cmd` is executed with `parameters`. In terms of implementation, this is done in the *Sensor* constructor (see `sensor.js` file), if the `bootstrap` fails (either because the sensor is not entitled to the node's system or because ), then constructor should not return a new *Sensor* object and fail. If it is a success, the new *Sensor* object is created and the *Core* singleton gets aware of it in its own `sensors` property. Thereafter all the detected sensors are published across the network.
+3.	
 
 > unfinished explanation
 
