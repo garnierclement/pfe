@@ -20,6 +20,7 @@
   ],
   "request": {
     "default": {
+      "limitation": 1,
       "options": [
         "$ADDRESS",
         "$PORT",

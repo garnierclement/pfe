@@ -245,6 +245,14 @@ Usually, there will only be one `mode` called `default`. Therefore the `default`
 How is this *mode* hierarchy be useful ? Let's consider a situation where we might want a slightly different type of the Request procedure. It is easy to implement it by just adding a new property after `default`.  
 As previously defined, the `default` procedure objective is *to send the sensor's data in OSC format to some other node*. Here, we can think of other *modes* that can be *send the sensor's data with another type of format* or *to send the data over TCP (instead of UDP)*.
 
+#### Limitation
+
+The `limitation` property of the `default` mode of the Request procedure sets the maximum of concurrent clients that can request the data of a sensor.
+
+This is to take in account the limitation of some sensors or drivers
+
+> WARNING, this is a new specification that is not yet implemented in Manticore
+
 #### Options
 
 Each mode can have some options. These options corresponds to variables that will be set by Manticore at runtime.
@@ -554,4 +562,5 @@ To implement, you should edit the constructor of the *Sensor* object (`sensor.js
 
 *	Find a way to create some JSON Schema and to validate the JSON description files, maybe see <http://json-schema.org/>
 *	Automatic generation of methods regarding the custom procedure, we could parse all other procedure and get the method associated, that will use the `async` module to execute each step. The code will be then generated at runtime
+*	We can think to develop a workaround for the limitation of some sensors driver in the case of multiples concurrent client requests. To do so, the data would always be sent to Manticore and Manticore would be responsible to duplicate the OSC data and to send them to multiple client at the same time.
 
