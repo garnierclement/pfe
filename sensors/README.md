@@ -30,7 +30,7 @@ In the following, we propose a standardized procedure to describe a sensor and w
 
 ## Structure of `description.json`
 
-Each sensor **must** be described by a [JSON] file called `description.json`. This file **must** be located at the root of the sensor working directory folder (each sensor have its own folder in the `sensors/` directory of the repository). The purpose of the file is to report the instructions that Manticore should follow to detect the presence of the sensor and to handle the request on it.
+Each sensor **must** be described by a [JSON] file called `description.json`. This file **must** be located at the root of the sensor working directory folder (each sensor has its own folder in the `sensors/` directory of the repository). The purpose of the file is to report the instructions that Manticore should follow to detect the presence of the sensor and to handle the request on it.
 
 *	`name`
 	+	*String*
@@ -39,19 +39,19 @@ Each sensor **must** be described by a [JSON] file called `description.json`. Th
 *	`systems`
 	+	*Object* containing *[System]* objects indexed by an alias
 	+	**mandatory** (at least one *[Command]* child)
-	+	Describe operating systems and architectures supported by the sensor. Each *[System]* is indexed by an alias that will be referenced by the `systems`property` of the *[Command]* objects
+	+	Describes operating systems and architectures supported by the sensor. Each *[System]* is indexed by an alias that will be referenced by the `systems`property` of the *[Command]* objects
 *	`bootstrap`
 	+ 	*Array* of *[Command]* objects
 	+ 	**mandatory**
-	+ 	Describe the commands to be executing when Manticore starts in order to detect whether the sensor is present or not on the node
+	+ 	Describes the commands to be executing when Manticore starts in order to detect whether the sensor is present or not on the node
 *	`data`
 	+ 	*Array* of *[Data]* objects
 	+ 	**mandatory** (at least one *[Data]* child)
-	+ 	Describe the data and the related [OSC] format provided by a sensor
+	+ 	Describes the data and the related [OSC] format provided by a sensor
 *	`request`
 	+	*Object*
 	+	**mandatory**
-	+	Describe the [Request] procedure so that a node can request the sensor's data. This procedure can have several *modes* and contains 3 main steps namely *check* to check whether the sensor is still available, *generate* in the case that we need to generate a file and finally *execute* that will trigger the commands to send the data to the requester's endpoint.
+	+	Describes the [Request] procedure so that a node can request the sensor's data. This procedure can have several *modes* and contains 3 main steps namely *check* to check whether the sensor is still available, *generate* in the case that we need to generate a file and finally *execute* that will trigger the commands to send the data to the requester's endpoint.
 
 [Command]: #command-object
 [System]: #system-object
@@ -72,7 +72,7 @@ A system object is a data structure that describes the operating systems and arc
 
 *	The value of the `alias_of_system` can be anything that gives an understandable description to the system such as `linux`, `osx` or even `my_own_pc`.
 	+ 	Currently we use the following values `linux`, `pi`, `win` and `osx`
-	+ 	These aliases are custom-made and does not rely on Node.js API or terminology
+	+ 	These aliases are custom-made and do not rely on Node.js API or terminology
 *	The `platform` property is **mandatory** and **must be equivalent** to a value returned by `require('os').platform()` in Node.js
 *	The `arch`property is optional and if set then it **must be equivalent** to a value returned by `require('os').arch()` in Node.js
 
@@ -117,7 +117,7 @@ The important thing is to choose an alias that fits best to what you want to ach
 
 ### Command object
 
-The Command object is a data structure representing a command that must be executing to perform any action.
+The Command object is a data structure representing a command that must be executed to perform any action.
 
 #### Command structure
 
@@ -155,7 +155,7 @@ Note that the variables `$ADDRESS` and `$PORT` have been respectively replaced b
 
 You may notice that for a shell script the `cmd` often starts with `./myscript.sh`. This is because Manticore will create a subshell in the sensors folder and then execute the content `cmd` from there.
 
-If you forget it, then it will try to execute `myscript.sh` and therefore look the environment variable `PATH` for it. Of course, the sensor folder is not in the `PATH` and you will get an error like `myscript.sh: command not found` or `myscript.sh: No such file or directory`.
+If you forget the './', then it will try to execute `myscript.sh` and therefore look for the environment variable `PATH` for it. Of course, the sensor folder is not in the `PATH` and you will get an error like `myscript.sh: command not found` or `myscript.sh: No such file or directory`.
 
 #### Command exit status
 
@@ -187,7 +187,7 @@ The object has a simple structure with 2 properties :
 
 >  For more information about OSC, refer to the [specification](http://opensoundcontrol.org/spec-1_0)
 
-Remember that the OSC format must be in accordance with the program that is responsible to forge the OSC packets and to send send (i.e. the program triggered by the *execute* step in [Request] procedure). 
+Remember that the OSC format must be in accordance with the program that is responsible to forge the OSC packets and to send (i.e. the program triggered by the *execute* step in [Request] procedure). 
 
 ### Bootstrap procedure
 
