@@ -123,19 +123,19 @@ The Command object is a data structure representing a command that must be execu
 
 	{
 		"path": "subfolder/scripts",
-			"cmd": "./my_script.sh",
-			"parameters": [
-				"--addr"
-				"$ADDRESS",
-				"--port",
-				"$PORT",
-			],
-			"systems": [
-				"osx",
-				"linux"
-			],
-			"sudo": true
-		}
+		"cmd": "./my_script.sh",
+		"parameters": [
+			"--addr"
+			"$ADDRESS",
+			"--port",
+			"$PORT",
+		],
+		"systems": [
+			"osx",
+			"linux"
+		],
+		"sudo": true
+	}
 
 *	The `path` property is the place where the subshell will be executed. This property is optional if the command is in the environment variable `PATH` or if the command/program is in the same directory as the `description.json` file.
 *	The `cmd` property is the command that will be executed. This property is obviously **mandatory**.
