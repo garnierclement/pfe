@@ -283,9 +283,13 @@ This description file -- which content is described in the previous section -- w
 
 1.	The first element parsed is the `systems`. According to the node's platform and architecture, Manticore will determine which system aliases that the node is entitled.
 2.	Then Manticore will try detect the sensor on the current node. To do so, it parses the `bootstrap` element and browses the [Command]. For each [Command], Manticore checks its `systems` property for matches with the system aliases. If it success, then the `cmd` is executed with `parameters`. In terms of implementation, this is done in the *Sensor* constructor (see `sensor.js` file), if the `bootstrap` fails (either because the sensor is not entitled to the node's system or because ), then constructor should not return a new *Sensor* object and fail. If it is a success, the new *Sensor* object is created and the *Core* singleton gets aware of it in its own `sensors` property. Thereafter all the detected sensors are published across the network.
-3. When the *Sensor* object is created. Not only it detects it and sets up its properties(identifier, name and associated data) but also automatically implements a method `request()` matching the instructions of the Request procedure in the description file.
+3. When the *Sensor* object is created. Not only it detects it and sets up its properties(identifier, name and associated data) but also automatically implements a method `request()` matching the instructions of the Request procedure in the description file. 
+	+	The prototype of this function is simple `request(mode, array_of_options)`. 
+	+	The `mode` will try match the one in the description file (if not set, automatically use `default`). 
+	+	The `array_of_options` are parameters set up by Manticore (e.g. after a request by another node) and therefore matched to the `options` in the description file.
+4. Then Manticore will execute each step of the procedure one after another. The next step cannot be triggered if the previous step has not finished successfully. If one step fails then the procedure cannot come to a successful conclusion and an error is triggered.
 
-> unfinished explanation
+> In the implementation, in order to avoid a callback hell and to give some modularity in the code, we are using the [async](https://github.com/caolan/async) module
 
 ## Tutorial: Adding a sensor
 
