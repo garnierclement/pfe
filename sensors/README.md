@@ -289,7 +289,7 @@ This description file -- which content is described in the previous section -- w
 	+	The `array_of_options` are parameters set up by Manticore (e.g. after a request by another node) and therefore matched to the `options` in the description file.
 4. Then Manticore will execute each step of the procedure one after another. The next step cannot be triggered if the previous step has not finished successfully. If one step fails then the procedure cannot come to a successful conclusion and an error is triggered.
 
-> In the implementation, in order to avoid a callback hell and to give some modularity in the code, we are using the [async](https://github.com/caolan/async) module
+> In the implementation, in order to avoid a callback hell and to give some modularity in the code, we are using the [async](https://github.com/caolan/async) module to execute the steps one after another
 
 ## Tutorial: Adding a sensor
 
