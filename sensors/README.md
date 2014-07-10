@@ -151,6 +151,12 @@ Thus, considering that we are in the sensor working directory, the result of the
 	
 Note that the variables `$ADDRESS` and `$PORT` have been respectively replaced by values `127.0.0.1` and `42424`.
 
+#### Note about the execution of the command
+
+You may notice that for a shell script the `cmd` often starts with `./myscript.sh`. This is because Manticore will create a subshell in the sensors folder and then execute the content `cmd` from there.
+
+If you forget it, then it will try to execute `myscript.sh` and therefore look the environment variable `PATH` for it. Of course, the sensor folder is not in the `PATH` and you will get an error like `myscript.sh: command not find` or `myscript.sh: No such file or directory`.
+
 #### Command exit status
 
 For each sensor, Manticore is responsible for parsing the `description.json` file and thus executing the commands described in the Command object.
