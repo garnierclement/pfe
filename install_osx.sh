@@ -85,9 +85,42 @@ install() {
 	install_pkg
 	npm_install
 	install_java_libraries
+	add_launchd
 }
 
+add_launchd() {
 
+	echo '[INSTALL] Adding manticore to /Library/LaunchDaemons...'
+	sudo echo -e '<?xml version="1.0" encoding="UTF-8"?>
+	<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+	<plist version="1.0">
+	\t<dict>
+	\t\t<key>Label</key>
+	\t\t<string>local.manticore</string>
+	\t\t<key>Program</key>
+	\t\t<string>'$DIR'/projects/manticore/launch-manticore.sh</string>
+	\t\t<key>RunAtLoad</key>
+	\t\t<true/>
+	\t\t<key>KeepAlive</key>
+	\t\t<true/>
+	\t\t<key>StandardInPath</key>
+	\t\t<string>/tmp/launch-manticore-daemon.stdin</string>
+	\t\t<key>StandardOutPath</key>
+	\t\t<string>/tmp/launch-manticore-daemon.stdout</string>
+	\t\t<key>StandardErrorPath</key>
+	\t\t<string>/tmp/launch-manticore-daemon.stderr</string>
+	\t</dict>
+	</plist>' >/Library/LaunchDaemons/local.manticore.plist
+
+	echo '[INSTALL] Loading Manticore Daemon...'
+	sudo launchctl load /Library/LaunchDaemons/local.manticore.plist
+
+	echo '[INSTALL] Started Manticore Daemon...'
+	sudo launchctl start /Library/LaunchDaemons/local.manticore.plist
+
+
+
+}
 
 install
 
