@@ -562,5 +562,4 @@ To implement, you should edit the constructor of the *Sensor* object (`sensor.js
 
 *	Find a way to create some JSON Schema and to validate the JSON description files, maybe see <http://json-schema.org/>
 *	Automatic generation of methods regarding the custom procedure, we could parse all other procedure and get the method associated, that will use the `async` module to execute each step. The code will be then generated at runtime
-*	We can think to develop a workaround for the limitation of some sensors driver in the case of multiples concurrent client requests. To do so, the data would always be sent to Manticore and Manticore would be responsible to duplicate the OSC data and to send them to multiple client at the same time.
-
+*	We can think to develop a workaround for the limitation of some sensors driver in the case of multiples concurrent client requests. To do so, the data would always be sent to Manticore and Manticore would be responsible to duplicate the OSC data and to send them to multiple client at the same time. However, this means that we need to change the way Manticore handles and respond to requests
