@@ -1,8 +1,17 @@
 {
   "name": "MIDI_keyboard",
   "systems": {
+    "linux": {
+      "platform": "linux"
+    }
   },
   "bootstrap": [
+    {
+      "cmd": "./checkMidiKeyboard.sh",
+      "systems": [
+        "linux"
+      ]
+    }
   ],
   "request": {
     "default": {
@@ -11,7 +20,14 @@
         "$PORT",
         "$GENERATED_PATCH"
       ],
-      "check": [],
+      "check": [
+        {
+          "cmd": "./checkMidiKeyboard.sh",
+          "systems": [
+            "linux"
+          ]
+        }
+      ],
       "generate": [],
       "execute": []
     }
