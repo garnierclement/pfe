@@ -93,6 +93,24 @@ and
 
 The first one targets all Linux operating systems (regardless of the architecture) whereas the second one only targets those that run on ARM processors (but not specifically Raspberry Pi, the alias just implies it).
 
+So if we have the following commands
+
+	{
+		"cmd": "command_for_unix_systems.sh",
+		"systems": [
+			"linux",
+			"osx"
+		]
+	},
+	{
+		"cmd": "command_only_for_pi.sh",
+		"systems": [
+			"pi"
+		]	
+	}
+
+On the Rapsberry Pi, Manticore will match on 2 aliases `linux` (because of the platform) and `pi` (because of the platform and architecture) and therefore execute both commands.
+
 Here, we use the alias `pi` for because we use devices called Raspberry Pi. Nonetheless the alias `linux-arm` could also have been used because its meaning is more closely related to the platform and architecture description.
 
 The important thing is to choose an alias that fits best to what you want to achieve and to be consistent in the way of describing a specific platform or architecture within one `description.json` file. Indeed, these system aliases are going to be used as a reference in `systems` property of the [Command] object (described in the next section).
@@ -167,7 +185,26 @@ Remember that the OSC format must be in accordance with the program that is resp
 
 ### Bootstrap procedure
 
-> to be done
+The Bootstrap procedure corresponds to the commands that must be executed to detect the sensor on a node.
+
+The structure is quite simple and is a simple array of [Command] objects for all supported systems
+
+	"bootstrap": [
+		{
+			"cmd": "./detectionScript-osx.sh",
+			"systems": [
+				"osx"
+			]
+		},
+		{
+			"cmd": "./detectionScript-linux.sh",
+			"systems": [
+				"linux"
+			]
+		}
+	]
+
+When Manticore starts up, it will execute these commands to detect the presence of the sensor on the node. If it is a success then, the sensor's presence will be published across the network.
 
 ### Request procedure
 
