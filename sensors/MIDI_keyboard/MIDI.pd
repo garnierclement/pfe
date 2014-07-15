@@ -14,7 +14,7 @@
 #X msg 240 116 send /ctl/ \$1;
 #X obj 369 80 loadbang;
 #X msg 292 239 print;
-#X msg 277 177 connect 192.168.0.2 7121;
+#X msg 277 177 connect localhost 7121;
 #X connect 0 0 1 0;
 #X connect 2 0 4 0;
 #X connect 4 0 0 0;

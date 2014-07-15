@@ -13,6 +13,20 @@
       ]
     }
   ],
+  "data": [
+    {
+      "description": "I_DONT_KNOW 1",
+      "osc_format": "f f f f"
+    },
+    {
+      "description": "I_DONT_KNOW 2",
+      "osc_format": "/note/ f f"
+    },
+    {
+      "description": "I_DONT_KNOW 3",
+      "osc_format": "/ctl/ f"
+    }
+  ],
   "request": {
     "default": {
       "options": [
@@ -28,8 +42,36 @@
           ]
         }
       ],
-      "generate": [],
-      "execute": []
+      "generate": [
+        {
+          "cmd": "./generateMidiKerboardData.sh",
+          "parameters": [
+            "$ADDRESS",
+            "$PORT",
+            "$GENERATED_PATCH"
+          ],
+          "systems": [
+            "linux"
+          ]
+        }
+      ],
+      "execute": [
+        {
+          "cmd": "pd-extended",
+          "parameters": [
+            "-nogui",
+            "-oss",
+            "-midiindev",
+            "1",
+            "-open",
+            "$GENERATED_PATCH"
+          ],
+          "systems": [
+            "linux"
+          ],
+          "path": "../../var/run"
+        }
+      ]
     }
   }
 }
