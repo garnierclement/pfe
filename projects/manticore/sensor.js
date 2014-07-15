@@ -163,7 +163,6 @@ function parseExecuteAndDie(sensor_name, cmd_array, systems, options, callback) 
 			var child = executeCommand(cmdToExecute, {cwd: working_dir} ,function(stdout, stderr) {
 				});
 			child.on('exit', function(exit_code) {
-					console.log("sdkjhskjdfh");
 					if (exit_code === 0) {
 						console.log('+[EXEC]\tCommand '+command+' for sensor '+sensor_name+ ' OK');
 						callback(null, exit_code);
