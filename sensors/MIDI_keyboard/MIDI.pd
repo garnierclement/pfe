@@ -14,9 +14,9 @@
 #X msg 240 116 send /ctl/ \$1;
 #X obj 369 80 loadbang;
 #X msg 292 239 print;
-#X msg 277 177 connect localhost 7121;
 #X msg -17 117 send /note2/ \$1;
 #X msg 17 183 print;
+#X msg 277 177 connect 127.0.0.1 7121;
 #X connect 0 0 1 0;
 #X connect 2 0 4 0;
 #X connect 4 0 0 0;
@@ -25,11 +25,11 @@
 #X connect 6 0 7 0;
 #X connect 6 1 7 1;
 #X connect 7 0 8 0;
-#X connect 7 0 14 0;
+#X connect 7 0 13 0;
 #X connect 8 0 4 0;
 #X connect 9 0 10 0;
 #X connect 10 0 4 0;
-#X connect 11 0 13 0;
-#X connect 13 0 0 0;
-#X connect 14 0 4 0;
-#X connect 14 0 15 0;
+#X connect 11 0 15 0;
+#X connect 13 0 4 0;
+#X connect 13 0 14 0;
+#X connect 15 0 0 0;
