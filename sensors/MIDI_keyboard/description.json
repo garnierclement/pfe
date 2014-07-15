@@ -15,15 +15,11 @@
   ],
   "data": [
     {
-      "description": "I_DONT_KNOW 1",
-      "osc_format": "f f f f"
+      "description": "Key Signal",
+      "osc_format": "/note2/ i"
     },
     {
-      "description": "I_DONT_KNOW 2",
-      "osc_format": "/note/ f f"
-    },
-    {
-      "description": "I_DONT_KNOW 3",
+      "description": "Control Signal",
       "osc_format": "/ctl/ f"
     }
   ],
