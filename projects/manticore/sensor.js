@@ -85,7 +85,6 @@ function Sensor (desc, systems)
 			// see 'results', normally exit code for check and generate or null
 			// and child for execute
 			if (err !== null) {
-				console.log(results);
 				callback(null, results[2]);
 			}
 			else {
