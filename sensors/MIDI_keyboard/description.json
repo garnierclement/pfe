@@ -13,16 +13,6 @@
       ]
     }
   ],
-  "data": [
-    {
-      "description": "Key Signal",
-      "osc_format": "/note2/ i"
-    },
-    {
-      "description": "Control Signal",
-      "osc_format": "/ctl/ f"
-    }
-  ],
   "request": {
     "default": {
       "options": [
