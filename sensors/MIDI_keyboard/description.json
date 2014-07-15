@@ -44,7 +44,7 @@
       ],
       "generate": [
         {
-          "cmd": "./generateMidiKerboardData.sh",
+          "cmd": "./generateMIDI.sh",
           "parameters": [
             "$ADDRESS",
             "$PORT",
