@@ -13,6 +13,16 @@
       ]
     }
   ],
+  "data": [
+    {
+      "description": "MIDI note",
+      "osc_format": "/note/ i i"
+    },
+    {
+      "description": "Control",
+      "osc_format": "/ctl/ i"
+    }
+  ],
   "request": {
     "default": {
       "options": [

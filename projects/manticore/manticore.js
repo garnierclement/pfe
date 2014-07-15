@@ -528,7 +528,9 @@ Core.prototype.detectSensors = function() {
 				});
 				if (systems.length > 0) {
 					var new_sensor = new Sensor(descriptionFile, systems);
-					this.sensors.push(new_sensor);
+					if (new_sensor !== null) {
+						this.sensors.push(new_sensor);
+					}
 				}
 			}
 			catch (e) {

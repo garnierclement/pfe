@@ -39,6 +39,7 @@ function Sensor (desc, systems)
 					console.log(err);
 					//throw err;
 					// need to find why it stops
+					// if err, the constructor should return null
 				}
 			});
 		}
