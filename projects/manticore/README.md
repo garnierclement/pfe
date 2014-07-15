@@ -55,6 +55,8 @@ on Windows, use `node.exe`
 
 	> node.exe app.js
 
+> On the Raspberry Pi, you may be required to prepend `sudo` because some drivers need root rights
+
 ## Guide
 
 ### Introduction
