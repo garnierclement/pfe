@@ -12,38 +12,56 @@ var path = require('path');
  * @param {Object} desc    Object representing the description.json file
  * @param {Array} systems  Array of all system aliases matching
  */
-function Sensor (desc, systems, sensor_callback)
+function Sensor (desc, systems, constructor_cb)
 {
+	var bootstrap_func = [];
 	// parse the content of the bootstrap object in the description file
 	_.each(desc.bootstrap, function(command, key) {
 		var intersect = _.intersection(command.systems, systems);
 		if (intersect.length > 0) {
-			var cmdToExecute = command.cmd;
-			_.each(command.parameters, function(param) {
-					cmdToExecute += ' '+param;
-			});
-			var working_dir = "../../sensors/"+desc.name;
-			if ('path' in command) {
-				working_dir = path.normalize(working_dir+'/'+command.path);
-			}
-			var child = executeCommand(cmdToExecute, {cwd: working_dir}, function(stdout, stderr) {
-				//console.log(stdout+stderr);
-			});
-			child.on('exit', function(exit_code) {
-				if (exit_code === 0) {
-					console.log('+[DTEC] Bootstrap command '+command.cmd+' for sensor '+desc.name+ ' OK');
-				}
-				else {
-					var err = "![DTEC] Bootstrap command "+command.cmd+" for sensor "+desc.name+" failed with exit code "+exit_code;
-					//console.log(err);
-					sensor_callback(err);
-					//throw err;
-					// need to find why it stops
-					// if err, the constructor should return null
-				}
-			});
+			////////
+			// create a new function that will be handled by async
+			var new_func = commandHandler.bind(null, command, desc.name);
+			bootstrap_func.push(new_func);
+			////////
+			// var cmdToExecute = command.cmd;
+			// _.each(command.parameters, function(param) {
+			// 		cmdToExecute += ' '+param;
+			// });
+			// var working_dir = "../../sensors/"+desc.name;
+			// if ('path' in command) {
+			// 	working_dir = path.normalize(working_dir+'/'+command.path);
+			// }
+			// var child = executeCommand(cmdToExecute, {cwd: working_dir}, function(stdout, stderr) {
+			// 	//console.log(stdout+stderr);
+			// });
+			// child.on('exit', function(exit_code) {
+			// 	if (exit_code === 0) {
+			// 		console.log('+[DTEC] Bootstrap command '+command.cmd+' for sensor '+desc.name+ ' OK');
+			// 	}
+			// 	else {
+			// 		var err = "![DTEC] Bootstrap command "+command.cmd+" for sensor "+desc.name+" failed with exit code "+exit_code;
+			// 		//console.log(err);
+			// 		constructor_cb(err);
+			// 		//throw err;
+			// 		// need to find why it stops
+			// 		// if err, the constructor should return null
+			// 	}
+			// });
 		}
 	});
+
+	// execute all the bootstrap commands one after another
+	if (bootstrap_func.length > 0) {
+		async.series(bootstrap_func, function(err, results){
+			if (err === null) {
+				console.log(results);
+			}
+			else {
+				constructor_cb(err);
+			}
+		});
+	}
 
 	this.id = uuid.v1();
 	this.name = desc.name;
@@ -93,7 +111,7 @@ function Sensor (desc, systems, sensor_callback)
 			}
 		});
 	};
-	sensor_callback(null);
+	constructor_cb(null);
 }
 
 module.exports = Sensor;
@@ -175,6 +193,43 @@ function parseExecuteAndDie(sensor_name, cmd_array, systems, options, callback) 
 						callback(err, exit_code);
 					}
 			});
+		}
+	});
+}
+
+/**
+ * Handles a Command object from descripion.json
+ * @param  {Function} next    [description]
+ * @param  {[type]}   command [description]
+ * @return {[type]}           [description]
+ */
+function commandHandler(command, sensor_name, next) {
+	// get the command
+	var cmdToExecute = command.cmd;
+	// parse the arguments
+	_.each(command.parameters, function(param) {
+		if (_.has(options, param)) {
+			cmdToExecute += ' '+options[param];
+		} else {
+			cmdToExecute += ' '+param;
+		}
+	});
+	// set the working dir for the subshell
+	var working_dir = "../../sensors/"+sensor_name;
+	if ('path' in command) {
+		working_dir = path.normalize(working_dir+'/'+command.path);
+	}
+	// execute the command
+	var child = executeCommand(cmdToExecute, {cwd: working_dir}, function(stdout, stderr) {});
+	child.on('exit', function(exit_code) {
+		if (exit_code === 0) {
+			console.log('+[EXEC]\tCommand '+command+' for sensor '+sensor_name+ ' OK');
+			next(null, exit_code);
+		}
+		else {
+			var err = "![EXEC]\tCommand "+command+" for sensor "+sensor_name+" failed with exit cod"+exit_code;
+			console.log(err);
+			next(err, exit_code);
 		}
 	});
 }

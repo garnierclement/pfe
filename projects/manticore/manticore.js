@@ -511,7 +511,7 @@ Core.prototype.detectSensors = function() {
 		var elemPath = sensorsPath+list[i];
 		var stat = fs.statSync(elemPath);
 		if (stat.isDirectory()) {
-			try {
+			// try {
 				var descriptionFile = require(elemPath+'/description.json');
 				var systems = [];
 				_.each(descriptionFile.systems, function(system, system_name) {
@@ -529,6 +529,7 @@ Core.prototype.detectSensors = function() {
 				if (systems.length > 0) {
 					var new_sensor = new Sensor(descriptionFile, systems, function(err){
 						if (err === null) {
+							console.log("NEWNEW");
 							self.sensors.push(new_sensor);
 						}
 						else {
@@ -536,10 +537,10 @@ Core.prototype.detectSensors = function() {
 						}
 					});
 				}
-			}
-			catch (e) {
-				console.log('![DTEC] '+e);
-			}
+		// 	}
+		// 	catch (e) {
+		// 		console.log('![DTEC] '+e);
+		// 	}
 		}
 	}
 	this.delayedPublishSensors(5000);
