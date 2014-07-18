@@ -12,7 +12,7 @@ var path = require('path');
  * @param {Object} desc    Object representing the description.json file
  * @param {Array} systems  Array of all system aliases matching
  */
-function Sensor (desc, systems)
+function Sensor (desc, systems, sensor_callback)
 {
 	// parse the content of the bootstrap object in the description file
 	_.each(desc.bootstrap, function(command, key) {
@@ -26,7 +26,6 @@ function Sensor (desc, systems)
 			if ('path' in command) {
 				working_dir = path.normalize(working_dir+'/'+command.path);
 			}
-			console.log(working_dir);
 			var child = executeCommand(cmdToExecute, {cwd: working_dir}, function(stdout, stderr) {
 				//console.log(stdout+stderr);
 			});
@@ -36,7 +35,8 @@ function Sensor (desc, systems)
 				}
 				else {
 					var err = "![DTEC] Bootstrap command "+command.cmd+" for sensor "+desc.name+" failed with exit code "+exit_code;
-					console.log(err);
+					//console.log(err);
+					sensor_callback(err);
 					//throw err;
 					// need to find why it stops
 					// if err, the constructor should return null
@@ -93,6 +93,7 @@ function Sensor (desc, systems)
 			}
 		});
 	};
+	sensor_callback(null);
 }
 
 module.exports = Sensor;

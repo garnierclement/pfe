@@ -527,10 +527,14 @@ Core.prototype.detectSensors = function() {
 					}
 				});
 				if (systems.length > 0) {
-					var new_sensor = new Sensor(descriptionFile, systems);
-					if (new_sensor !== null) {
-						this.sensors.push(new_sensor);
-					}
+					var new_sensor = new Sensor(descriptionFile, systems, function(err){
+						if (err === null) {
+							self.sensors.push(new_sensor);
+						}
+						else {
+							console.log(err);
+						}
+					});
 				}
 			}
 			catch (e) {
