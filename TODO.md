@@ -2,12 +2,12 @@
 
 - [ ] Autostart of Manticore after the Pi has booted
 - [x] Windows compatibility (never been tested)
-- [ ] Give a model to sensor
-- [ ] Insert new sensors : MIDI Keyboard + Inertial sensor
+- [x] Give a model to sensor
+- [x] Insert new sensors : MIDI Keyboard + Inertial sensor
 - [x] Design a proper message object with header + type + payload
 - [x] Test with more than 5 nodes
 - [ ] If request is too long or fail, timeout and return fail request resource
-- [ ] Keep track of local requested resource
+- [x] Keep track of local requested resource
 - [ ] Handle soft/hard release in API 
 - [x] Store this.ip reliabily
 - [x] add a flag in nodes[] when it is itself
@@ -34,3 +34,4 @@
 - [ ] periodic detection of sensors (or continusly polling devices and then send a signal to manticore)
 - [ ] Idea: test different mdns module ofr Node.js, see mdns-js in pure js (no dependency) or reimplement a custom discovery and presence system
 - [ ] Sensor "intertial" has no property `data` in its `description.json` file, need to look at the xBeeReadSerial to check the OSC format used
+- [ ] Create a package .pkg for Mac OS X to install dependencies and then copy the repo in /Applications/Manticore and also install a launchd file in /Library/LaunchDaemons or ~/Library/LaunchDaemons 
