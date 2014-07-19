@@ -191,7 +191,7 @@ function commandHandler(command, options, sensor_name, next) {
 	var cmdToExecute = command.cmd;
 	// parse the arguments
 	_.each(command.parameters, function(param) {
-		if (_.has(options, param)) {
+		if (options !== null && _.has(options, param)) {
 			cmdToExecute += ' '+options[param];
 		} else {
 			cmdToExecute += ' '+param;
