@@ -533,6 +533,7 @@ Core.prototype.detectSensors = function() {
 						self.sensors.push(this);
 					}
 					else {
+						console.log("![DTEC]\t"+err);
 						// the creation of the object failed
 						// nothing to do then
 					}

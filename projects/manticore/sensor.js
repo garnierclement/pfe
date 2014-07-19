@@ -24,7 +24,7 @@ function Sensor (desc, systems, constructor_cb)
 			// the bind methods of the Function object creates a new function with defined parameters
 			// here commandHandler(command, sensor_name, next) becomes commandHandler(next)
 			// and the 2 first parameters are set
-			var new_func = commandHandler.bind(null, command, desc.name);
+			var new_func = commandHandler.bind(null, command, null, desc.name);
 			bootstrap_func.push(new_func);
 		}
 	});
@@ -36,7 +36,8 @@ function Sensor (desc, systems, constructor_cb)
 				constructor_cb(err);
 			}
 			else {
-				// no errors in bootstrap procedure
+				// no errors in bootstrap procedure, new sensor found
+				console.log("+[DTEC] New sensor found "+desc.name);
 				// setting the sensor properties
 				self.id = uuid.v1();
 				self.name = desc.name;
@@ -166,11 +167,11 @@ function parseExecuteAndDie(sensor_name, cmd_array, systems, options, callback) 
 				});
 			child.on('exit', function(exit_code) {
 					if (exit_code === 0) {
-						console.log('+[EXEC]\tCommand '+command+' for sensor '+sensor_name+ ' OK');
+						console.log('+[EXEC]\tCOMMAND '+command+' for SENSOR '+sensor_name+ ' OK');
 						callback(null, exit_code);
 					}
 					else {
-						var err = "![EXEC]\tCommand "+command+" for sensor "+sensor_name+" failed with exit code "+exit_code;
+						var err = "COMMAND "+command+" for SENSOR "+sensor_name+" FAILED with exit code "+exit_code;
 						console.log(err);
 						callback(err, exit_code);
 					}
@@ -185,7 +186,7 @@ function parseExecuteAndDie(sensor_name, cmd_array, systems, options, callback) 
  * @param  {[type]}   command [description]
  * @return {[type]}           [description]
  */
-function commandHandler(command, sensor_name, next) {
+function commandHandler(command, options, sensor_name, next) {
 	// get the command
 	var cmdToExecute = command.cmd;
 	// parse the arguments
@@ -202,16 +203,15 @@ function commandHandler(command, sensor_name, next) {
 		working_dir = path.normalize(working_dir+'/'+command.path);
 	}
 	// execute the command
-	console.log('+[EXEC]\tStarting execution of command '+cmdToExecute+' for sensor '+sensor_name);
+	//console.log('+[EXEC]\tCOMMAND '+cmdToExecute+' for SENSOR '+sensor_name);
 	var child = executeCommand(cmdToExecute, {cwd: working_dir}, function(stdout, stderr) {});
 	child.on('exit', function(exit_code) {
 		if (exit_code === 0) {
-			console.log('+[EXEC]\tCommand '+cmdToExecute+' for sensor '+sensor_name+ ' OK');
+			//console.log('+[EXEC]\tCOMMAND '+cmdToExecute+' for SENSOR '+sensor_name+ ' OK');
 			next(null, exit_code);
 		}
 		else {
-			var err = "![EXEC]\tCommand "+cmdToExecute<+" for sensor "+sensor_name+" failed with exit cod"+exit_code;
-			console.log(err);
+			var err = "COMMAND "+cmdToExecute+" for SENSOR "+sensor_name+" FAILED with exit code "+exit_code;
 			next(err, exit_code);
 		}
 	});
@@ -236,7 +236,7 @@ Sensor.prototype.addData = function(_name, osc_string) {
 function executeCommand(cmd, opts, callback) {
 	try {
 		var child = exec(cmd, opts, function(err, stdout, stderr){
-			console.log("+[EXEC]\tExecuting "+cmd+"\n"+stdout+stderr);
+			//console.log("+[EXEC]\tExecuting "+cmd+"\n"+stdout+stderr);
 			callback(stdout, stderr);
 		});
 		return child;
