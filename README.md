@@ -14,7 +14,7 @@
 	Main directory encompassing all the components of our project  
 * 	`scripts/`  
 	Scripts used for bootstrap, installation and debug  
-*	`sensors/`
+*	`sensors/`  
 	Description of the sensors and their parameters
 * 	`var/`  
 	Directory used to store logs, PIDs, and any temporary genrated file during the execution of any component  

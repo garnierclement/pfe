@@ -244,8 +244,6 @@ Using GET HTTP request
 
 ### Reading the log
 
-> // TODO write about conventions used in logging
-
 The logging have the following structure
 
 	<symbol>[<subject>] <message>
@@ -266,11 +264,11 @@ The `<symbol>`can be
 *	`+` used for any relevant information
 *	`>` used for incoming message
 *	`!` used for errors
-*	`-` used for the disapperance of a node
+*	`-` used for the disappearance of a node
 
 The `<subject>` can be
 
-*	`CORE`
+*	`CORE` for anything related to the core
 *	`HTTP`	for any connection or event related to the Web user interface
 *	`UDP`	for the creation and the reception on the built-in UDP socket
 *	`mDNS`	for anything related to the mdns module (browsing and advertising)
@@ -283,14 +281,24 @@ The `<subject>` can be
 *	`REQ`	for anything related to a request (either synchronous or asynchronous)
 *	`REP`	for anything related to a reply
 *	`PUB`	for anything related to the publisher socket (used by InCh)
-*	`SUB`	for anything relted to the subscriber socket (used by InCh)
+*	`SUB`	for anything related to the subscriber socket (used by InCh)
+*	`EXEC`	for anything related to the execution of a command
+*	`DTEC`	for anything related to the detection of a sensor
 
-### HTTP Web user interface
+### Embedded client HTTP server 
+
+Manticore have a embedded HTTP server built-in.
+
+Web user interface
 
 #### Jade
 
+The web user interface is designed by a tempting engine used by Express
+
 > // TODO Jade templating engine
 > // Add a screenshot
+
+[Jade]: http://jade-lang.com/
 
 ## Installation
 
