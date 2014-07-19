@@ -511,36 +511,33 @@ Core.prototype.detectSensors = function() {
 		var elemPath = sensorsPath+list[i];
 		var stat = fs.statSync(elemPath);
 		if (stat.isDirectory()) {
-			// try {
-				var descriptionFile = require(elemPath+'/description.json');
-				var systems = [];
-				_.each(descriptionFile.systems, function(system, system_name) {
-					if (system.platform === self.platform) {
-						if (system.arch) {
-							if (system.arch === self.arch) {
-								systems.push(system_name);
-							}
-						}
-						else {
+			var descriptionFile = require(elemPath+'/description.json');
+			var systems = [];
+			_.each(descriptionFile.systems, function(system, system_name) {
+				if (system.platform === self.platform) {
+					if (system.arch) {
+						if (system.arch === self.arch) {
 							systems.push(system_name);
 						}
 					}
-				});
-				if (systems.length > 0) {
-					var new_sensor = new Sensor(descriptionFile, systems, function(err){
-						if (err === null) {
-							console.log("NEWNEW");
-							self.sensors.push(new_sensor);
-						}
-						else {
-							console.log(err);
-						}
-					});
+					else {
+						systems.push(system_name);
+					}
 				}
-		// 	}
-		// 	catch (e) {
-		// 		console.log('![DTEC] '+e);
-		// 	}
+			});
+			if (systems.length > 0) {
+				var new_sensor = new Sensor(descriptionFile, systems, function(err){
+					if (err === null) {
+						// in this callback, 'this' corresponds to 
+						// the object created by the Sensor constructor
+						self.sensors.push(this);
+					}
+					else {
+						// the creation of the object failed
+						// nothing to do then
+					}
+				});
+			}
 		}
 	}
 	this.delayedPublishSensors(5000);

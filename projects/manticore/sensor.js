@@ -15,103 +15,85 @@ var path = require('path');
 function Sensor (desc, systems, constructor_cb)
 {
 	var bootstrap_func = [];
-	// parse the content of the bootstrap object in the description file
+	var self = this;
+	// parse the content of the bootstrap procedure in the description file
+	// and create a new function for each Command object found
 	_.each(desc.bootstrap, function(command, key) {
 		var intersect = _.intersection(command.systems, systems);
 		if (intersect.length > 0) {
-			////////
-			// create a new function that will be handled by async
+			// the bind methods of the Function object creates a new function with defined parameters
+			// here commandHandler(command, sensor_name, next) becomes commandHandler(next)
+			// and the 2 first parameters are set
 			var new_func = commandHandler.bind(null, command, desc.name);
 			bootstrap_func.push(new_func);
-			////////
-			// var cmdToExecute = command.cmd;
-			// _.each(command.parameters, function(param) {
-			// 		cmdToExecute += ' '+param;
-			// });
-			// var working_dir = "../../sensors/"+desc.name;
-			// if ('path' in command) {
-			// 	working_dir = path.normalize(working_dir+'/'+command.path);
-			// }
-			// var child = executeCommand(cmdToExecute, {cwd: working_dir}, function(stdout, stderr) {
-			// 	//console.log(stdout+stderr);
-			// });
-			// child.on('exit', function(exit_code) {
-			// 	if (exit_code === 0) {
-			// 		console.log('+[DTEC] Bootstrap command '+command.cmd+' for sensor '+desc.name+ ' OK');
-			// 	}
-			// 	else {
-			// 		var err = "![DTEC] Bootstrap command "+command.cmd+" for sensor "+desc.name+" failed with exit code "+exit_code;
-			// 		//console.log(err);
-			// 		constructor_cb(err);
-			// 		//throw err;
-			// 		// need to find why it stops
-			// 		// if err, the constructor should return null
-			// 	}
-			// });
 		}
 	});
 
 	// execute all the bootstrap commands one after another
 	if (bootstrap_func.length > 0) {
 		async.series(bootstrap_func, function(err, results){
-			if (err === null) {
-				console.log(results);
+			if (err) {
+				constructor_cb(err);
 			}
 			else {
-				constructor_cb(err);
+				// no errors in bootstrap procedure
+				// setting the sensor properties
+				self.id = uuid.v1();
+				self.name = desc.name;
+				self.data = [];
+
+				// parsing the content of 'data' in the description file
+				_.each(desc.data, function(datum) {
+					self.data.push({name: datum.description, osc: datum.osc_format});
+				});
+
+				// create the handler for the request procedure
+				self.request = function(mode, options, callback) {
+					var opt;
+					//parse options
+					if (_.has(desc.request, mode)) {
+							opt = _.object(desc.request[mode].options, options);
+					}
+					console.log(opt);
+					async.series([
+						function(next) {
+							console.log("check");
+							// check
+							parseExecuteAndDie(desc.name, desc.request[mode].check, systems, opt, next);
+						},
+						function(next) {
+							// generate
+							if ('generate' in desc.request[mode]) {
+								parseExecuteAndDie(desc.name, desc.request[mode].generate, systems, opt, next);
+							}
+							else {
+								next(null, 0);
+							}
+						},
+						function(next) {
+							// execute
+							console.log("execute");
+							parseAndExecute(desc.name, desc.request[mode].execute, systems, opt, next);
+						}
+					],
+					function(err, results) {
+						// see 'results', normally exit code for check and generate or null
+						// and child for execute
+						if (err !== null) {
+							callback(null, results[2]);
+						}
+						else {
+							callback(err);
+						}
+					});
+				};
+
+				// calling the callback constructor with 'thisValue' pointing to
+				// the created Sensor
+				constructor_cb.apply(self, [null]);
 			}
 		});
 	}
-
-	this.id = uuid.v1();
-	this.name = desc.name;
-	var data = this.data = [];
-
-	// parsing the content of 'data' in the description file
-	_.each(desc.data, function(datum) {
-		data.push({name: datum.description, osc: datum.osc_format});
-	});
-
-	this.request = function(mode, options, callback) {
-		var opt;
-		//parse options
-		if (_.has(desc.request, mode)) {
-				opt = _.object(desc.request[mode].options, options);
-		}
-		console.log(opt);
-		async.series([
-			function(next) {
-				console.log("check");
-				// check
-				parseExecuteAndDie(desc.name, desc.request[mode].check, systems, opt, next);
-			},
-			function(next) {
-				// generate
-				if ('generate' in desc.request[mode]) {
-					parseExecuteAndDie(desc.name, desc.request[mode].generate, systems, opt, next);
-				}
-				else {
-					next(null, 0);
-				}
-			},
-			function(next) {
-				// execute
-				console.log("execute");
-				parseAndExecute(desc.name, desc.request[mode].execute, systems, opt, next);
-			}
-		],
-		function(err, results) {
-			// see 'results', normally exit code for check and generate or null
-			// and child for execute
-			if (err !== null) {
-				callback(null, results[2]);
-			}
-			else {
-				callback(err);
-			}
-		});
-	};
-	constructor_cb(null);
 }
 
 module.exports = Sensor;
@@ -220,14 +202,15 @@ function commandHandler(command, sensor_name, next) {
 		working_dir = path.normalize(working_dir+'/'+command.path);
 	}
 	// execute the command
+	console.log('+[EXEC]\tStarting execution of command '+cmdToExecute+' for sensor '+sensor_name);
 	var child = executeCommand(cmdToExecute, {cwd: working_dir}, function(stdout, stderr) {});
 	child.on('exit', function(exit_code) {
 		if (exit_code === 0) {
-			console.log('+[EXEC]\tCommand '+command+' for sensor '+sensor_name+ ' OK');
+			console.log('+[EXEC]\tCommand '+cmdToExecute+' for sensor '+sensor_name+ ' OK');
 			next(null, exit_code);
 		}
 		else {
-			var err = "![EXEC]\tCommand "+command+" for sensor "+sensor_name+" failed with exit cod"+exit_code;
+			var err = "![EXEC]\tCommand "+cmdToExecute<+" for sensor "+sensor_name+" failed with exit cod"+exit_code;
 			console.log(err);
 			next(err, exit_code);
 		}

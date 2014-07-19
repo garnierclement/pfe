@@ -1,0 +1,85 @@
+{
+  "name": "virtual",
+  "systems": {
+    "linux": {
+      "platform": "linux"
+    },
+    "osx": {
+      "platform": "darwin"
+    },
+    "win": {
+      "platform": "win32"
+    },
+    "pi": {
+      "platform": "linux",
+      "arch": "arm"
+    }
+  },
+  "bootstrap": [
+    {
+      "cmd": "echo 'common command for all systems'",
+      "systems": [
+        "linux",
+        "osx",
+        "win",
+        "pi"
+      ]
+    },
+    {
+      "cmd": "echo 'linux specific command'",
+      "systems": [
+        "linux"
+      ]
+    },
+    {
+      "cmd": "echo 'osx specific command'",
+      "systems": [
+        "osx"
+      ]
+    },
+    {
+      "cmd": "echo 'windows specific command'",
+      "systems": [
+        "win"
+      ]
+    },
+    {
+      "cmd": "echo 'pi specific command'",
+      "systems": [
+        "pi"
+      ]
+    },
+    {
+      "cmd": "cat testfile",
+      "systems": [
+        "linux",
+        "osx",
+        "pi"
+      ]
+    }
+  ],
+  "data": [
+    {
+      "description": "virtual data C",
+      "osc_format": "/virtual/a f"
+    },
+    {
+      "description": "virtual data B",
+      "osc_format": "/virtual/b f"
+    }
+  ],
+  "request": {
+    "default": {
+      "limitation": 1,
+      "options": [
+        "$ADDRESS",
+        "$PORT",
+        "$GENERATED_PATCH"
+      ],
+      "check": [
+      ],
+      "execute": [
+      ]
+    }
+  }
+}
