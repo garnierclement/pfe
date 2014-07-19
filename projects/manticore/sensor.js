@@ -9,15 +9,17 @@ var path = require('path');
 
 /**
  * Sensor object
- * @param {Object} desc    Object representing the description.json file
- * @param {Array} systems  Array of all system aliases matching
+ * 
+ * @param {Object}		desc						Object representing the description.json file
+ * @param {Array}			systems					Array of all system aliases matching
+ * @param {Function}	constructor_cb	Callback called when the constructor ends (or fails)
  */
 function Sensor (desc, systems, constructor_cb)
 {
 	var bootstrap_func = [];
 	var self = this;
 	// parse the content of the bootstrap procedure in the description file
-	// and create a new function for each Command object found
+	// and create a new function for each Command object that matches the system aliases
 	_.each(desc.bootstrap, function(command, key) {
 		var intersect = _.intersection(command.systems, systems);
 		if (intersect.length > 0) {
@@ -100,6 +102,45 @@ function Sensor (desc, systems, constructor_cb)
 module.exports = Sensor;
 
 /**
+ * Handles a Command object from descripion.json
+ * 
+ * @param  {Object}   command     Command object from description.json file
+ * @param  {Array}		options     [description]
+ * @param  {String}   sensor_name Name of the sensor (name property in description.json)
+ * @param  {Function} next        Callback to call the next function used in async module
+ */
+function commandHandler(command, options, sensor_name, next) {
+	// get the command
+	var cmdToExecute = command.cmd;
+	// parse the arguments
+	_.each(command.parameters, function(param) {
+		if (options !== null && _.has(options, param)) {
+			cmdToExecute += ' '+options[param];
+		} else {
+			cmdToExecute += ' '+param;
+		}
+	});
+	// set the working dir for the subshell
+	var working_dir = "../../sensors/"+sensor_name;
+	if ('path' in command) {
+		working_dir = path.normalize(working_dir+'/'+command.path);
+	}
+	// execute the command
+	//console.log('+[EXEC]\tCOMMAND '+cmdToExecute+' for SENSOR '+sensor_name);
+	var child = executeCommand(cmdToExecute, {cwd: working_dir}, function(stdout, stderr) {});
+	child.on('exit', function(exit_code) {
+		if (exit_code === 0) {
+			//console.log('+[EXEC]\tCOMMAND '+cmdToExecute+' for SENSOR '+sensor_name+ ' OK');
+			next(null, exit_code);
+		}
+		else {
+			var err = "COMMAND "+cmdToExecute+" for SENSOR "+sensor_name+" FAILED with exit code "+exit_code;
+			next(err, exit_code);
+		}
+	});
+}
+
+/**
  * Parse the content of an array of Command objects from the description.json file
  * Execute the command if one of the system aliases match
  * Finally use the callback to return the child process
@@ -176,43 +217,6 @@ function parseExecuteAndDie(sensor_name, cmd_array, systems, options, callback) 
 						callback(err, exit_code);
 					}
 			});
-		}
-	});
-}
-
-/**
- * Handles a Command object from descripion.json
- * @param  {Function} next    [description]
- * @param  {[type]}   command [description]
- * @return {[type]}           [description]
- */
-function commandHandler(command, options, sensor_name, next) {
-	// get the command
-	var cmdToExecute = command.cmd;
-	// parse the arguments
-	_.each(command.parameters, function(param) {
-		if (options !== null && _.has(options, param)) {
-			cmdToExecute += ' '+options[param];
-		} else {
-			cmdToExecute += ' '+param;
-		}
-	});
-	// set the working dir for the subshell
-	var working_dir = "../../sensors/"+sensor_name;
-	if ('path' in command) {
-		working_dir = path.normalize(working_dir+'/'+command.path);
-	}
-	// execute the command
-	//console.log('+[EXEC]\tCOMMAND '+cmdToExecute+' for SENSOR '+sensor_name);
-	var child = executeCommand(cmdToExecute, {cwd: working_dir}, function(stdout, stderr) {});
-	child.on('exit', function(exit_code) {
-		if (exit_code === 0) {
-			//console.log('+[EXEC]\tCOMMAND '+cmdToExecute+' for SENSOR '+sensor_name+ ' OK');
-			next(null, exit_code);
-		}
-		else {
-			var err = "COMMAND "+cmdToExecute+" for SENSOR "+sensor_name+" FAILED with exit code "+exit_code;
-			next(err, exit_code);
 		}
 	});
 }
