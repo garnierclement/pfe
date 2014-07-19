@@ -9,7 +9,7 @@
 * 	`definitions/`  
 	General conventions and definitions   
 * 	`pd/`  
-	Pure data patches  
+	Collection of Pure Data patches  
 * 	`projects/`  
 	Main directory encompassing all the components of our project  
 * 	`scripts/`  
@@ -23,13 +23,10 @@
 
 * 	**Manticore**  
 	*Located in `projects/manticore/`*  
-	> // TODO add description  
-* 	**InertialSender**  
-	*Located in `projects/InertialSender/`*  
-	> // TODO add description  
+	Core program of the framework
 * 	**Max/MSP client and Java externals**  
 	*Located in `projects/MAX/`*  
-	> // TODO add description  
+	Manticore client for Max/MSP developed as a Java external
 
 
 [SPE-T Program]: http://telecom.insa-lyon.fr/content/filiere-telecoms-rd-chine
