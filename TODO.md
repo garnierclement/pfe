@@ -33,3 +33,4 @@
 - [ ] implement the limitation on a specific mode of a specific procedure (number of maximum clients)
 - [ ] periodic detection of sensors (or continusly polling devices and then send a signal to manticore)
 - [ ] Idea: test different mdns module ofr Node.js, see mdns-js in pure js (no dependency) or reimplement a custom discovery and presence system
+- [ ] Sensor "intertial" has no property `data` in its `description.json` file, need to look at the xBeeReadSerial to check the OSC format used
