@@ -19,7 +19,7 @@ pkgbuild --root package \
 	--version $VERSION \
 	--install-location "/Applications/Manticore/" \
 	--scripts scripts/core \
-	out/manticore-$VERSION.pkg
+	out/core-$VERSION.pkg
 
 	#--ownership recommended \
 
@@ -46,5 +46,12 @@ pkgbuild --nopayload \
 	--identifier com.github.garnierclement.pfe.dependency.zeromq \
 	--scripts scripts/zeromq \
 	out/zeromq-brew.pkg
+
+# Main package
+productbuild --distribution distribution.xml \
+	--resources resources \
+	--package-path out \
+	--version $VERSION \
+	manticore-$VERSION.pkg
 
 	

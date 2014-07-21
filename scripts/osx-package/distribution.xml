@@ -1,29 +1,66 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <installer-gui-script minSpecVersion="1">
-    <title>Some daemon</title>
-    <organization>org.someid</organization>
+    <title>Manticore</title>
+    <organization>com.github.garnierclement</organization>
     <domains enable_localSystem="true"/>
-    <options customize="never" require-scripts="true" rootVolumeOnly="true" />
+    <options customize="allow" require-scripts="true" rootVolumeOnly="true" />
     <!-- Define documents displayed at various steps -->
     <welcome    file="welcome.html"    mime-type="text/html" />
-    <license    file="license.html"    mime-type="text/html" />
     <conclusion file="conclusion.html" mime-type="text/html" />
     <!-- List all component packages -->
-    <pkg-ref id="org.someid.daemon"
-             version="0"
-             auth="root">output.pkg</pkg-ref>
+    <pkg-ref id="com.github.garnierclement.pfe.manticore"
+             version="0.1"
+             auth="none">core-0.1.pkg</pkg-ref>
+    <pkg-ref id="com.github.garnierclement.pfe.launchd"
+             version="0.1"
+             auth="root">manticore-launchd.pkg</pkg-ref>
+    <pkg-ref id="com.github.garnierclement.pfe.dependency.brew"
+             version="0.1"
+             auth="root">brew.pkg</pkg-ref>
+    <pkg-ref id="com.github.garnierclement.pfe.dependency.nodejs"
+             version="0.1"
+             auth="root">nodejs-brew.pkg</pkg-ref>
+    <pkg-ref id="com.github.garnierclement.pfe.dependency.zeromq"
+             version="0.1"
+             auth="root">zeromq-brew.pkg</pkg-ref>
     <!-- List them again here. They can now be organized
          as a hierarchy if you want. -->
     <choices-outline>
-        <line choice="org.someid.daemon"/>
+        <line choice="com.github.garnierclement.pfe.manticore"/>
+        <line choice="com.github.garnierclement.pfe.launchd"/>
+        <line choice="com.github.garnierclement.pfe.dependency.brew"/>
+        <line choice="com.github.garnierclement.pfe.dependency.nodejs"/>
+        <line choice="com.github.garnierclement.pfe.dependency.zeromq"/>
     </choices-outline>
     <!-- Define each choice above -->
     <choice
-        id="org.someid.daemon"
-        visible="false"
-        title="some daemon"
-        description="The daemon"
-        start_selected="true">
-      <pkg-ref id="org.someid.daemon"/>
+        id="com.github.garnierclement.pfe.manticore"
+        title="Manticore"
+        description="Manticore">
+      <pkg-ref id="com.github.garnierclement.pfe.manticore"/>
+    </choice>
+    <choice
+        id="com.github.garnierclement.pfe.launchd"
+        title="Manticore as a daemon"
+        description="Automatically launches Manticore after the installation and at startup. Keep it running in the background.">
+      <pkg-ref id="com.github.garnierclement.pfe.launchd"/>
+    </choice>
+    <choice
+        id="com.github.garnierclement.pfe.dependency.brew"
+        title="Homebrew"
+        description="Install Homebrew to install other dependencies. If already install, just run 'brew update'">
+      <pkg-ref id="com.github.garnierclement.pfe.dependency.brew"/>
+    </choice>
+    <choice
+        id="com.github.garnierclement.pfe.dependency.nodejs"
+        title="Node.js"
+        description="Install Node.js with Homebrew">
+      <pkg-ref id="com.github.garnierclement.pfe.dependency.brew"/>
+    </choice>
+    <choice
+        id="com.github.garnierclement.pfe.dependency.zeromq"
+        title="ZeroMQ"
+        description="Install ZeroMQ with PGM support">
+      <pkg-ref id="com.github.garnierclement.pfe.dependency.zeromq"/>
     </choice>
 </installer-gui-script>

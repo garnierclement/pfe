@@ -44,4 +44,5 @@ The main script is `create-pkg.sh` and the tree structure of this folder is the 
 
 * `pkgbuild` looks for scripts in files called `preinstall` and `postinstall`
 * You can use `set -e` to exit immediately if a command exits with a non-zero status (if applicable)
-* Remember to `chmod +x` the scripts otherwise the installation will fail during the execution of the scripts
+* Remember to `chmod +x` the scripts otherwise the installation will fail during the execution of the scripts (and not only `chmod u+x`)
+* Use `--nopayload` to create payload-free packages with `pkgbuild` (only scripts)
