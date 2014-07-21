@@ -1,0 +1,1 @@
+Manticore has been installed. You can find it in `/Applications/Manticore`.
