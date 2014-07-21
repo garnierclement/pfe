@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo "nodejs ok"
+
+exit 0

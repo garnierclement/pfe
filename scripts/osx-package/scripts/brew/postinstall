@@ -1,0 +1,10 @@
+#/bin/sh
+
+if hash brew 2>/dev/null; then
+	echo "[INSTALL] Homebrew already installed. Checking for update..."
+	brew update;
+else
+	echo "[INSTALL] Installing homebrew..."
+	ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
+	brew update
+fi
