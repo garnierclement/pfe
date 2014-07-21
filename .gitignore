@@ -1,12 +1,16 @@
 # Mac OS X
 *.DS_Store
 
+# Package for OS X
+scripts/osx-package/out
+scripts/osx-package/package
+
 # Node.js
 node_modules
 
 # Temporary files
-/var/run/*.pd
-/var/run/*.pid
+var/run/*.pd
+var/run/*.pid
 net_info.json
 
 # Sublime Text
