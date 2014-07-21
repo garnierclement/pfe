@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 
 if hash brew 2>/dev/null; then
 	echo "[INSTALL] Homebrew already installed. Checking for update..."

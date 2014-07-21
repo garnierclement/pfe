@@ -12,27 +12,35 @@ mkdir out
 
 # Create package for Manticore
 pkgbuild --root package \
-	--identifier com.manticore.core \
+	--identifier com.github.garnierclement.pfe.manticore \
 	--version 1.0 \
 	--install-location "/Applications/Manticore/" \
+	--scripts scripts/core \
 	out/manticore-v1.0.pkg
 
-	#--scripts scripts/core \
 	#--ownership recommended \
+
+# Register in launchd
+pkgbuild --root launchd/ \
+	--identifier com.github.garnierclement.pfe.launchd \
+	--install-location "/Library/LaunchDaemons/" \
+	--scripts scripts/launchd \
+	--ownership recommended \
+	out/manticore-launchd.pkg
 
 # Create dependency packages (no payload, just script)
 pkgbuild --nopayload \
-	--identifier com.manticore.dependency.brew \
+	--identifier com.github.garnierclement.pfe.dependency.brew \
 	--scripts scripts/brew \
 	out/brew.pkg
 
 pkgbuild --nopayload \
-	--identifier com.manticore.dependency.nodejs \
+	--identifier com.github.garnierclement.pfe.dependency.nodejs \
 	--scripts scripts/nodejs \
 	out/nodejs-brew.pkg
 
 pkgbuild --nopayload \
-	--identifier com.manticore.dependency.zeromq \
+	--identifier com.github.garnierclement.pfe.dependency.zeromq \
 	--scripts scripts/zeromq \
 	out/zeromq-brew.pkg
 

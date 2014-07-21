@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 set -e
 
-touch ~/Desktop/install.txt
+brew install zeromq --with-pgm

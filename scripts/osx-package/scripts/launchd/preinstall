@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+
+ID="com.github.garnierclement.pfe.manticore"
+
+if /bin/launchctl list $ID &> /dev/null; then
+    /bin/launchctl unload "/Library/LaunchDaemons/$ID.plist"
+fi
+
+exit 0

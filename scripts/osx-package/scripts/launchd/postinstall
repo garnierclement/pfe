@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -e
+ID="com.github.garnierclement.pfe.manticore"
+
+/bin/launchctl load "/Library/LaunchDaemons/$ID.plist"
