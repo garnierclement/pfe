@@ -1,6 +1,9 @@
 #!/bin/sh
 
-# Create package root
+# Variables
+VERSION="0.1"
+
+# Create a custom package for Manticore
 mkdir package
 cp -Rf ../../docs/ package/docs/
 cp -Rf ../../projects/ package/projects/
@@ -13,14 +16,14 @@ mkdir out
 # Create package for Manticore
 pkgbuild --root package \
 	--identifier com.github.garnierclement.pfe.manticore \
-	--version 1.0 \
+	--version $VERSION \
 	--install-location "/Applications/Manticore/" \
 	--scripts scripts/core \
-	out/manticore-v1.0.pkg
+	out/manticore-$VERSION.pkg
 
 	#--ownership recommended \
 
-# Register in launchd
+# Package for launchd
 pkgbuild --root launchd/ \
 	--identifier com.github.garnierclement.pfe.launchd \
 	--install-location "/Library/LaunchDaemons/" \
@@ -28,7 +31,7 @@ pkgbuild --root launchd/ \
 	--ownership recommended \
 	out/manticore-launchd.pkg
 
-# Create dependency packages (no payload, just script)
+# Create dependency packages (no payload, just scripts)
 pkgbuild --nopayload \
 	--identifier com.github.garnierclement.pfe.dependency.brew \
 	--scripts scripts/brew \
@@ -43,7 +46,5 @@ pkgbuild --nopayload \
 	--identifier com.github.garnierclement.pfe.dependency.zeromq \
 	--scripts scripts/zeromq \
 	out/zeromq-brew.pkg
-
-
 
 	

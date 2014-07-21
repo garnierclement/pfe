@@ -1,4 +1,7 @@
-#!/usr/bin/env sh
+#!/bin/sh
+
 set -e
 
 brew install zeromq --with-pgm
+
+exit 0

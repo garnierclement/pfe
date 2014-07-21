@@ -1,5 +1,10 @@
 #!/bin/sh
 
-echo "nodejs ok"
+if hash node 2>/dev/null; then
+	echo "[INSTALL] Node.js already installed."
+else
+	echo "[INSTALL] Installing Node.js..."
+	brew install node
+fi
 
 exit 0
