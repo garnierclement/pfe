@@ -50,12 +50,12 @@
 
 ### Running Manticore as a daemon
 
-* ***description*** : Running Manticore as a daemon (i.e. in the background). No need for OS X because we are using `launchd` (that puts programs in the background). Look for `forever` module for Node.js and `launch-manticore.js` in the Manticore project's folder.
+* ***description*** : Running Manticore as a daemon (i.e. in the background). No need for OS X because we are using `launchd` (that puts programs in the background). Look for `forever` module for Node.js and `launch-manticore.js` in the Manticore project's folder, this can be a start. Maybe they are better ways.
 * ***status*** : started
 
 ### Autostart of Manticore on Pi and Windows
 
-* ***description*** : Autostart of Manticore on Pi and Windows. No need for OS X because we are using `launchd` (see `scripts/osx-package/`)
+* ***description*** : Autostart of Manticore on Pi and Windows. No need for OS X because we are using `launchd` (see `scripts/osx-package/`). On the Pi, look for `inetd` to make it like a service and the System V-style `init` daemon to start at boot time.
 
 ### Ensure the unicity of Manticore on a node
 
