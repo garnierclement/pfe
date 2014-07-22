@@ -55,7 +55,7 @@
 
 ### Autostart of Manticore on Pi and Windows
 
-* ***description*** : Autostart of Manticore on Pi and Windows. No need for OS X because we are using `launchd` (see `scripts/osx-package/`). On the Pi, look for `inetd` to make it like a service and the System V-style `init` daemon to start at boot time.
+* ***description*** : Autostart of Manticore on Pi and Windows. No need for OS X because we are using `launchd` (see `scripts/osx-package/`). On the Pi, look for `inetd` to make Manticore like a network service and `systemd` or the System V-style `init` daemon to start at boot time. For Windows, google it.
 
 ### Ensure the unicity of Manticore on a node
 
@@ -68,6 +68,19 @@
 
 [mdns-js]: https://www.npmjs.org/package/mdns-js
 [ZRE]: http://rfc.zeromq.org/spec:20
+
+### New feature: data-proxy
+
+* ***description*** : data-proxy
+
+> TODO description
+
+### Handle several requests for the same sensor
+
+
+* ***description*** : Handle several requests for the same sensor
+
+> TODO description
 
 
 ## Raspberry Pi
@@ -98,6 +111,10 @@
 * ***description*** Currently the mouse sensor is only completely defined on Mac OS X. Windows is lacking some `bootstrap` scripts and all the step for the `request` procedure to be performed. Linux and Pi are still missing the `execute` step in the `request` procedure. This also implies that Pure Data must be installed (and thus considered as a dependency).
 * ***keywords*** : *Linux, Raspberry Pi, Windows, mouse, Pure Data*
 
+### MIDI keyboard testing and improvements
+
+* ***description*** : The MIDI keyboard have only been tested once or twice and should now work. But it requires more thorough testing and some decision to be made about the OSC data format that we are going to use.
+
 ## Package
 
 ### Package an OSX Installer
@@ -113,6 +130,19 @@
 
 [Raspbian]: http://www.raspbian.org/
 
+## Demo
+
+### Create new client in another platform/language
+
+* ***description*** : Create a new client in Processing or openFrameworks or any other creative programming tool in order to provide more examples of what is a client. Currently the only available client are the web interface and the Max/MSP external.
+
+### Build a complete audio and visual demo with multiple sensors
+
+* ***description*** : Build a complete audio and visual demo with multiple sensors. With the sensors (3 inertial sensors and a MIDI Keyboard)
+
+> TODO need to finish description
+
+
 ## Network
 
 ### Using ad hoc Wi-Fi networks
@@ -120,6 +150,15 @@
 * ***description*** : At this time, we always used either a central router with infrastructure mode Wi-Fi network to connect the different nodes of the network. One interesting topic would be make it work on a completely ad hoc Wi-Fi networks and compare the performance. For the IP addressing, we could either rely on Link-local addresses (IPv4 with IPv4ll/APIPA that is part of Zeroconf, see [RFC3927] or built in IPv6) or elect a leader that will trigger a DHCP server for all the other one. On ad hoc networks, one should also address the topic of multi-hop communications and routing between nodes. 
 
 [RFC3927]: http://tools.ietf.org/html/rfc3927
+
+### PUB/SUB with multicast
+
+* ***description*** : Change to PUB/SUB communication pattern to use a predefined multicast address and PGM or EPGM (thus over UDP). Test it against the way it is used now (currently every node subscribes to every other node in TCP).
+
+### Wireless and wired testing
+
+* ***description*** : Some testing must be node to test the influence of the wireless networks used. We need to know when it is going to be a mess.
+
 ## Security
 
 ### Security issues in Manticore
