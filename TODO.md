@@ -1,18 +1,5 @@
 # TODO
 
-The tasks are organized in the following topics :
-
-*	Project
-*	Manticore
-*	Raspberry Pi
-*	Sensors
-*	Package
-*	Network
-*	Security
-
-## Contents
-
-
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
@@ -63,11 +50,12 @@ The tasks are organized in the following topics :
 
 ### Running Manticore as a daemon
 
-* ***description*** : Running Manticore as a daemon (i.e. in the background). 
+* ***description*** : Running Manticore as a daemon (i.e. in the background). No need for OS X because we are using `launchd` (that puts programs in the background). Look for `forever` module for Node.js and `launch-manticore.js` in the Manticore project's folder.
+* ***status*** : started
 
 ### Autostart of Manticore on Pi and Windows
 
-* ***description*** : Autostart of Manticore on Pi and Windows
+* ***description*** : Autostart of Manticore on Pi and Windows. No need for OS X because we are using `launchd` (see `scripts/osx-package/`)
 
 ### Ensure the unicity of Manticore on a node
 
@@ -96,7 +84,10 @@ The tasks are organized in the following topics :
 * ***description*** : Currently when Manticore checks for the presence of inertial sensors on the Raspberry Pi, this will always detect one, even if there is no Arduino board connected onto the Pi. Indeed according to the `description.json` file associated with the inertial sensor, this will execute the command `xBeeReadSerial -c` (`-c` for checking). But actually, if you look at the source code of `xBeeReadSerial.cpp` you will see that it does not do anything and just return 0 (i.e. success). To implement it properly, one should investigate about the serial communication between the Pi and the xBee chip on the Arduino board.
 * ***status*** : hardly begun
 * ***keywords*** : *inertial sensor, Arduino, xBee chip, C++, serial communication*
-* ***resources*** :
+
+### Missing `data` description of inertial sensor
+
+* ***description*** : The `description.json` file for Manticore has no `data`. One should look into the 
 
 ### "polling" the presence of new sensors
 
