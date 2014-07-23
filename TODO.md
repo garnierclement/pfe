@@ -138,22 +138,26 @@
 
 ### Build a complete audio and visual demo with multiple sensors
 
-* ***description*** : Build a complete audio and visual demo with multiple sensors. With the sensors (3 inertial sensors and a MIDI Keyboard)
-
-> TODO need to finish description
-
+* ***description*** : Build a complete audio and visual demo with multiple sensors. With the sensors (3 inertial sensors and a MIDI Keyboard), Max/MSP and maybe one other visual client, one can create a real interactive working demo using Manticore behind-the-scene.
 
 ## Network
 
 ### Using ad hoc Wi-Fi networks
 
-* ***description*** : At this time, we always used either a central router with infrastructure mode Wi-Fi network to connect the different nodes of the network. One interesting topic would be make it work on a completely ad hoc Wi-Fi networks and compare the performance. For the IP addressing, we could either rely on Link-local addresses (IPv4 with IPv4ll/APIPA that is part of Zeroconf, see [RFC3927] or built in IPv6) or elect a leader that will trigger a DHCP server for all the other one. On ad hoc networks, one should also address the topic of multi-hop communications and routing between nodes. 
+* ***description*** : At this time, we always used either a central router with infrastructure mode Wi-Fi network to connect the different nodes of the network. One interesting topic would be make it work on a completely ad hoc Wi-Fi networks and compare the performance. For the IP addressing, we could either rely on Link-local addresses (IPv4 with IPv4ll/APIPA that is part of Zeroconf, see [RFC3927] or built in IPv6) or elect a leader that will trigger a DHCP server for all the other one. On ad hoc networks, one should also address the topic of multi-hop communications and routing between nodes (see [802.11s] for mesh networking).
 
 [RFC3927]: http://tools.ietf.org/html/rfc3927
+[802.11s]: http://en.wikipedia.org/wiki/IEEE_802.11s
 
 ### PUB/SUB with multicast
 
 * ***description*** : Change to PUB/SUB communication pattern to use a predefined multicast address and PGM or EPGM (thus over UDP). Test it against the way it is used now (currently every node subscribes to every other node in TCP).
+* ***resources*** :
+	+ [ZeroMQ PGM implementation]
+	+ For PGM (Pragmatic General Multicast), see [RFC3208]
+	
+[ZeroMQ PGM implementation]: http://api.zeromq.org/2-1:zmq-pgm
+[RFC3208]: http://tools.ietf.org/html/rfc3208
 
 ### Wireless and wired testing
 
