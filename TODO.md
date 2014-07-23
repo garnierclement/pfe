@@ -72,15 +72,15 @@
 ### New feature: data-proxy
 
 * ***description*** : data-proxy
-
-> TODO description
+ 
 
 ### Handle several requests for the same sensor
 
+> TODO description
 
 * ***description*** : Handle several requests for the same sensor
 
-> TODO description
+> Let's imagine a several users all request the same sensor data. Instead of having a communication channel delivering OSC packets from the sensor's node to each of these users individually, we would implement some sort of system that would aggregate this data and send it to all the users having requested the sensor data. Should this system be integrated at the core level? should it be integrated at the driver-level of the sensor?
 
 
 ## Raspberry Pi
@@ -113,7 +113,7 @@
 
 ### MIDI keyboard testing and improvements
 
-* ***description*** : The MIDI keyboard have only been tested once or twice and should now work. But it requires more thorough testing and some decision to be made about the OSC data format that we are going to use.
+* ***description*** : The MIDI keyboard has only been tested once or twice and should now work. But it requires more thorough testing and some decision to be made about the OSC data format that we are going to use.
 
 ## Package
 
@@ -163,7 +163,7 @@
 
 ### Security issues in Manticore
 
-* ***description*** : As the project is still in an early development stage, we focused more on the features but one should now starts to enquire the security breach that can be found into Manticore. Indeed, some functionalities we used to help the development must be removed or at least constrained in a production environment. For instance in the interactive command in Manticore we can remotely execute some commands. This wal extremely useful to publish the command `git pull` to all nodes without the need to authenticate. Nevertheless used in a wrong way (bad commands) this can cause a severe damage to your computer.
+* ***description*** : As the project is still in an early development stage, we focused more on the features but one should now starts to enquire the security breach that can be found into Manticore. Indeed, some functionalities we used to help the development must be removed or at least constrained in a production environment. For instance in the interactive command in Manticore we can remotely execute some commands. This was extremely useful to publish the command `git pull` to all nodes without the need to authenticate. Nevertheless used in a wrong way (bad commands) this can cause a severe damage to your computer.
 
 # TODO List
 
