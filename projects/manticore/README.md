@@ -12,22 +12,28 @@ In the following, the words *core* and *manticore* with/without a capital letter
   - [Objectives](#objectives)
     - [What we want to achieve ?](#what-we-want-to-achieve-)
     - [How does it work ?](#how-does-it-work-)
-    - [Note about the use of ZeroMQ Sockets](#note-about-the-use-of-zeromq-sockets)
-    - [Note about the use of mDNS](#note-about-the-use-of-mdns)
-    - [Use cases](#use-cases)
-  - [Interactive commands](#interactive-commands)
-  - [Events](#events)
-  - [Core commands](#core-commands)
+  - [Note about the use of ZeroMQ Sockets](#note-about-the-use-of-zeromq-sockets)
+    - [ZeroMQ sockets](#zeromq-sockets)
+    - [ZeroMQ usage in Manticore](#zeromq-usage-in-manticore)
+  - [Note about the use of mDNS](#note-about-the-use-of-mdns)
   - [Source files](#source-files)
+  - [The core singleton](#the-core-singleton)
+    - [Core events](#core-events)
+    - [Core methods](#core-methods)
   - [Data structures](#data-structures)
+    - [Message](#message)
+    - [Node](#node)
+    - [Sensor](#sensor)
     - [Record](#record)
   - [Inter-core messaging](#inter-core-messaging)
     - [Message structure](#message-structure)
     - [Message command and associated payload](#message-command-and-associated-payload)
-  - [External messaging](#external-messaging)
+  - [Embedded client HTTP server](#embedded-client-http-server)
+    - [External messaging](#external-messaging)
+    - [User friendly Web interface](#user-friendly-web-interface)
+  - [Play around with Manticore](#play-around-with-manticore)
+    - [Interactive mode](#interactive-mode)
   - [Reading the log](#reading-the-log)
-  - [HTTP Web user interface](#http-web-user-interface)
-    - [Jade](#jade)
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
     - [Prerequisites on Mac OS X](#prerequisites-on-mac-os-x)
@@ -86,12 +92,12 @@ on Windows, use `node.exe`
 
 * 	At startup, a node **advertise** its **presence** by broadcasting a `_node._tcp` service on **Zeroconf**. Doing so, other nodes can simply browse this service to dynamically discover its presence.
 * 	We assume that all the nodes are on the **same network segment** (i.e in the same subnet). Thus we can infer that they can directly address other nodes using the recipient IP address.
-* 	Each node provides different **communication channels** relying on a specific pattern : **uni-** or **bidirectional**, **synchronous** or **asynchronous**.
+* 	Each node provides different **communication channels** relying on specific patterns : **uni-**, **bi-** or **multidirectional**, **synchronous** or **asynchronous**.
 * 	The **group messaging** is achieved by a communication channel called *Information Channel (InCh)* implementing the publisher/subscriber network pattern. Hence, each node has 2 sockets : 
 	+ the publisher socket solely used to send information to all its subscribers.
 	+ the subscriber socket solely used to receive information from all other nodes.
 *	The **point-to-point messaging** is achieved by another communication channel called *Main Channel (MaCh)* implementing the request/reply network pattern. According to the situation, this request/reply can either be synchronous (an immediate reply is requested and thus will block the execution) or asynchronous (we expect a response but not urgently).
-*	To communicate with **external processes**, a HTTP server is embedded in each node and can provide a **web API**, accepting GET request and serving JSON file or plain text status.
+*	To communicate with **external processes**, a HTTP server is embedded in each node and can provide a **web API**, accepting GET requests and serving JSON file or plain text status.
 *	The **distribution of the resource** data is made using **OSC packets** on UDP datagrams. The main use case is a client that desire a resource provided on a specific node of the network. To achieve a proper delivery of the dynamic OSC data stream to this client, we use the information collected on both InCh and MaCh and execute the following procedure :
 	1. A client issue a request on a local core to know the network status and resources available
 	2. The server sends back a list of network nodes with its capabilities (this list is known by the core through 1. Browsing of `_node._tcp` service and 2. Listening on any published event on InCh)
@@ -105,7 +111,9 @@ on Windows, use `node.exe`
 **Note 2**: These channels are solely used to inter-core communication. That is to say that any external communication with a core must use the built-in HTTP server.
 
 
-#### Note about the use of ZeroMQ Sockets
+### Note about the use of ZeroMQ Sockets
+
+#### ZeroMQ sockets
 
 * PUB to publish data
 * SUB to subscribe to a PUB socket
@@ -114,41 +122,65 @@ on Windows, use `node.exe`
 * ROUTER to issue asynchronous replies
 * DEALER to issue asynchronous requests
 
-We can think of REQ and DEALER soscket sas "clients" and ROUTER sockets as "servers". That is why we bind the ROUTER sockets and connect REQ and DEALER sockets to them.
+We can think of REQ and DEALER sockets as "clients" and ROUTER sockets as "servers". That is why we bind the ROUTER sockets and connect REQ and DEALER sockets to them.
 
-> //TODO: write about 0MQ sockets and pattern
-> Node: see bind/connect mechanism in UNIX sockets
+**Note**: For more information about ZeroMQ and the way these sockets work, refer to the ZeroMQ page "[Learn the basics]".
 
-#### Note about the use of mDNS
+[Learn the basics]: http://zeromq.org/intro:read-the-manual
 
-We use the mdns module for Node.js.
+#### ZeroMQ usage in Manticore
 
-See the documentation : <http://agnat.github.io/node_mdns/user_guide.html>
+Here are some simple examples describing the use of the above defined communication
 
-#### Use cases
-
+* 	`REQ[1] --request--> ROUTER[2] --ack|noack--> REQ[1]`  
+	+ Here we have 2 nodes, denoted above as [1] and [2] and we will exploit the MaCh communication channel in a synchronous way
+	+ After receiving a request of resource from a local client, node [1]
 *   `PUB[1] --remote--> SUB[N] | ROUTER[N] --output--> DEALER[1] --ack--> ROUTER[N]`  
 	(mixing InCh + MaCh and used for remote command execution)
-* 	`REQ[1] --request--> ROUTER[2] --ack|noack--> REQ[1]`  
-	(using MaCh to request a resource)
 	
 > // TODO : detail the procedure
 
-### Interactive commands
+### Note about the use of mDNS
 
-The following commands are available
+We use the mdns module for Node.js. Each node of the network advertise its presence by providing a service called `_node._tcp`. When 
 
-* `debug` show core.nodes
-* `eval [js]` use eval() javascript function to imitate REPL mechanism
-* `log [js]` same as eval but will also show the result on stdout using console.log()
-* `send [msg]` send a the string `msg` to publish socket
-* `remote [cmd]` ask remote execution of `cmd` command
-* `emit [event]` is equivalent to core.emit('event'), used for debug purpose only
-* `exec [cmd]` execute a command in the shell (no need to quit the program or to open a new ssh session)  
-* `exit` gracefully close sockets and exit (equivalent to Ctrl+C)
-* `request`
+Then to monitor the come and go of
 
-### Events
+* Browse a `_node._tcp` service
+
+		var mdns = require('mdns');
+		var browser = mdns.createBrowser(mdns.tcp('node'));
+		browser.start();
+		
+* Event `serviceUp` when a new node is discovered
+
+		browser.on('serviceUp', function(service) {
+			...
+		});	
+		
+* Event `serviceDown` when a node disappear
+
+		browser.on('serviceDown', function(service) {
+			...
+		});	
+
+**Note**: For more information about this module, refer the documentation <http://agnat.github.io/node_mdns/user_guide.html>
+
+
+### Source files
+
+* Main file and entry point of the program : `app.js` that will handle the web interface and the `Core` events
+* Manticore : `manticore.js` implements the `Core` singleton and set all sockets and communication channels
+* Classes :
+	+ Sensor in `sensor.js`
+	+ Node in `node.js`
+	+ Record in `record.js`
+* Tools :
+	+ `interactive.js` contains code for interactive commands in the shell
+
+### The Core singleton
+
+#### Core events
 
 * `ready` is triggered when **initialization finishes**
 * `inch` is triggered when the **subscriber** socket **receives** some data (meaning *I've just received some data on the information channel* or *Another node just published some information*)
@@ -157,7 +189,7 @@ The following commands are available
 * `died` is triggered when we discover that a **node disapears** from the network
 * `test` (for testing purpose only)
 
-### Core commands
+#### Core methods
 
 These are the methods used by the Core singleton to interact with its state and its communication channels.
 
@@ -170,21 +202,33 @@ These are the methods used by the Core singleton to interact with its state and 
 
 > // TODO : add commented examples
 
-
-### Source files
-
-* `app.js` is the main entry point of the program
-* `manticore.js` is the module containing the core singleton
-* `node.js` is the Node class
-* `interactive.js` contains code for interactive commands in the shell
-* `trigger.js` contains code for generating and executing processes
-
 ### Data structures
+
+Manticore uses the following data structures :
 
 *	Message
 * 	Node
 * 	Sensor
 * 	Record
+
+#### Message
+
+#### Node
+
+#### Sensor
+
+The Sensor class is used to represent a sensor in Manticore. A sensor object have the following properties :
+
+*	`id` an UUID set a runtime to uniquely identify a sensor over the network
+*	`name` a name to describe the sensor
+*	`data`	the OSC format and a description
+
+And the following method :
+
+*	`request` 
+
+**Note**: To understand how this properties and methods are set, please refer to the Sensor documentation in the directory `sensors/` at the root of the directory.
+
 
 #### Record
 
@@ -237,10 +281,44 @@ It is simply a Javascript object with 2 main parts :
 * 	`release`
 * 	`ack`
 
-### External messaging
+
+### Embedded client HTTP server 
+
+Manticore have a embedded HTTP server built-in.
+
+> // routes with Express
+
+#### External messaging
 
 Inspired by REST API
 Using GET HTTP request
+
+Web user interface
+
+#### User friendly Web interface
+
+The web user interface is designed with a templating engine called [Jade].
+
+[Jade]: http://jade-lang.com/
+
+### Play around with Manticore
+
+#### Interactive mode
+
+When running Manticore in a shell, you can directly type some commands in your shell. This interactive mode, is really useful to debug the development.
+
+* `debug` show core.nodes
+* `eval [js]` use eval() javascript function to imitate REPL mechanism
+* `log [js]` same as eval but will also show the result on stdout using console.log()
+* `send [msg]` send a the string `msg` to the publish socket (every node will receive the message)
+* `remote [cmd]` ask remote execution of `cmd` command (not secure, be careful but useful to `git pull` all nodes)
+* `emit [event]` is equivalent to `core.emit('event')`, used for debug purpose only
+* `exec [cmd]` execute a command in the shell (no need to quit the program or to open a new ssh session)  
+* `exit` gracefully close sockets and exit (equivalent to Ctrl+C)
+* `request [id]` to request the resource `id`
+
+If you want to add or customize a command, you should edit the `interactive.js` file.
+
 
 ### Reading the log
 
@@ -284,21 +362,6 @@ The `<subject>` can be
 *	`SUB`	for anything related to the subscriber socket (used by InCh)
 *	`EXEC`	for anything related to the execution of a command
 *	`DTEC`	for anything related to the detection of a sensor
-
-### Embedded client HTTP server 
-
-Manticore have a embedded HTTP server built-in.
-
-Web user interface
-
-#### Jade
-
-The web user interface is designed by a tempting engine used by Express
-
-> // TODO Jade templating engine
-> // Add a screenshot
-
-[Jade]: http://jade-lang.com/
 
 ## Installation
 
