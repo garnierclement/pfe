@@ -17,23 +17,22 @@ In the following, the words *core* and *manticore* with/without a capital letter
     - [ZeroMQ usage in Manticore](#zeromq-usage-in-manticore)
   - [Note about the use of mDNS](#note-about-the-use-of-mdns)
   - [Source files](#source-files)
-  - [The core singleton](#the-core-singleton)
+  - [The Core singleton](#the-core-singleton)
     - [Core events](#core-events)
     - [Core methods](#core-methods)
   - [Data structures](#data-structures)
-    - [Message](#message)
     - [Node](#node)
     - [Sensor](#sensor)
     - [Record](#record)
   - [Inter-core messaging](#inter-core-messaging)
     - [Message structure](#message-structure)
     - [Message command and associated payload](#message-command-and-associated-payload)
-  - [Embedded client HTTP server](#embedded-client-http-server)
+  - [Embedded HTTP server](#embedded-http-server)
     - [External messaging](#external-messaging)
     - [User friendly Web interface](#user-friendly-web-interface)
   - [Play around with Manticore](#play-around-with-manticore)
     - [Interactive mode](#interactive-mode)
-  - [Reading the log](#reading-the-log)
+    - [Reading the log](#reading-the-log)
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
     - [Prerequisites on Mac OS X](#prerequisites-on-mac-os-x)
@@ -61,13 +60,21 @@ on Windows, use `node.exe`
 
 	> node.exe app.js
 
-> On the Raspberry Pi, you may be required to prepend `sudo` because some drivers need root rights
+> On the Raspberry Pi, you may be required to prepend `sudo` because some sensor's drivers may need root user rights
 
 ## Guide
 
 ### Introduction
 
-> // TODO : simply detail use case and present the associated objectives
+The framework is composed of 4 elements : the **core**, the **client**, the **data-provider** and the **endpoint**.
+
+* The core is the main element and it is basically a daemon running in the background that will make a node part of the network
+* The client is the interface by which and user can interact with a core (e.g. for requesting a resource on remote node)
+* The data-provider is the element responsible for sending the sensor's data, basically it can be Pure Data patch or a dedicated driver that formats the data in OSC packets and send it to the selected endpoint
+* The endpoint is basically a socket set up by the user (manually or automatically) that listens for the data from the data-provider
+
+The aim of this guide is to describe the core element that we call Manticore and its implementation.
+
 
 ### Objectives
 
@@ -142,11 +149,11 @@ Here are some simple examples describing the use of the above defined communicat
 
 ### Note about the use of mDNS
 
-We use the mdns module for Node.js. Each node of the network advertise its presence by providing a service called `_node._tcp`. When 
+We use the mdns module for Node.js. Each node of the network advertise its presence by providing a service called `_node._tcp`. When advertising, we also add the `id` of the node as a TXT record.
 
-Then to monitor the come and go of
+Then to monitor the come and go of nodes in the network, we can use the browser that will focus on other `_node._tcp` services and events will be emitted when node are discovered or disappear.
 
-* Browse a `_node._tcp` service
+* To browse a `_node._tcp` service in the local network
 
 		var mdns = require('mdns');
 		var browser = mdns.createBrowser(mdns.tcp('node'));
@@ -180,13 +187,17 @@ Then to monitor the come and go of
 
 ### The Core singleton
 
+#### Core attributes
+
+* 
+
 #### Core events
 
 * `ready` is triggered when **initialization finishes**
 * `inch` is triggered when the **subscriber** socket **receives** some data (meaning *I've just received some data on the information channel* or *Another node just published some information*)
 * `mach` is triggered when a **request** is **received** on MaCh (meaning *I've just received a request*)
 * `reply` is triggered when a **response** to **previous request** is received
-* `died` is triggered when we discover that a **node disapears** from the network
+* `died` is triggered when we discover that a **node disappears** from the network
 * `test` (for testing purpose only)
 
 #### Core methods
@@ -200,20 +211,26 @@ These are the methods used by the Core singleton to interact with its state and 
 * `reply()`
 * `close()`
 
-> // TODO : add commented examples
+> // TODO add missing important methods
 
 ### Data structures
 
 Manticore uses the following data structures :
 
-*	Message
 * 	Node
 * 	Sensor
 * 	Record
 
-#### Message
-
 #### Node
+
+The node class is used to represent a node in the network. Each Manticore instance keeps a list of the node in the network in the array `Core.nodes`. 
+
+* `id` an UUID to uniquely identify a node in the network
+* `host` the hostname of a node
+* `name` the name of a node
+* `ip`	the IP address of a node
+* `sensors` the sensors that the node has published (an array of Sensor objects, see below for details)
+* `network_iface` the network interface on which the node has been discovered
 
 #### Sensor
 
@@ -221,11 +238,11 @@ The Sensor class is used to represent a sensor in Manticore. A sensor object hav
 
 *	`id` an UUID set a runtime to uniquely identify a sensor over the network
 *	`name` a name to describe the sensor
-*	`data`	the OSC format and a description
+*	`data`	the OSC format and the description of the data provided by the sensor
 
 And the following method :
 
-*	`request` 
+*	`request` to handle the request of the sensor's data
 
 **Note**: To understand how this properties and methods are set, please refer to the Sensor documentation in the directory `sensors/` at the root of the directory.
 
@@ -272,9 +289,7 @@ It is simply a Javascript object with 2 main parts :
 * `header` contains the type of message and some information about the sender (uuid, hostname and IP address)
 * `payload` can be any Javascript primitive data types (i.e. `String`, `Boolean` or `Number`), composite data types (i.e. `Object` or `Array`) or special data types (i.e. `null` or `undefined`). In the case of composite types, its structure will be related to the type of message specified in the header.
 
-> // TODO : need to write about ZeroMQ Frame and envelope
-
-#### Message command and associated payload
+#### Message types and associated payload
 
 * 	`raw`
 * 	`request`
@@ -282,24 +297,28 @@ It is simply a Javascript object with 2 main parts :
 * 	`ack`
 
 
-### Embedded client HTTP server 
+### Embedded HTTP server 
 
 Manticore have a embedded HTTP server built-in.
 
-> // routes with Express
+> // serve routes with Express for 1. web API and 2. the user web interface
+> // introduce the LoCh (Local Channel) that is to say when the client and the core are on the same computer (node)
 
-#### External messaging
+#### External messaging with Manticore Web API
 
-Inspired by REST API
-Using GET HTTP request
+The Manticore Web API creates an entry point for local client to interact with the network.
 
-Web user interface
+> // Inspired by REST API
+> // Using GET HTTP request
+> // describe the API verb and parameters
 
 #### User friendly Web interface
 
 The web user interface is designed with a templating engine called [Jade].
 
 [Jade]: http://jade-lang.com/
+
+> // allow the use of a web browser as universal client
 
 ### Play around with Manticore
 
@@ -320,7 +339,7 @@ When running Manticore in a shell, you can directly type some commands in your s
 If you want to add or customize a command, you should edit the `interactive.js` file.
 
 
-### Reading the log
+#### Reading the log
 
 The logging have the following structure
 
@@ -362,6 +381,13 @@ The `<subject>` can be
 *	`SUB`	for anything related to the subscriber socket (used by InCh)
 *	`EXEC`	for anything related to the execution of a command
 *	`DTEC`	for anything related to the detection of a sensor
+
+#### Built-in endpoint
+
+Manticore has a built in endpoint. Indeed at startup, the core binds an UDP socket on port 42424. This is a simple endpoint that will only display the raw content of the received stream to stdout. Therefore it is used for debug purpose to test the web user interface and API or the request procedure without the need to manually set up an endpoint.
+
+**Note**: If you only have
+
 
 ## Installation
 
@@ -421,15 +447,15 @@ Compile and install [Node.js] v0.10.28 from source tarball (**on the Raspberry P
 	$ rm zeromq-node-v0.10.28.tar.gz
 	$ rm -rf node-v0.10.28
 
-Alternatively, if you have already compiled it once (i.e. `make`) on a [Raspberry Pi], you can directly do the following
+Alternatively, if you have already compiled it once (i.e. `make`) on a [Raspberry Pi], *tar* the compiled files, upload it to a another Pi, *untar* and you can directly do the following
 
 	$ cd node-v0.10.28
 	$ ln -fs out/Release/node node
 	$ sudo /usr/bin/python tools/install.py install
-	$ node -v 				# must display v.0.10.28
+	$ node -v 				# must display v0.10.28
 	$ npm -v 				# must display v1.4.9	
 
-Compile and install [ZeroMQ] v4.0.4 from source tarball (it also requires libtool, autoconf and automake, but they are provided by Rapsbian)
+Compile and install [ZeroMQ] v4.0.4 from source tarball (it also requires libtool, autoconf and automake, but they are provided by Raspbian)
 
 	$ sudo apt-get install uuid-dev
 	$ wget http://download.zeromq.org/zeromq-4.0.4.tar.gz
