@@ -178,6 +178,12 @@
 
 * ***description*** : As the project is still in an early development stage, we focused more on the features but one should now starts to enquire the security breach that can be found into Manticore. Indeed, some functionalities we used to help the development must be removed or at least constrained in a production environment. For instance in the interactive command in Manticore we can remotely execute some commands. This was extremely useful to publish the command `git pull` to all nodes without the need to authenticate. Nevertheless used in a wrong way (bad commands) this can cause a severe damage to your computer.
 
+## Updates
+
+### Dependency updates
+
+* ***description*** : As Node.js is still young one should care about the evolution of the framework. Now we are using the stable branch v0.10.X but when later migrating to new versions
+
 # TODO List
 
 The previous old TODO list below :
