@@ -32,20 +32,25 @@ pkgbuild --root launchd/ \
 	out/manticore-launchd.pkg
 
 # Create dependency packages (no payload, just scripts)
-pkgbuild --nopayload \
-	--identifier com.github.garnierclement.pfe.dependency.brew \
-	--scripts scripts/brew \
-	out/brew.pkg
+# REPLACED by packages created with brew-pkg, so no need to install brew
 
-pkgbuild --nopayload \
-	--identifier com.github.garnierclement.pfe.dependency.nodejs \
-	--scripts scripts/nodejs \
-	out/nodejs-brew.pkg
+# pkgbuild --nopayload \
+# 	--identifier com.github.garnierclement.pfe.dependency.brew \
+# 	--scripts scripts/brew \
+# 	out/brew.pkg
+# NO NEED for brew anymore, the package will everything we need
 
-pkgbuild --nopayload \
-	--identifier com.github.garnierclement.pfe.dependency.zeromq \
-	--scripts scripts/zeromq \
-	out/zeromq-brew.pkg
+# pkgbuild --nopayload \
+# 	--identifier com.github.garnierclement.pfe.dependency.nodejs \
+# 	--scripts scripts/nodejs \
+# 	out/nodejs-brew.pkg
+brew pkg nodejs
+
+# pkgbuild --nopayload \
+# 	--identifier com.github.garnierclement.pfe.dependency.zeromq \
+# 	--scripts scripts/zeromq \
+# 	out/zeromq-brew.pkg
+brew pkg --with-deps zeromq
 
 # Main package
 productbuild --distribution distribution.xml \
