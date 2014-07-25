@@ -341,21 +341,21 @@ The API is based on the GET HTTP method, and is composed of 4 main types of requ
 
 * The **network information request** : upon this request, the requestor will be provided with a JSON string describing the current state of the network, that is to say information about the nodes in the network. The request is called in the following manner
 
-		`http:/localhost:3000/nodes/`
+		http:/localhost:3000/nodes/
 		
 * The **request resource request** : this request is called when one whishes to request a resource. The request is called in the following manner
 
-		`http:/localhost:3000/request/[id]?port=[portnumber]
+		http:/localhost:3000/request/[id]?port=[portnumber]
  The id and port number corresponds to the resource's UUID and port number.
  
 * The **release resource request** : this request is called when one whishes to release an already requested resource. The request is called in the following manner
 
-		`http:/localhost:3000/release/[id]
+		http:/localhost:3000/release/[id]
  The id corresponds to the resource's UUID.
  
 * The **kill resource request** : this request is called when one whishes to kill the process which is providing the data from the request resource. The request is called in the following manner
 
-		`http:localhost:3000/kill/[pid]
+		http:localhost:3000/kill/[pid]
 	The pid is the Process indentifier of the data providing process.
 
 
