@@ -30,6 +30,7 @@ The main script is `create-pkg.sh` and the tree structure of this folder is the 
 * [launchd.plist man page] (Apple Developer)
 * [launchd.info]
 * [brew-pkg]
+* [Packages]
 
 
 [Making OS X Installer Packages like a Pro]: http://stackoverflow.com/questions/11487596/making-os-x-installer-packages-like-a-pro-xcode4-developer-id-mountain-lion-re
@@ -41,6 +42,7 @@ The main script is `create-pkg.sh` and the tree structure of this folder is the 
 [launchd.plist man page]: https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man5/launchd.plist.5.html
 [launchd.info]: http://launchd.info/
 [brew-pkg]: https://github.com/timsutton/brew-pkg
+[Packages]: http://s.sudre.free.fr/Software/Packages/about.html
 
 ## Pre and post install scripts
 
