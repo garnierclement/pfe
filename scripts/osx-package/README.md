@@ -29,6 +29,7 @@ The main script is `create-pkg.sh` and the tree structure of this folder is the 
 * [Creating payload-free packages with pkgbuild]
 * [launchd.plist man page] (Apple Developer)
 * [launchd.info]
+* [brew-pkg]
 
 
 [Making OS X Installer Packages like a Pro]: http://stackoverflow.com/questions/11487596/making-os-x-installer-packages-like-a-pro-xcode4-developer-id-mountain-lion-re
@@ -39,6 +40,7 @@ The main script is `create-pkg.sh` and the tree structure of this folder is the 
 [Creating payload-free packages with pkgbuild]: http://derflounder.wordpress.com/2012/08/15/creating-payload-free-packages-with-pkgbuild/
 [launchd.plist man page]: https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man5/launchd.plist.5.html
 [launchd.info]: http://launchd.info/
+[brew-pkg]: https://github.com/timsutton/brew-pkg
 
 ## Pre and post install scripts
 
@@ -46,3 +48,16 @@ The main script is `create-pkg.sh` and the tree structure of this folder is the 
 * You can use `set -e` to exit immediately if a command exits with a non-zero status (if applicable)
 * Remember to `chmod +x` the scripts otherwise the installation will fail during the execution of the scripts (and not only `chmod u+x`)
 * Use `--nopayload` to create payload-free packages with `pkgbuild` (only scripts)
+
+## Package for dependency from Homebrew
+
+We use [brew-pkg] to build OS X installer packages directly from Homebrew formulae.
+
+To install [brew-pkg]
+
+	$ brew tap timsutton/formulae
+	$ brew install brew-pkg
+
+Then to create the required packages
+
+	$ brew pkg --with-deps zeromq
