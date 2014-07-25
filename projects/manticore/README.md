@@ -17,22 +17,24 @@ In the following, the words *core* and *manticore* with/without a capital letter
     - [ZeroMQ usage in Manticore](#zeromq-usage-in-manticore)
   - [Note about the use of mDNS](#note-about-the-use-of-mdns)
   - [Source files](#source-files)
-  - [The Core singleton](#the-core-singleton)
-    - [Core events](#core-events)
-    - [Core methods](#core-methods)
   - [Data structures](#data-structures)
     - [Node](#node)
     - [Sensor](#sensor)
     - [Record](#record)
+  - [The Core singleton](#the-core-singleton)
+    - [Core attributes](#core-attributes)
+    - [Core events](#core-events)
+    - [Core methods](#core-methods)
   - [Inter-core messaging](#inter-core-messaging)
     - [Message structure](#message-structure)
-    - [Message command and associated payload](#message-command-and-associated-payload)
+    - [Message types and associated payload](#message-types-and-associated-payload)
   - [Embedded HTTP server](#embedded-http-server)
-    - [External messaging](#external-messaging)
+    - [External messaging with Manticore Web API](#external-messaging-with-manticore-web-api)
     - [User friendly Web interface](#user-friendly-web-interface)
   - [Play around with Manticore](#play-around-with-manticore)
     - [Interactive mode](#interactive-mode)
     - [Reading the log](#reading-the-log)
+    - [Built-in endpoint](#built-in-endpoint)
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
     - [Prerequisites on Mac OS X](#prerequisites-on-mac-os-x)
@@ -137,15 +139,25 @@ We can think of REQ and DEALER sockets as "clients" and ROUTER sockets as "serve
 
 #### ZeroMQ usage in Manticore
 
-Here are some simple examples describing the use of the above defined communication
+Here are some simple examples mixing the use of the above defined communication channels and ZeroMQ sockets.
 
-* 	`REQ[1] --request--> ROUTER[2] --ack|noack--> REQ[1]`  
-	+ Here we have 2 nodes, denoted above as [1] and [2] and we will exploit the MaCh communication channel in a synchronous way
-	+ After receiving a request of resource from a local client, node [1]
-*   `PUB[1] --remote--> SUB[N] | ROUTER[N] --output--> DEALER[1] --ack--> ROUTER[N]`  
-	(mixing InCh + MaCh and used for remote command execution)
+**SCENARIO 1**  
+
+Here we have 2 nodes, denoted above as [1] and [2]. A client (on node [1]) wants to request a resource available on node [2]. The request resource procedure will exploit the main communication channel (MaCh) in a synchronous way.
+
+	`REQ[1] --request--> ROUTER[2] --ack|noack--> REQ[1]`  
 	
-> // TODO : detail the procedure
+* After receiving a request of resource from a local client on the web API, node [1] will issue a `request` message to node [2] using a REQ socket on MaCh, here this procedure is blocking because we wait for node [2] to answer before responding to the local client and letting it know if the request of the resource  was successful.
+* Node [2] receives this `request` message on its ROUTER socket, do the necessary processing to provide the requested resource and acknowledge positively (or negatively if an error occured) by sending a `ack` message to node [1]. Note that the ROUTER socket can handle multiple requests from different nodes at the same time, and responding to one request does not say that other requests are ignored.
+* Node [1] was waiting for the `ack` message and look into it to see whether it was successful or not.
+* In turn, node [1] can now respond to the client and thus notify it of the status of the request resource procedure.
+
+**SCENARIO 2**
+
+	`PUB[1] --remote--> SUB[N] | ROUTER[N] --output--> DEALER[1] --ack--> ROUTER[N]`  
+	
+
+> // TODO : detail the second scenario mixing InCh and MaCh and used for remote command execution
 
 ### Note about the use of mDNS
 
@@ -184,34 +196,6 @@ Then to monitor the come and go of nodes in the network, we can use the browser 
 	+ Record in `record.js`
 * Tools :
 	+ `interactive.js` contains code for interactive commands in the shell
-
-### The Core singleton
-
-#### Core attributes
-
-* 
-
-#### Core events
-
-* `ready` is triggered when **initialization finishes**
-* `inch` is triggered when the **subscriber** socket **receives** some data (meaning *I've just received some data on the information channel* or *Another node just published some information*)
-* `mach` is triggered when a **request** is **received** on MaCh (meaning *I've just received a request*)
-* `reply` is triggered when a **response** to **previous request** is received
-* `died` is triggered when we discover that a **node disappears** from the network
-* `test` (for testing purpose only)
-
-#### Core methods
-
-These are the methods used by the Core singleton to interact with its state and its communication channels.
-
-* `init()` will start mDNS advertising and browsing of `_node.tcp` service, bind sockets
-* `publish()` will trigger a `inch` event on all subscribers
-* `send()` will trigger a `mach` event on the recipient
-* `syncSend()` will also trigger a `mach`
-* `reply()`
-* `close()`
-
-> // TODO add missing important methods
 
 ### Data structures
 
@@ -267,6 +251,66 @@ We distinguish 2 types of records :
 	+	the IP of the destination node that can provide the data (this is used as a commodity for the release resource procedure, so we do not need to look up the core.nodes[] and associated sensors[] to find the IP address)
 
 These records works in pairs and at any time if a `client_request` is a valid record in one node (i.e. the client), you could fine an equivalent `active_resource` on another node of the network (i.e. the server). This `active_resource` is matching to the previously initiated `client_request`.
+
+### The Core singleton
+
+The `Core` object is implemented as a singleton (only a single instance of a class). This is achieved by the fact that the module does not export the constructor of the object but a new instance of it.
+
+	module.exports = new Core();
+	
+Thus the first call to `require('manticore.js')` will create the object and all other require will look at the cache and return an pointer to the previously created object.
+
+For more information about `require()` and modules in Node.js, refer to this article [How `require()` Actually Works]
+
+[How `require()` Actually Works]: http://fredkschott.com/post/2014/06/require-and-the-module-system/
+
+#### Core attributes
+
+The `Core` object has the following attributes :
+
+* `name` the hostname of the node
+* `uuid` an unique identifier to identify the node (generated at runtime)
+* `arch` the architecture of the node (ARM, x64, x86)
+* `platform` the platform of the node (Linux, Darwin, Windows)
+* `ip` the IP address of the node (corresponding to the network interface on which the service advertisement is done)
+* `nodes` an array of Node objects corresponding to the other nodes discovered on the network
+* `sensors` an array of Sensor objects corresponding to the sensors of the node
+* `records` an array of Record objects (i.e. history of client requests and currently running data-providers
+* `publisher` a PUB socket (ZeroMQ) to publish information to its subscribers
+* `subscriber` a SUB socket (ZeroMQ) to receive information from the publisher it subscribed
+* `requester` a DEALER socket (ZeroMQ) to issue asynchronous requests
+* `mach` a ROUTER socket (ZeroMQ) to handle asynchronous requests
+* `udp` a simple UDP socket
+* `advertiser` a mdns object to advertise its presence as a `_node._tcp` service
+* `browser` a mdns object to browse `_node._tcp` services
+* `lastpublish` a timestamp of the last publication of the node's capabilities (i.e. sensors)
+
+**Note**: `Core.nodes` will contain all nodes of the network (including itself). Indeed, this means that the advertisement was successful and the node discovered itself.
+
+**Note 2 **: The previous note implies that `Core.sensors` will
+
+
+#### Core events
+
+* `ready` is triggered when **initialization finishes**
+* `inch` is triggered when the **subscriber** socket **receives** some data (meaning *I've just received some data on the information channel* or *Another node just published some information*)
+* `mach` is triggered when a **request** is **received** on MaCh (meaning *I've just received a request*)
+* `reply` is triggered when a **response** to **previous request** is received
+* `died` is triggered when we discover that a **node disappears** from the network
+* `test` (for testing purpose only)
+
+#### Core methods
+
+These are the methods used by the Core singleton to interact with its state and its communication channels.
+
+* `init()` will start mDNS advertising and browsing of `_node.tcp` service, bind sockets
+* `publish()` will trigger a `inch` event on all subscribers
+* `send()` will trigger a `mach` event on the recipient
+* `syncSend()` will also trigger a `mach`
+* `reply()`
+* `close()`
+
+> // TODO add missing important methods
 
 ### Inter-core messaging
 
@@ -343,35 +387,36 @@ The API is based on the GET HTTP method, and is composed of 4 main types of requ
 
 		http:/localhost:3000/nodes/
 		
-* The **request resource request** : this request is called when one whishes to request a resource. The request is called in the following manner
+* The **request resource request** : this request is called when one wishes to request a resource. The request is called in the following manner
 
 		http:/localhost:3000/request/[id]?port=[portnumber]
- The id and port number corresponds to the resource's UUID and port number.
+ The `[id]` and `[portnumber]` corresponds to the resource's UUID and port number.
  
-* The **release resource request** : this request is called when one whishes to release an already requested resource. The request is called in the following manner
+* The **release resource request** : this request is called when one wishes to release an already requested resource. The request is called in the following manner
 
 		http:/localhost:3000/release/[id]
- The id corresponds to the resource's UUID.
+ The `[id]` corresponds to the resource's UUID.
  
-* The **kill resource request** : this request is called when one whishes to kill the process which is providing the data from the request resource. The request is called in the following manner
+* The **kill data-provider request** : this request is called when one wishes to kill the process which is providing the data from the request resource. The request is called in the following manner
 
 		http:localhost:3000/kill/[pid]
-	The pid is the Process indentifier of the data providing process.
+	The `[pid]` is the Process identifier of the data providing process.
 
 
 #### User friendly Web interface
 
 The web user interface is designed with a templating engine called [Jade].
 
-[Jade]: http://jade-lang.com/
+The most obvious purpose of this utility is to give the user an easy way to see the current network capability, that is to say the nodes that are currently present on the network, and their associated resources. This is done all thanks to [Jade] and [Bootstrap] Twitter which we have used to render a simple but efficient web user interface.
 
-The most obvious purpose of this utility is to give the user an easy way to see the current network capability, that is to say the nodes that are currently present on the network, and their associated resources. This is done all thanks to Jade and Bootstrap Twitter which we have used to render a simple but efficient web user interface.
+Another very important functionality is to allow users to use the web user interface as a "universal client", that is to say as a resource requestor, that bridges the gap between manticore and any application, as long as it is enabled with the capability of receiving UDP streams on a specific port.
 
-Another very important functionnality is to allow users to use the web user interface as a "universal client", that is to say as a resource requestor, that bridges the gap between manticore and any application, as long as it is enabled with the capability of receiving UDP streams on a specific port.
-
-In this manner, all the user needs to do is to create a udp receiving socket binded to a specific port X on whatever application he wants to use, and juste use the web user interface of manticore to request the wanted resource to the same specific port X.
+In this manner, all the user needs to do is to create a UDP receiving socket bound to a specific port X on whatever application he wants to use, and just use his web browser to request the wanted resource to the same specific port X.
 
 He will then also be able to release the data, and in extreme cases kill the data providing process which is sending the requested data from the remote or local node.
+
+[Jade]: http://jade-lang.com/
+[Bootstrap]: http://getbootstrap.com/
 
 
 ### Play around with Manticore
