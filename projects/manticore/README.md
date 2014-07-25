@@ -299,18 +299,65 @@ It is simply a Javascript object with 2 main parts :
 
 ### Embedded HTTP server 
 
-Manticore have a embedded HTTP server built-in.
+Manticore has a embedded HTTP server built-in. This server has two main purposes: 
 
-> // serve routes with Express for 1. web API and 2. the user web interface
-> // introduce the LoCh (Local Channel) that is to say when the client and the core are on the same computer (node)
+* The first being the platform for the Local Channel (Loch) that is to say, the communication channel between manticore and any local user client, such as but not limited to Max/MSP,
+* The second being that this embedded HTTP server can also be used as a web user interface, that we also like to call the "universal client", because it will be accessible to the user very easily, and will most of all allow him to perform the same operations which are possible on a local user client like the one we have developped for Max/MSP.
+
+The server thus routes, with the help of our favorite framework, namely Express, two kinds of requests:
+
+* Requests for the web API, that enables the communication channel between manticore and any local user client,
+* Requests for accessing the web user interface
+
+In app.js, Express is called in the following manner :
+
+	var express = require('express');
+	var api = express();
+	
+We then set up routes for the web user interface in the following manner :
+
+	api.get('/', function(req, res) {...});
+	
+And the route for the web API in the following manner :
+
+	api.get('/nodes', function(req, res) {...});
+	
+	api.get('/request/:id', function(req, res) {...});
+
+	api.get('/release/:id', function(req, res) {...});
+
+	api.get('/kill/:pid', function(req, res) {...});
+
+The parameters of each of these API functions are explained in the following section.
+
+
 
 #### External messaging with Manticore Web API
 
-The Manticore Web API creates an entry point for local client to interact with the network.
+The Manticore Web API creates an entry point for a local client to interact with the network.
 
-> // Inspired by REST API
-> // Using GET HTTP request
-> // describe the API verb and parameters
+The Manticore web API is inspired by REST API, in the sense the architecture used is a stateless client-server architecture, using unique identifiers to describe resources.
+The API is based on the GET HTTP method, and is composed of 4 main types of requests :
+
+* The **network information request** : upon this request, the requestor will be provided with a JSON string describing the current state of the network, that is to say information about the nodes in the network. The request is called in the following manner
+
+		`http:/localhost:3000/nodes/`
+		
+* The **request resource request** : this request is called when one whishes to request a resource. The request is called in the following manner
+
+		`http:/localhost:3000/request/[id]?port=[portnumber]
+ The id and port number corresponds to the resource's UUID and port number.
+ 
+* The **release resource request** : this request is called when one whishes to release an already requested resource. The request is called in the following manner
+
+		`http:/localhost:3000/release/[id]
+ The id corresponds to the resource's UUID.
+ 
+* The **kill resource request** : this request is called when one whishes to kill the process which is providing the data from the request resource. The request is called in the following manner
+
+		`http:localhost:3000/kill/[pid]
+	The pid is the Process indentifier of the data providing process.
+
 
 #### User friendly Web interface
 
@@ -318,7 +365,14 @@ The web user interface is designed with a templating engine called [Jade].
 
 [Jade]: http://jade-lang.com/
 
-> // allow the use of a web browser as universal client
+The most obvious purpose of this utility is to give the user an easy way to see the current network capability, that is to say the nodes that are currently present on the network, and their associated resources. This is done all thanks to Jade and Bootstrap Twitter which we have used to render a simple but efficient web user interface.
+
+Another very important functionnality is to allow users to use the web user interface as a "universal client", that is to say as a resource requestor, that bridges the gap between manticore and any application, as long as it is enabled with the capability of receiving UDP streams on a specific port.
+
+In this manner, all the user needs to do is to create a udp receiving socket binded to a specific port X on whatever application he wants to use, and juste use the web user interface of manticore to request the wanted resource to the same specific port X.
+
+He will then also be able to release the data, and in extreme cases kill the data providing process which is sending the requested data from the remote or local node.
+
 
 ### Play around with Manticore
 
