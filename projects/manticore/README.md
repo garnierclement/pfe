@@ -27,7 +27,7 @@ In the following, the words *core* and *manticore* with/without a capital letter
     - [Core methods](#core-methods)
   - [Inter-core messaging](#inter-core-messaging)
     - [Message structure](#message-structure)
-    - [Message types and associated payload](#message-types-and-associated-payload)
+    - [Message types and associated payloads](#message-types-and-associated-payloads)
   - [Embedded HTTP server](#embedded-http-server)
     - [External messaging with Manticore Web API](#external-messaging-with-manticore-web-api)
     - [User friendly Web interface](#user-friendly-web-interface)
@@ -145,16 +145,16 @@ Here are some simple examples mixing the use of the above defined communication 
 
 Here we have 2 nodes, denoted above as [1] and [2]. A client (on node [1]) wants to request a resource available on node [2]. The request resource procedure will exploit the main communication channel (MaCh) in a synchronous way.
 
-	`REQ[1] --request--> ROUTER[2] --ack|noack--> REQ[1]`  
+	REQ[1] --request--> ROUTER[2] --ack|noack--> REQ[1]  
 	
 * After receiving a request of resource from a local client on the web API, node [1] will issue a `request` message to node [2] using a REQ socket on MaCh, here this procedure is blocking because we wait for node [2] to answer before responding to the local client and letting it know if the request of the resource  was successful.
-* Node [2] receives this `request` message on its ROUTER socket, do the necessary processing to provide the requested resource and acknowledge positively (or negatively if an error occured) by sending a `ack` message to node [1]. Note that the ROUTER socket can handle multiple requests from different nodes at the same time, and responding to one request does not say that other requests are ignored.
+* Node [2] receives this `request` message on its ROUTER socket, do the necessary processing to provide the requested resource and acknowledge positively (or negatively if an error occurred) by sending a `ack` message to node [1]. Note that the ROUTER socket can handle multiple requests from different nodes at the same time, and responding to one request does not say that other requests are ignored.
 * Node [1] was waiting for the `ack` message and look into it to see whether it was successful or not.
 * In turn, node [1] can now respond to the client and thus notify it of the status of the request resource procedure.
 
 **SCENARIO 2**
 
-	`PUB[1] --remote--> SUB[N] | ROUTER[N] --output--> DEALER[1] --ack--> ROUTER[N]`  
+	PUB[1] --remote--> SUB[N] | ROUTER[N] --output--> DEALER[1] --ack--> ROUTER[N]  
 	
 
 > // TODO : detail the second scenario mixing InCh and MaCh and used for remote command execution
@@ -287,8 +287,7 @@ The `Core` object has the following attributes :
 
 **Note**: `Core.nodes` will contain all nodes of the network (including itself). Indeed, this means that the advertisement was successful and the node discovered itself.
 
-**Note 2 **: The previous note implies that `Core.sensors` will
-
+**Note 2**: Following the previous note, we set that the `Core.sensors` array also points to the attribute `sensors` of the Node object that represent itself in the `Core.nodes` array. Thus if we browse the content of all `sensors` attributes of each Node object in `Core.nodes`, then we have a collection of all sensors in the network (including the one connected on the current node).
 
 #### Core events
 
@@ -333,20 +332,21 @@ It is simply a Javascript object with 2 main parts :
 * `header` contains the type of message and some information about the sender (uuid, hostname and IP address)
 * `payload` can be any Javascript primitive data types (i.e. `String`, `Boolean` or `Number`), composite data types (i.e. `Object` or `Array`) or special data types (i.e. `null` or `undefined`). In the case of composite types, its structure will be related to the type of message specified in the header.
 
-#### Message types and associated payload
+#### Message types and associated payloads
 
 * 	`raw`
 * 	`request`
 * 	`release`
 * 	`ack`
 
+> // TODO add the payloads
 
 ### Embedded HTTP server 
 
 Manticore has a embedded HTTP server built-in. This server has two main purposes: 
 
 * The first being the platform for the Local Channel (Loch) that is to say, the communication channel between manticore and any local user client, such as but not limited to Max/MSP,
-* The second being that this embedded HTTP server can also be used as a web user interface, that we also like to call the "universal client", because it will be accessible to the user very easily, and will most of all allow him to perform the same operations which are possible on a local user client like the one we have developped for Max/MSP.
+* The second being that this embedded HTTP server can also be used as a web user interface, that we also like to call the "universal client", because it will be accessible to the user very easily, and will most of all allow him to perform the same operations which are possible on a local user client like the one we have developed for Max/MSP.
 
 The server thus routes, with the help of our favorite framework, namely Express, two kinds of requests:
 
@@ -571,19 +571,19 @@ Compile and install [ZeroMQ] v4.0.4 from source tarball (it also requires libtoo
 
 This is experimental and only tested on Windows 7 x64.
 
-1. You need to dowload and install
+1. You need to download and install
 	* 	[Node.js] v0.10.x  
 	* 	[Bonjour SDK for Windows]  
 		To download the SDK, you need to have an Apple Developer ID (it's free)  
-		Bonjour SDK is required for the dns_sd.h header file used by the mdns module for Node.js  
+		Bonjour SDK is required for the `dns_sd.h` header file used by the mdns module for Node.js  
 		At the time of writing version 2.0.4 is the latest available  
 	* 	[Python 2.7]  
 		Python is required when installing the zmq module for Node.js  
 		During the installation, check the box *add python.exe to PATH*  
 	* 	[ZeroMQ 4.0.4]  
-		During the installation, choose the full installation (with source code and compiled librairies)  
-		[Direct link for Windows x64](http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x64.exe)  
-		[Direct link for Windows x86](http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x86.exe)  
+		During the installation, choose the **full** installation (with source code and compiled librairies)
+		+ [Direct link for Windows x64](http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x64.exe)  
+		+ [Direct link for Windows x86](http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x86.exe)  
 	* 	[Git] or [GitHub for Windows]  (optional)
 2. Reboot your system 
 
@@ -595,7 +595,7 @@ This is experimental and only tested on Windows 7 x64.
 
 ### Node.js module dependencies
 
-Install Node.js module dependencies ([mdns] and [zmq]) with  
+Install Node.js module dependencies ([mdns] and [zmq]) with npm
 (see `package.json` for more information about versions)
 
 	$ npm install
