@@ -19,5 +19,7 @@
   <string>../../var/log/stdout.log</string>
   <key>StandardErrorPath</key>
   <string>../../var/log/stderr.log</string>
+  <key>StandardInPath</key>
+  <string>../../var/run/manticore.stdin</string>
 </dict>
 </plist>
