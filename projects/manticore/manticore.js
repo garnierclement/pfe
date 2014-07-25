@@ -28,11 +28,11 @@ var Record = require('./record.js');	// Record object
  *
  * @name		hostname of the current computer
  * @uuid		unique identifier of the current core process
- * @nodes		array of Node objects 
+ * @nodes		array of Node objects
  * @publisher	publisher socket (ZeroMQ) for information channel (InCh)
- * @udp			udp socket 
+ * @udp			udp socket
  * @advertiser	mDNS advertiser of service _node._tcp
- * @browser		DNS-SD browser of _node._tcp services		
+ * @browser		DNS-SD browser of _node._tcp services
  * @mach		tcp socket for direct communication between node's core (MaCh)
  */
 function Core()
@@ -70,7 +70,7 @@ var self = module.exports = new Core();
  * Emit 'ready' event when initialized
  */
 Core.prototype.init = function() {
-	console.log('+[CORE]\tCore starting on '+this.name);
+	console.log('+[CORE]\tCore starting on '+this.name+' at '+Date());
 	console.log('+[CORE]\tCore id '+this.uuid);
 	// bind local socket
 	this.udp.bind(UDP_PORT, function() {
