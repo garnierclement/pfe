@@ -526,31 +526,33 @@ $ mkdir my_new_sensor</code></pre>
 </ul></li>
 <li><a href="#note-about-the-use-of-mdns">Note about the use of mDNS</a></li>
 <li><a href="#source-files">Source files</a></li>
-<li><a href="#the-core-singleton">The Core singleton</a>
-<ul>
-<li><a href="#core-events">Core events</a></li>
-<li><a href="#core-methods">Core methods</a></li>
-</ul></li>
 <li><a href="#data-structures">Data structures</a>
 <ul>
 <li><a href="#node">Node</a></li>
 <li><a href="#sensor">Sensor</a></li>
 <li><a href="#record">Record</a></li>
 </ul></li>
+<li><a href="#the-core-singleton">The Core singleton</a>
+<ul>
+<li><a href="#core-attributes">Core attributes</a></li>
+<li><a href="#core-events">Core events</a></li>
+<li><a href="#core-methods">Core methods</a></li>
+</ul></li>
 <li><a href="#inter-core-messaging">Inter-core messaging</a>
 <ul>
 <li><a href="#message-structure">Message structure</a></li>
-<li><a href="#message-command-and-associated-payload">Message command and associated payload</a></li>
+<li><a href="#message-types-and-associated-payloads">Message types and associated payloads</a></li>
 </ul></li>
 <li><a href="#embedded-http-server">Embedded HTTP server</a>
 <ul>
-<li><a href="#external-messaging">External messaging</a></li>
+<li><a href="#external-messaging-with-manticore-web-api">External messaging with Manticore Web API</a></li>
 <li><a href="#user-friendly-web-interface">User friendly Web interface</a></li>
 </ul></li>
 <li><a href="#play-around-with-manticore">Play around with Manticore</a>
 <ul>
 <li><a href="#interactive-mode">Interactive mode</a></li>
 <li><a href="#reading-the-log">Reading the log</a></li>
+<li><a href="#built-in-endpoint">Built-in endpoint</a></li>
 </ul></li>
 </ul></li>
 <li><a href="#installation">Installation</a>
@@ -640,17 +642,20 @@ $ mkdir my_new_sensor</code></pre>
 <p>We can think of REQ and DEALER sockets as &quot;clients&quot; and ROUTER sockets as &quot;servers&quot;. That is why we bind the ROUTER sockets and connect REQ and DEALER sockets to them.</p>
 <p><strong>Note</strong>: For more information about ZeroMQ and the way these sockets work, refer to the ZeroMQ page &quot;<a href="http://zeromq.org/intro:read-the-manual">Learn the basics</a>&quot;.</p>
 <h4 id="zeromq-usage-in-manticore"><span class="header-section-number">2.2.3.2</span> ZeroMQ usage in Manticore</h4>
-<p>Here are some simple examples describing the use of the above defined communication</p>
+<p>Here are some simple examples mixing the use of the above defined communication channels and ZeroMQ sockets.</p>
+<p><strong>SCENARIO 1</strong></p>
+<p>Here we have 2 nodes, denoted above as [1] and [2]. A client (on node [1]) wants to request a resource available on node [2]. The request resource procedure will exploit the main communication channel (MaCh) in a synchronous way.</p>
+<pre><code>REQ[1] --request--&gt; ROUTER[2] --ack|noack--&gt; REQ[1]  </code></pre>
 <ul>
-<li><code>REQ[1] --request--&gt; ROUTER[2] --ack|noack--&gt; REQ[1]</code>
-<ul>
-<li>Here we have 2 nodes, denoted above as [1] and [2] and we will exploit the MaCh communication channel in a synchronous way</li>
-<li>After receiving a request of resource from a local client, node [1]</li>
-</ul></li>
-<li><code>PUB[1] --remote--&gt; SUB[N] | ROUTER[N] --output--&gt; DEALER[1] --ack--&gt; ROUTER[N]</code><br /> (mixing InCh + MaCh and used for remote command execution)</li>
+<li>After receiving a request of resource from a local client on the web API, node [1] will issue a <code>request</code> message to node [2] using a REQ socket on MaCh, here this procedure is blocking because we wait for node [2] to answer before responding to the local client and letting it know if the request of the resource was successful.</li>
+<li>Node [2] receives this <code>request</code> message on its ROUTER socket, do the necessary processing to provide the requested resource and acknowledge positively (or negatively if an error occurred) by sending a <code>ack</code> message to node [1]. Note that the ROUTER socket can handle multiple requests from different nodes at the same time, and responding to one request does not say that other requests are ignored.</li>
+<li>Node [1] was waiting for the <code>ack</code> message and look into it to see whether it was successful or not.</li>
+<li>In turn, node [1] can now respond to the client and thus notify it of the status of the request resource procedure.</li>
 </ul>
+<p><strong>SCENARIO 2</strong></p>
+<pre><code>PUB[1] --remote--&gt; SUB[N] | ROUTER[N] --output--&gt; DEALER[1] --ack--&gt; ROUTER[N]  </code></pre>
 <blockquote>
-<p>// TODO : detail the procedure</p>
+<p>// TODO : detail the second scenario mixing InCh and MaCh and used for remote command execution</p>
 </blockquote>
 <h3 id="note-about-the-use-of-mdns"><span class="header-section-number">2.2.4</span> Note about the use of mDNS</h3>
 <p>We use the mdns module for Node.js. Each node of the network advertise its presence by providing a service called <code>_node._tcp</code>. When advertising, we also add the <code>id</code> of the node as a TXT record.</p>
@@ -685,41 +690,14 @@ browser.start();</code></pre></li>
 <li><code>interactive.js</code> contains code for interactive commands in the shell</li>
 </ul></li>
 </ul>
-<h3 id="the-core-singleton"><span class="header-section-number">2.2.6</span> The Core singleton</h3>
-<h4 id="core-attributes"><span class="header-section-number">2.2.6.1</span> Core attributes</h4>
-<ul>
-<li></li>
-</ul>
-<h4 id="core-events"><span class="header-section-number">2.2.6.2</span> Core events</h4>
-<ul>
-<li><code>ready</code> is triggered when <strong>initialization finishes</strong></li>
-<li><code>inch</code> is triggered when the <strong>subscriber</strong> socket <strong>receives</strong> some data (meaning <em>I've just received some data on the information channel</em> or <em>Another node just published some information</em>)</li>
-<li><code>mach</code> is triggered when a <strong>request</strong> is <strong>received</strong> on MaCh (meaning <em>I've just received a request</em>)</li>
-<li><code>reply</code> is triggered when a <strong>response</strong> to <strong>previous request</strong> is received</li>
-<li><code>died</code> is triggered when we discover that a <strong>node disappears</strong> from the network</li>
-<li><code>test</code> (for testing purpose only)</li>
-</ul>
-<h4 id="core-methods"><span class="header-section-number">2.2.6.3</span> Core methods</h4>
-<p>These are the methods used by the Core singleton to interact with its state and its communication channels.</p>
-<ul>
-<li><code>init()</code> will start mDNS advertising and browsing of <code>_node.tcp</code> service, bind sockets</li>
-<li><code>publish()</code> will trigger a <code>inch</code> event on all subscribers</li>
-<li><code>send()</code> will trigger a <code>mach</code> event on the recipient</li>
-<li><code>syncSend()</code> will also trigger a <code>mach</code></li>
-<li><code>reply()</code></li>
-<li><code>close()</code></li>
-</ul>
-<blockquote>
-<p>// TODO add missing important methods</p>
-</blockquote>
-<h3 id="data-structures"><span class="header-section-number">2.2.7</span> Data structures</h3>
+<h3 id="data-structures"><span class="header-section-number">2.2.6</span> Data structures</h3>
 <p>Manticore uses the following data structures :</p>
 <ul>
 <li>Node</li>
 <li>Sensor</li>
 <li>Record</li>
 </ul>
-<h4 id="node"><span class="header-section-number">2.2.7.1</span> Node</h4>
+<h4 id="node"><span class="header-section-number">2.2.6.1</span> Node</h4>
 <p>The node class is used to represent a node in the network. Each Manticore instance keeps a list of the node in the network in the array <code>Core.nodes</code>.</p>
 <ul>
 <li><code>id</code> an UUID to uniquely identify a node in the network</li>
@@ -729,7 +707,7 @@ browser.start();</code></pre></li>
 <li><code>sensors</code> the sensors that the node has published (an array of Sensor objects, see below for details)</li>
 <li><code>network_iface</code> the network interface on which the node has been discovered</li>
 </ul>
-<h4 id="sensor"><span class="header-section-number">2.2.7.2</span> Sensor</h4>
+<h4 id="sensor"><span class="header-section-number">2.2.6.2</span> Sensor</h4>
 <p>The Sensor class is used to represent a sensor in Manticore. A sensor object have the following properties :</p>
 <ul>
 <li><code>id</code> an UUID set a runtime to uniquely identify a sensor over the network</li>
@@ -741,7 +719,7 @@ browser.start();</code></pre></li>
 <li><code>request</code> to handle the request of the sensor's data</li>
 </ul>
 <p><strong>Note</strong>: To understand how this properties and methods are set, please refer to the Sensor documentation in the directory <code>sensors/</code> at the root of the directory.</p>
-<h4 id="record"><span class="header-section-number">2.2.7.3</span> Record</h4>
+<h4 id="record"><span class="header-section-number">2.2.6.3</span> Record</h4>
 <p>The Record class is used to keep track of requests, states and history of the core activity and communication.</p>
 <p>The implementation of the Record class is located in <code>record.js</code> and used either in the main application <code>app.js</code> and the Core <code>manticore.js</code>.</p>
 <p>We distinguish 2 types of records :</p>
@@ -762,6 +740,55 @@ browser.start();</code></pre></li>
 </ul></li>
 </ul>
 <p>These records works in pairs and at any time if a <code>client_request</code> is a valid record in one node (i.e. the client), you could fine an equivalent <code>active_resource</code> on another node of the network (i.e. the server). This <code>active_resource</code> is matching to the previously initiated <code>client_request</code>.</p>
+<h3 id="the-core-singleton"><span class="header-section-number">2.2.7</span> The Core singleton</h3>
+<p>The <code>Core</code> object is implemented as a singleton (only a single instance of a class). This is achieved by the fact that the module does not export the constructor of the object but a new instance of it.</p>
+<pre><code>module.exports = new Core();</code></pre>
+<p>Thus the first call to <code>require('manticore.js')</code> will create the object and all other require will look at the cache and return an pointer to the previously created object.</p>
+<p>For more information about <code>require()</code> and modules in Node.js, refer to this article <a href="http://fredkschott.com/post/2014/06/require-and-the-module-system/">How <code>require()</code> Actually Works</a></p>
+<h4 id="core-attributes"><span class="header-section-number">2.2.7.1</span> Core attributes</h4>
+<p>The <code>Core</code> object has the following attributes :</p>
+<ul>
+<li><code>name</code> the hostname of the node</li>
+<li><code>uuid</code> an unique identifier to identify the node (generated at runtime)</li>
+<li><code>arch</code> the architecture of the node (ARM, x64, x86)</li>
+<li><code>platform</code> the platform of the node (Linux, Darwin, Windows)</li>
+<li><code>ip</code> the IP address of the node (corresponding to the network interface on which the service advertisement is done)</li>
+<li><code>nodes</code> an array of Node objects corresponding to the other nodes discovered on the network</li>
+<li><code>sensors</code> an array of Sensor objects corresponding to the sensors of the node</li>
+<li><code>records</code> an array of Record objects (i.e. history of client requests and currently running data-providers</li>
+<li><code>publisher</code> a PUB socket (ZeroMQ) to publish information to its subscribers</li>
+<li><code>subscriber</code> a SUB socket (ZeroMQ) to receive information from the publisher it subscribed</li>
+<li><code>requester</code> a DEALER socket (ZeroMQ) to issue asynchronous requests</li>
+<li><code>mach</code> a ROUTER socket (ZeroMQ) to handle asynchronous requests</li>
+<li><code>udp</code> a simple UDP socket</li>
+<li><code>advertiser</code> a mdns object to advertise its presence as a <code>_node._tcp</code> service</li>
+<li><code>browser</code> a mdns object to browse <code>_node._tcp</code> services</li>
+<li><code>lastpublish</code> a timestamp of the last publication of the node's capabilities (i.e. sensors)</li>
+</ul>
+<p><strong>Note</strong>: <code>Core.nodes</code> will contain all nodes of the network (including itself). Indeed, this means that the advertisement was successful and the node discovered itself.</p>
+<p><strong>Note 2</strong>: Following the previous note, we set that the <code>Core.sensors</code> array also points to the attribute <code>sensors</code> of the Node object that represent itself in the <code>Core.nodes</code> array. Thus if we browse the content of all <code>sensors</code> attributes of each Node object in <code>Core.nodes</code>, then we have a collection of all sensors in the network (including the one connected on the current node).</p>
+<h4 id="core-events"><span class="header-section-number">2.2.7.2</span> Core events</h4>
+<ul>
+<li><code>ready</code> is triggered when <strong>initialization finishes</strong></li>
+<li><code>inch</code> is triggered when the <strong>subscriber</strong> socket <strong>receives</strong> some data (meaning <em>I've just received some data on the information channel</em> or <em>Another node just published some information</em>)</li>
+<li><code>mach</code> is triggered when a <strong>request</strong> is <strong>received</strong> on MaCh (meaning <em>I've just received a request</em>)</li>
+<li><code>reply</code> is triggered when a <strong>response</strong> to <strong>previous request</strong> is received</li>
+<li><code>died</code> is triggered when we discover that a <strong>node disappears</strong> from the network</li>
+<li><code>test</code> (for testing purpose only)</li>
+</ul>
+<h4 id="core-methods"><span class="header-section-number">2.2.7.3</span> Core methods</h4>
+<p>These are the methods used by the Core singleton to interact with its state and its communication channels.</p>
+<ul>
+<li><code>init()</code> will start mDNS advertising and browsing of <code>_node.tcp</code> service, bind sockets</li>
+<li><code>publish()</code> will trigger a <code>inch</code> event on all subscribers</li>
+<li><code>send()</code> will trigger a <code>mach</code> event on the recipient</li>
+<li><code>syncSend()</code> will also trigger a <code>mach</code></li>
+<li><code>reply()</code></li>
+<li><code>close()</code></li>
+</ul>
+<blockquote>
+<p>// TODO add missing important methods</p>
+</blockquote>
 <h3 id="inter-core-messaging"><span class="header-section-number">2.2.8</span> Inter-core messaging</h3>
 <h4 id="message-structure"><span class="header-section-number">2.2.8.1</span> Message structure</h4>
 <p>The message exchanged on the communication channels (InCh and MaCh) are JSON files and have the following structure :</p>
@@ -779,28 +806,63 @@ browser.start();</code></pre></li>
 <li><code>header</code> contains the type of message and some information about the sender (uuid, hostname and IP address)</li>
 <li><code>payload</code> can be any Javascript primitive data types (i.e. <code>String</code>, <code>Boolean</code> or <code>Number</code>), composite data types (i.e. <code>Object</code> or <code>Array</code>) or special data types (i.e. <code>null</code> or <code>undefined</code>). In the case of composite types, its structure will be related to the type of message specified in the header.</li>
 </ul>
-<h4 id="message-types-and-associated-payload"><span class="header-section-number">2.2.8.2</span> Message types and associated payload</h4>
+<h4 id="message-types-and-associated-payloads"><span class="header-section-number">2.2.8.2</span> Message types and associated payloads</h4>
 <ul>
 <li><code>raw</code></li>
 <li><code>request</code></li>
 <li><code>release</code></li>
 <li><code>ack</code></li>
 </ul>
+<blockquote>
+<p>// TODO add the payloads</p>
+</blockquote>
 <h3 id="embedded-http-server"><span class="header-section-number">2.2.9</span> Embedded HTTP server</h3>
-<p>Manticore have a embedded HTTP server built-in.</p>
-<blockquote>
-<p>// serve routes with Express for 1. web API and 2. the user web interface // introduce the LoCh (Local Channel) that is to say when the client and the core are on the same computer (node)</p>
-</blockquote>
+<p>Manticore has a embedded HTTP server built-in. This server has two main purposes:</p>
+<ul>
+<li>The first being the platform for the Local Channel (Loch) that is to say, the communication channel between manticore and any local user client, such as but not limited to Max/MSP,</li>
+<li>The second being that this embedded HTTP server can also be used as a web user interface, that we also like to call the &quot;universal client&quot;, because it will be accessible to the user very easily, and will most of all allow him to perform the same operations which are possible on a local user client like the one we have developed for Max/MSP.</li>
+</ul>
+<p>The server thus routes, with the help of our favorite framework, namely Express, two kinds of requests:</p>
+<ul>
+<li>Requests for the web API, that enables the communication channel between manticore and any local user client,</li>
+<li>Requests for accessing the web user interface</li>
+</ul>
+<p>In app.js, Express is called in the following manner :</p>
+<pre><code>var express = require(&#39;express&#39;);
+var api = express();</code></pre>
+<p>We then set up routes for the web user interface in the following manner :</p>
+<pre><code>api.get(&#39;/&#39;, function(req, res) {...});</code></pre>
+<p>And the route for the web API in the following manner :</p>
+<pre><code>api.get(&#39;/nodes&#39;, function(req, res) {...});
+
+api.get(&#39;/request/:id&#39;, function(req, res) {...});
+
+api.get(&#39;/release/:id&#39;, function(req, res) {...});
+
+api.get(&#39;/kill/:pid&#39;, function(req, res) {...});</code></pre>
+<p>The parameters of each of these API functions are explained in the following section.</p>
 <h4 id="external-messaging-with-manticore-web-api"><span class="header-section-number">2.2.9.1</span> External messaging with Manticore Web API</h4>
-<p>The Manticore Web API creates an entry point for local client to interact with the network.</p>
-<blockquote>
-<p>// Inspired by REST API // Using GET HTTP request // describe the API verb and parameters</p>
-</blockquote>
+<p>The Manticore Web API creates an entry point for a local client to interact with the network.</p>
+<p>The Manticore web API is inspired by REST API, in the sense the architecture used is a stateless client-server architecture, using unique identifiers to describe resources. The API is based on the GET HTTP method, and is composed of 4 main types of requests :</p>
+<ul>
+<li><p>The <strong>network information request</strong> : upon this request, the requestor will be provided with a JSON string describing the current state of the network, that is to say information about the nodes in the network. The request is called in the following manner</p>
+<pre><code>http:/localhost:3000/nodes/</code></pre></li>
+<li><p>The <strong>request resource request</strong> : this request is called when one wishes to request a resource. The request is called in the following manner</p>
+<pre><code>http:/localhost:3000/request/[id]?port=[portnumber]</code></pre>
+<p>The <code>[id]</code> and <code>[portnumber]</code> corresponds to the resource's UUID and port number.</p></li>
+<li><p>The <strong>release resource request</strong> : this request is called when one wishes to release an already requested resource. The request is called in the following manner</p>
+<pre><code>http:/localhost:3000/release/[id]</code></pre>
+<p>The <code>[id]</code> corresponds to the resource's UUID.</p></li>
+<li><p>The <strong>kill data-provider request</strong> : this request is called when one wishes to kill the process which is providing the data from the request resource. The request is called in the following manner</p>
+<pre><code>http:localhost:3000/kill/[pid]</code></pre>
+<p>The <code>[pid]</code> is the Process identifier of the data providing process.</p></li>
+</ul>
 <h4 id="user-friendly-web-interface"><span class="header-section-number">2.2.9.2</span> User friendly Web interface</h4>
 <p>The web user interface is designed with a templating engine called <a href="http://jade-lang.com/">Jade</a>.</p>
-<blockquote>
-<p>// allow the use of a web browser as universal client</p>
-</blockquote>
+<p>The most obvious purpose of this utility is to give the user an easy way to see the current network capability, that is to say the nodes that are currently present on the network, and their associated resources. This is done all thanks to <a href="http://jade-lang.com/">Jade</a> and <a href="http://getbootstrap.com/">Bootstrap</a> Twitter which we have used to render a simple but efficient web user interface.</p>
+<p>Another very important functionality is to allow users to use the web user interface as a &quot;universal client&quot;, that is to say as a resource requestor, that bridges the gap between manticore and any application, as long as it is enabled with the capability of receiving UDP streams on a specific port.</p>
+<p>In this manner, all the user needs to do is to create a UDP receiving socket bound to a specific port X on whatever application he wants to use, and just use his web browser to request the wanted resource to the same specific port X.</p>
+<p>He will then also be able to release the data, and in extreme cases kill the data providing process which is sending the requested data from the remote or local node.</p>
 <h3 id="play-around-with-manticore"><span class="header-section-number">2.2.10</span> Play around with Manticore</h3>
 <h4 id="interactive-mode"><span class="header-section-number">2.2.10.1</span> Interactive mode</h4>
 <p>When running Manticore in a shell, you can directly type some commands in your shell. This interactive mode, is really useful to debug the development.</p>
@@ -911,18 +973,22 @@ $ rm -rf zeromq-4.0.4</code></pre>
 <h4 id="prerequisites-on-windows"><span class="header-section-number">2.3.1.3</span> Prerequisites on Windows</h4>
 <p>This is experimental and only tested on Windows 7 x64.</p>
 <ol style="list-style-type: decimal">
-<li>You need to dowload and install
+<li>You need to download and install
 <ul>
 <li><a href="http://nodejs.org/">Node.js</a> v0.10.x<br /></li>
-<li><a href="https://developer.apple.com/downloads/index.action?q=Bonjour%20SDK%20for%20Windows#">Bonjour SDK for Windows</a><br /> To download the SDK, you need to have an Apple Developer ID (it's free)<br /> Bonjour SDK is required for the dns_sd.h header file used by the mdns module for Node.js<br /> At the time of writing version 2.0.4 is the latest available<br /></li>
+<li><a href="https://developer.apple.com/downloads/index.action?q=Bonjour%20SDK%20for%20Windows#">Bonjour SDK for Windows</a><br /> To download the SDK, you need to have an Apple Developer ID (it's free)<br /> Bonjour SDK is required for the <code>dns_sd.h</code> header file used by the mdns module for Node.js<br /> At the time of writing version 2.0.4 is the latest available<br /></li>
 <li><a href="https://www.python.org/download/windows">Python 2.7</a><br /> Python is required when installing the zmq module for Node.js<br /> During the installation, check the box <em>add python.exe to PATH</em><br /></li>
-<li><a href="http://zeromq.org/distro:microsoft-windows">ZeroMQ 4.0.4</a><br /> During the installation, choose the full installation (with source code and compiled librairies)<br /> <a href="http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x64.exe">Direct link for Windows x64</a><br /> <a href="http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x86.exe">Direct link for Windows x86</a><br /></li>
+<li><a href="http://zeromq.org/distro:microsoft-windows">ZeroMQ 4.0.4</a><br /> During the installation, choose the <strong>full</strong> installation (with source code and compiled librairies)
+<ul>
+<li><a href="http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x64.exe">Direct link for Windows x64</a><br /></li>
+<li><a href="http://miru.hk/archive/ZeroMQ-4.0.4~miru1.0-x86.exe">Direct link for Windows x86</a><br /></li>
+</ul></li>
 <li><a href="http://git-scm.com/download/win">Git</a> or <a href="https://windows.github.com/">GitHub for Windows</a> (optional)</li>
 </ul></li>
 <li>Reboot your system</li>
 </ol>
 <h3 id="node.js-module-dependencies"><span class="header-section-number">2.3.2</span> Node.js module dependencies</h3>
-<p>Install Node.js module dependencies (<a href="https://www.npmjs.org/package/mdns">mdns</a> and <a href="https://www.npmjs.org/package/zmq">zmq</a>) with<br />(see <code>package.json</code> for more information about versions)</p>
+<p>Install Node.js module dependencies (<a href="https://www.npmjs.org/package/mdns">mdns</a> and <a href="https://www.npmjs.org/package/zmq">zmq</a>) with npm (see <code>package.json</code> for more information about versions)</p>
 <pre><code>$ npm install</code></pre>
 <p>If you encounter any issue with the automatic npm installation, you can manually install them one by one.</p>
 <pre><code>$ npm install mdns
