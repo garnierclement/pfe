@@ -243,7 +243,7 @@ We distinguish 2 types of records :
 	+	the time of the reception of the `request` command on MaCh
 	+	the core node id which requested the resource (so he can identify it in `core.nodes[]`)
 	+	the IP address and port of the endpoint where to send the sensor data (namely OSC packets)
-	+	ulimately if the core node that requested the resource is on the same machine as the client the IP address of the endpoint should match the IP of the node id (but this is not mandatory)
+	+	ultimately if the core node that requested the resource is on the same machine as the client the IP address of the endpoint should match the IP of the node id (but this is not mandatory)
 * 	`client_request` : these records track every request issued by a local client and is aware of :
 	+	the time of the reception of the method GET `/request/[id]?[port]` on the built in HTTP server
 	+	the IP address of the client (if local client, then 127.0.0.1)
@@ -315,16 +315,16 @@ These are the methods used by the Core singleton to interact with its state and 
 
 #### Message structure
 
-The message exchanged on the communication channels (InCh and MaCh) are JSON files and have the following structure :
+The message exchanged on the communication channels (InCh and MaCh) are JavaScript serialized objects (JSON) and have the following structure :
 
 	{
 	  "header": {
 	    "src": "4626ca80-f211-11e3-8ad9-4df458080716",
 	    "name": "clementpi",
 	    "ip": "192.168.1.171",
-	    "type": "raw"
+	    "type": "request"
 	  },
-	  "payload": {}
+	  "payload": { ... }
 	}
 
 It is simply a Javascript object with 2 main parts :
@@ -334,12 +334,41 @@ It is simply a Javascript object with 2 main parts :
 
 #### Message types and associated payloads
 
-* 	`raw`
-* 	`request`
-* 	`release`
-* 	`ack`
+When nodes are exchanging information over the network, they can use the following type of messages. This messages are the base for all communication and custom protocols used in inter-core messaging.
 
-> // TODO add the payloads
+* 	`raw` for messages containing raw data (mainly used for debug)
+
+		"payload": "Anything can be put here"
+		
+* 	`request` is issued by a node requesting a resource on another node
+
+		"payload": {
+			"data": "UUID of the resource requested",
+			"dst": "IP address of the endpoint",
+			"port": "port of the endpoint"
+		}
+		
+* 	`release` is issued by a node wanted to release a previously requested resource
+
+		"payload": {
+			"data": "UUID of the resource to release"
+		}
+	
+* 	`ack` to simply acknowledge the reception of a message or to reply with a status (success or failure)
+
+		"payload": {
+			"status": true || false
+		}
+
+* `new_sensor` used by a node to publish its sensors (i.e. `Core.sensors`)
+
+		"payload": {
+			"sensors": {
+				// Array of Sensor objects
+			}
+		}
+
+* `exec` used to execute a command received from another node
 
 ### Embedded HTTP server 
 
@@ -389,8 +418,8 @@ The API is based on the GET HTTP method, and is composed of 4 main types of requ
 		
 * The **request resource request** : this request is called when one wishes to request a resource. The request is called in the following manner
 
-		http:/localhost:3000/request/[id]?port=[portnumber]
- The `[id]` and `[portnumber]` corresponds to the resource's UUID and port number.
+		http:/localhost:3000/request/[id]?port=[portnumber]?dst=[endpoint]
+ The `[id]`, `[portnumber]` and `[endpoint]` corresponds respectively to the requested resource's UUID, the port number and IP address of the endpoint to send the data to.
  
 * The **release resource request** : this request is called when one wishes to release an already requested resource. The request is called in the following manner
 
@@ -426,9 +455,9 @@ He will then also be able to release the data, and in extreme cases kill the dat
 When running Manticore in a shell, you can directly type some commands in your shell. This interactive mode, is really useful to debug the development.
 
 * `debug` show core.nodes
-* `eval [js]` use eval() javascript function to imitate REPL mechanism
+* `eval [js]` use eval() javascript function to imitate REPL mechanism (not safe!)
 * `log [js]` same as eval but will also show the result on stdout using console.log()
-* `send [msg]` send a the string `msg` to the publish socket (every node will receive the message)
+* `send [msg]` send a the string `msg` to the publish socket (every node will receive the raw message)
 * `remote [cmd]` ask remote execution of `cmd` command (not secure, be careful but useful to `git pull` all nodes)
 * `emit [event]` is equivalent to `core.emit('event')`, used for debug purpose only
 * `exec [cmd]` execute a command in the shell (no need to quit the program or to open a new ssh session)  
@@ -455,12 +484,13 @@ Like this (starting procedure)
 	+[mDNS]	Start browsing for _node._tcp services
 	+[MACH]	Socket listening on 45454
 
-The `<symbol>`can be
+The `<symbol>` can be
 
 *	`+` used for any relevant information
 *	`>` used for incoming message
 *	`!` used for errors
 *	`-` used for the disappearance of a node
+*	`:` used for debug
 
 The `<subject>` can be
 
@@ -480,13 +510,19 @@ The `<subject>` can be
 *	`SUB`	for anything related to the subscriber socket (used by InCh)
 *	`EXEC`	for anything related to the execution of a command
 *	`DTEC`	for anything related to the detection of a sensor
+*	`DBUG` for anything related to debug
 
 #### Built-in endpoint
 
 Manticore has a built in endpoint. Indeed at startup, the core binds an UDP socket on port 42424. This is a simple endpoint that will only display the raw content of the received stream to stdout. Therefore it is used for debug purpose to test the web user interface and API or the request procedure without the need to manually set up an endpoint.
 
-**Note**: If you only have
+**Note**: It can be used in pair with the `request [id]` command in the interactive mode (therefore acting as a client).
 
+#### Custom endpoint
+
+If you need to manually create a simple endpoint of any computer in the network and you cannot run Manticore on it, you can use netcat
+
+	$ nc -ul 42424
 
 ## Installation
 
@@ -634,6 +670,16 @@ This must not be harmful and the warning can be hidden with the following enviro
 	$ export AVAHI_COMPAT_NOWARN=1
 
 For further investigation, enquire <http://0pointer.de/avahi-compat?s=libdns_sd&e=node>
+
+### mDNSResponder issues
+
+You encounter some issues with the mDNSResponder that prevented the node to detect itself. We think that mDNSResponder bug and didn't refresh its cache and so the TXT record associated was not the one really advertised.
+
+A simple way to solve it is to simply restart the daemon on Mac OS X
+
+	$ sudo killall mDNSResponder
+	
+**Note**: mDNSResponder is a daemon invoked at boot time to implement Multicast DNS and DNS Service Discovery in Mac OS X, see `man mDNSResponder` for more information.
 
 ### Auto-detection on multiple interfaces
 

@@ -9,7 +9,7 @@
 </head>
 <body>
 <div id="header">
-<h1 class="title">Manticore</h1>
+<h1 class="title">Manticore <br> Documentation and Development Guide</h1>
 </div>
 <h1 id="sensors"><span class="header-section-number">1</span> Sensors</h1>
 <p>The main purpose of this project is to allow the use of sensors distributed over a network. In the following, we propose a standardized procedure to describe a sensor and we also explain how it is incorporated within the framework.</p>
@@ -729,7 +729,7 @@ browser.start();</code></pre></li>
 <li>the time of the reception of the <code>request</code> command on MaCh</li>
 <li>the core node id which requested the resource (so he can identify it in <code>core.nodes[]</code>)</li>
 <li>the IP address and port of the endpoint where to send the sensor data (namely OSC packets)</li>
-<li>ulimately if the core node that requested the resource is on the same machine as the client the IP address of the endpoint should match the IP of the node id (but this is not mandatory)</li>
+<li>ultimately if the core node that requested the resource is on the same machine as the client the IP address of the endpoint should match the IP of the node id (but this is not mandatory)</li>
 </ul></li>
 <li><code>client_request</code> : these records track every request issued by a local client and is aware of :
 <ul>
@@ -791,15 +791,15 @@ browser.start();</code></pre></li>
 </blockquote>
 <h3 id="inter-core-messaging"><span class="header-section-number">2.2.8</span> Inter-core messaging</h3>
 <h4 id="message-structure"><span class="header-section-number">2.2.8.1</span> Message structure</h4>
-<p>The message exchanged on the communication channels (InCh and MaCh) are JSON files and have the following structure :</p>
+<p>The message exchanged on the communication channels (InCh and MaCh) are JavaScript serialized objects (JSON) and have the following structure :</p>
 <pre><code>{
   &quot;header&quot;: {
     &quot;src&quot;: &quot;4626ca80-f211-11e3-8ad9-4df458080716&quot;,
     &quot;name&quot;: &quot;clementpi&quot;,
     &quot;ip&quot;: &quot;192.168.1.171&quot;,
-    &quot;type&quot;: &quot;raw&quot;
+    &quot;type&quot;: &quot;request&quot;
   },
-  &quot;payload&quot;: {}
+  &quot;payload&quot;: { ... }
 }</code></pre>
 <p>It is simply a Javascript object with 2 main parts :</p>
 <ul>
@@ -807,15 +807,32 @@ browser.start();</code></pre></li>
 <li><code>payload</code> can be any Javascript primitive data types (i.e. <code>String</code>, <code>Boolean</code> or <code>Number</code>), composite data types (i.e. <code>Object</code> or <code>Array</code>) or special data types (i.e. <code>null</code> or <code>undefined</code>). In the case of composite types, its structure will be related to the type of message specified in the header.</li>
 </ul>
 <h4 id="message-types-and-associated-payloads"><span class="header-section-number">2.2.8.2</span> Message types and associated payloads</h4>
+<p>When nodes are exchanging information over the network, they can use the following type of messages. This messages are the base for all communication and custom protocols used in inter-core messaging.</p>
 <ul>
-<li><code>raw</code></li>
-<li><code>request</code></li>
-<li><code>release</code></li>
-<li><code>ack</code></li>
+<li><p><code>raw</code> for messages containing raw data (mainly used for debug)</p>
+<pre><code>&quot;payload&quot;: &quot;Anything can be put here&quot;</code></pre></li>
+<li><p><code>request</code> is issued by a node requesting a resource on another node</p>
+<pre><code>&quot;payload&quot;: {
+  &quot;data&quot;: &quot;UUID of the resource requested&quot;,
+  &quot;dst&quot;: &quot;IP address of the endpoint&quot;,
+  &quot;port&quot;: &quot;port of the endpoint&quot;
+}</code></pre></li>
+<li><p><code>release</code> is issued by a node wanted to release a previously requested resource</p>
+<pre><code>&quot;payload&quot;: {
+  &quot;data&quot;: &quot;UUID of the resource to release&quot;
+}</code></pre></li>
+<li><p><code>ack</code> to simply acknowledge the reception of a message or to reply with a status (success or failure)</p>
+<pre><code>&quot;payload&quot;: {
+  &quot;status&quot;: true || false
+}</code></pre></li>
+<li><p><code>new_sensor</code> used by a node to publish its sensors (i.e. <code>Core.sensors</code>)</p>
+<pre><code>&quot;payload&quot;: {
+  &quot;sensors&quot;: {
+    // Array of Sensor objects
+  }
+}</code></pre></li>
+<li><p><code>exec</code> used to execute a command received from another node</p></li>
 </ul>
-<blockquote>
-<p>// TODO add the payloads</p>
-</blockquote>
 <h3 id="embedded-http-server"><span class="header-section-number">2.2.9</span> Embedded HTTP server</h3>
 <p>Manticore has a embedded HTTP server built-in. This server has two main purposes:</p>
 <ul>
@@ -848,8 +865,8 @@ api.get(&#39;/kill/:pid&#39;, function(req, res) {...});</code></pre>
 <li><p>The <strong>network information request</strong> : upon this request, the requestor will be provided with a JSON string describing the current state of the network, that is to say information about the nodes in the network. The request is called in the following manner</p>
 <pre><code>http:/localhost:3000/nodes/</code></pre></li>
 <li><p>The <strong>request resource request</strong> : this request is called when one wishes to request a resource. The request is called in the following manner</p>
-<pre><code>http:/localhost:3000/request/[id]?port=[portnumber]</code></pre>
-<p>The <code>[id]</code> and <code>[portnumber]</code> corresponds to the resource's UUID and port number.</p></li>
+<pre><code>http:/localhost:3000/request/[id]?port=[portnumber]?dst=[endpoint]</code></pre>
+<p>The <code>[id]</code>, <code>[portnumber]</code> and <code>[endpoint]</code> corresponds respectively to the requested resource's UUID, the port number and IP address of the endpoint to send the data to.</p></li>
 <li><p>The <strong>release resource request</strong> : this request is called when one wishes to release an already requested resource. The request is called in the following manner</p>
 <pre><code>http:/localhost:3000/release/[id]</code></pre>
 <p>The <code>[id]</code> corresponds to the resource's UUID.</p></li>
@@ -868,9 +885,9 @@ api.get(&#39;/kill/:pid&#39;, function(req, res) {...});</code></pre>
 <p>When running Manticore in a shell, you can directly type some commands in your shell. This interactive mode, is really useful to debug the development.</p>
 <ul>
 <li><code>debug</code> show core.nodes</li>
-<li><code>eval [js]</code> use eval() javascript function to imitate REPL mechanism</li>
+<li><code>eval [js]</code> use eval() javascript function to imitate REPL mechanism (not safe!)</li>
 <li><code>log [js]</code> same as eval but will also show the result on stdout using console.log()</li>
-<li><code>send [msg]</code> send a the string <code>msg</code> to the publish socket (every node will receive the message)</li>
+<li><code>send [msg]</code> send a the string <code>msg</code> to the publish socket (every node will receive the raw message)</li>
 <li><code>remote [cmd]</code> ask remote execution of <code>cmd</code> command (not secure, be careful but useful to <code>git pull</code> all nodes)</li>
 <li><code>emit [event]</code> is equivalent to <code>core.emit('event')</code>, used for debug purpose only</li>
 <li><code>exec [cmd]</code> execute a command in the shell (no need to quit the program or to open a new ssh session)<br /></li>
@@ -890,12 +907,13 @@ api.get(&#39;/kill/:pid&#39;, function(req, res) {...});</code></pre>
 +[CORE] Advertising _node._tcp on 32323
 +[mDNS] Start browsing for _node._tcp services
 +[MACH] Socket listening on 45454</code></pre>
-<p>The <code>&lt;symbol&gt;</code>can be</p>
+<p>The <code>&lt;symbol&gt;</code> can be</p>
 <ul>
 <li><code>+</code> used for any relevant information</li>
 <li><code>&gt;</code> used for incoming message</li>
 <li><code>!</code> used for errors</li>
 <li><code>-</code> used for the disappearance of a node</li>
+<li><code>:</code> used for debug</li>
 </ul>
 <p>The <code>&lt;subject&gt;</code> can be</p>
 <ul>
@@ -915,10 +933,14 @@ api.get(&#39;/kill/:pid&#39;, function(req, res) {...});</code></pre>
 <li><code>SUB</code> for anything related to the subscriber socket (used by InCh)</li>
 <li><code>EXEC</code> for anything related to the execution of a command</li>
 <li><code>DTEC</code> for anything related to the detection of a sensor</li>
+<li><code>DBUG</code> for anything related to debug</li>
 </ul>
 <h4 id="built-in-endpoint"><span class="header-section-number">2.2.10.3</span> Built-in endpoint</h4>
 <p>Manticore has a built in endpoint. Indeed at startup, the core binds an UDP socket on port 42424. This is a simple endpoint that will only display the raw content of the received stream to stdout. Therefore it is used for debug purpose to test the web user interface and API or the request procedure without the need to manually set up an endpoint.</p>
-<p><strong>Note</strong>: If you only have</p>
+<p><strong>Note</strong>: It can be used in pair with the <code>request [id]</code> command in the interactive mode (therefore acting as a client).</p>
+<h4 id="custom-endpoint"><span class="header-section-number">2.2.10.4</span> Custom endpoint</h4>
+<p>If you need to manually create a simple endpoint of any computer in the network and you cannot run Manticore on it, you can use netcat</p>
+<pre><code>$ nc -ul 42424</code></pre>
 <h2 id="installation"><span class="header-section-number">2.3</span> Installation</h2>
 <h3 id="prerequisites"><span class="header-section-number">2.3.1</span> Prerequisites</h3>
 <p>Manticore is based on Node.js and exploits ZeroMQ and Zeroconf/Bonjour.</p>
@@ -1013,7 +1035,12 @@ $ npm install async</code></pre>
 <p>This must not be harmful and the warning can be hidden with the following environment variable</p>
 <pre><code>$ export AVAHI_COMPAT_NOWARN=1</code></pre>
 <p>For further investigation, enquire <a href="http://0pointer.de/avahi-compat?s=libdns_sd&amp;e=node">http://0pointer.de/avahi-compat?s=libdns_sd&amp;e=node</a></p>
-<h3 id="auto-detection-on-multiple-interfaces"><span class="header-section-number">2.4.2</span> Auto-detection on multiple interfaces</h3>
+<h3 id="mdnsresponder-issues"><span class="header-section-number">2.4.2</span> mDNSResponder issues</h3>
+<p>You encounter some issues with the mDNSResponder that prevented the node to detect itself. We think that mDNSResponder bug and didn't refresh its cache and so the TXT record associated was not the one really advertised.</p>
+<p>A simple way to solve it is to simply restart the daemon on Mac OS X</p>
+<pre><code>$ sudo killall mDNSResponder</code></pre>
+<p><strong>Note</strong>: mDNSResponder is a daemon invoked at boot time to implement Multicast DNS and DNS Service Discovery in Mac OS X, see <code>man mDNSResponder</code> for more information.</p>
+<h3 id="auto-detection-on-multiple-interfaces"><span class="header-section-number">2.4.3</span> Auto-detection on multiple interfaces</h3>
 <p>Because a node advertises a <em>node.</em>tcp service and at the same time browses/discovers any node advertising the same <em>node.</em>tcp service, it is ultimately going to see multiple instance of itself.</p>
 <p>Currently we only care about the first one it sees (but maybe it is not the one we want) and for the others, the log will show something like</p>
 <pre><code>+[mDNS] Service up: macbook-cgarnier at 192.168.190.1 (vmnet1)
