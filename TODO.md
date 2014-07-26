@@ -1,4 +1,7 @@
+<!-- START Document title-->
+<!-- DON'T REMOVE THE HTML COMMENTS, THEY ARE USED AS TOKENS -->
 # TODO
+<!-- END Document title-->
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -185,6 +188,7 @@
 * ***description*** : As Node.js is still young one should care about the evolution of the framework. Now we are using the stable branch v0.10.X but when later migrating to new versions
 
 <!-- START old TODO -->
+<!-- DON'T REMOVE THE HTML COMMENTS, THEY ARE USED AS TOKENS -->
 
 # TODO List
 
