@@ -10,7 +10,7 @@ sed '/<!-- START/,/<!-- END/d' ../projects/manticore/README.md > tmp_manticore.m
 pandoc tmp_sensor.md tmp_manticore.md \
 	-o doc.pdf \
 	--tab-stop=2 --toc --toc-depth=4 -N --chapters \
-	-V title="\textbf{Manticore} \\\ Documentation \\\ and \\\ Programming Guide" \
+	-V title="\textbf{Manticore} \\\ Documentation \\\ and \\\ Development Guide" \
 	-V author="Homère \textsc{Faivre}" \
 	-V author="Clément \textsc{Garnier}" \
 	-V geometry="margin=1.2in" \
@@ -25,5 +25,5 @@ rm tmp_manticore.md
 pandoc ../sensors/README.md ../projects/manticore/README.md \
 	-o doc.html \
 	--tab-stop=2 -N -s \
-	-V title="Manticore" \
+	-V title="Manticore <br> Documentation and Development Guide" \
 	-V lang="en"
