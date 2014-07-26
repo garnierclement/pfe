@@ -3,7 +3,7 @@ var core = require('./manticore.js');
 
 process.stdin.setEncoding('utf8');
 
-// Interactive commands within the terminal
+/* Interactive commands within the terminal */
 process.stdin.on('readable', function() {
 	var chunk = process.stdin.read();
 	if (chunk !== null) {
@@ -113,11 +113,8 @@ process.stdin.on('readable', function() {
 				}
 			});
 		}
-		else if (/^fake/.test(chunk)) {
-			core.fakeSensors();
-		}
 		else {
-			console.log("![CORE]\tAvailable commands : help|debug|eval|log|exec|send|remote|emit|request|release|fake");
+			console.log("![CORE]\tAvailable commands : help|debug|eval|log|exec|send|remote|emit|request|release");
 		}
 	}
 });
