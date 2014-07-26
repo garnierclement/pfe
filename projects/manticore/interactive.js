@@ -113,6 +113,9 @@ process.stdin.on('readable', function() {
 				}
 			});
 		}
+		else if (/^sensors/.test(chunk)) {
+			core.delayedPublishSensors(0);
+		}
 		else {
 			console.log("![CORE]\tAvailable commands : help|debug|eval|log|exec|send|remote|emit|request|release");
 		}
