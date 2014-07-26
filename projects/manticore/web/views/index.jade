@@ -12,7 +12,7 @@ block content
 				th Host
 				th IP address
 				th UUID
-				th Request resource
+				th Request resource (port, IP)
 		each node, index in nodes
 			tr
 				td
@@ -38,6 +38,7 @@ block content
 						td
 							form(methode='GET', action='/request/#{sensor.id}')
 								input(name='port', type='number', value=42424, min=0, max=65536)
+								input(name='dst', value="IP")
 								input.btn.btn-default(type='submit', value="Request")
 
 	h2 Sensors 

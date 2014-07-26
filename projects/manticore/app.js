@@ -15,11 +15,6 @@ api.set('views', path.join(__dirname, 'web/views'));
 api.set('view engine', 'jade');
 api.use(express.static(path.join(__dirname, 'web/static')));
 
-// Start HTTP server to serve JSON API
-api.listen(3000, function() {
-	console.log('+[HTTP]\tListening on 3000');
-});
-
 /**
  * Handles the 'ready' event on the core
  * This implies that the core has started
@@ -39,14 +34,16 @@ core.on('ready', function() {
 		res.send({nodes: core.nodes });
 	});
 
-	// HTTP GET /request/[uuid]?port=[portnumber]
+	// HTTP GET /request/[uuid]?port=[portnumber]?dst=[endpoint]
 	api.get('/request/:id', function(req, res) {
 		console.log('>[HTTP]\tRequest resource from '+ req.ip +' with id '+req.param('id'));
 		res.set({'Content-Type': 'text/plain'});
 		var resource = req.param('id');
 		var port = req.query.port || 16161;
 		var src = req.ip;
-		core.requestResource(resource, port, src, function(err, header, payload) {
+		var dst = req.query.dst;
+		if (dst === "IP") { dst = src; }  // if dst not specified using the IP of the client
+		core.requestResource(resource, port, src, dst, function(err, header, payload) {
 			if (err === null) {
 				if (payload.status)
 					res.send(resource);
@@ -160,10 +157,10 @@ core.on('mach', function(envelope, header, payload) {
 			var sensor = _.findWhere(core.sensors, {id: payload.data});
 			console.log(sensor);
 			if (sensor !== undefined) {
-				var dst = header.ip;
+				var dst = payload.dst;
 				if (dst === this.ip) dst = '127.0.0.1';
 				var opts = [dst, payload.port, header.src+'-'+payload.port+'.pd'];
-				var new_record = new Record(payload.data, 'active_resource', header.src, dst, payload.port);
+				var new_record = new Record(payload.data, 'active_resource', header.src, dst, payload.port, core.itself);
 				var mode = (mode in payload) ? payload.mode : 'default';
 				sensor.request(mode, opts, function(err, child) {
 					if (err === null) {
@@ -229,7 +226,8 @@ core.on('died', function(deadNodeId) {
  * Used for debug purpose only
  */
 core.on('test', function(){
-	trigger.generate('192.168.0.1',1234,'../../pd/mousePosition.pd','../../var/run/output.pd');
+	// Do some testing here
+	// and use the emit command in interactive mode to trigger the event 'test'
 });
 
 /**
@@ -246,21 +244,7 @@ process.on('SIGINT', function() {
  */
 core.init();
 
-
-/**
- * Check if running on Mac OS X
- * @return {Boolean} true if OS X
- */
-function isDarwin() {
-	if (require('os').platform() == 'darwin') return true;
-	else return false;
-}
-
-/**
- * Check if running on Linux
- * @return {Boolean} true if Linux
- */
-function isLinux() {
-	if (require('os').platform() == 'linux') return true;
-	else return false;
-}
+// Start HTTP server to serve JSON API
+api.listen(3000, function() {
+	console.log('+[HTTP]\tListening on 3000');
+});

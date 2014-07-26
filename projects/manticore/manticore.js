@@ -37,24 +37,32 @@ var Record = require('./record.js');	// Record object
  */
 function Core()
 {
-	this.name = os.hostname();
-	this.uuid = uuid.v1();
-	this.arch = os.arch();
+	/* Core identification */
+	this.uuid     = uuid.v1();
+	this.name     = os.hostname();
 	this.platform = os.platform();
-	this.nodes = [];						// store discovered nodes
-	this.ip = null;							// IP address advertised on Zeroconf
-	this.sensors = [];						// store local sensors
-	this.records = [];
-	this.lastPublish = null;
-	this.publisher = zmq.socket('pub');		// publisher socket (InCh)
-	this.subscriber = zmq.socket('sub');	// subscriber socket (InCh)
-	this.udp = dgram.createSocket('udp4');	// local udp socket for receiving OSC data
-	this.requester = zmq.socket('dealer');	//
-	this.mach = zmq.socket('router');
-	this.syncRequester = zmq.socket('req');
-	// advertisement of a _node._tcp. service on this node, on port 32323
+	this.arch     = os.arch();
+
+	/* Core collections */
+	this.nodes   = [];			// store discovered nodes
+	this.sensors = [];			// store node's sensors
+	this.records = [];			// store nodes's records
+
+	/* Core utils and aliases */
+	this.itself      = null;	// reference of the current node in this.nodes (Node object)
+	this.ip          = null;	// alias to node's IP address advertised on Zeroconf
+	this.lastPublish = null;	// timstamp of the last time we publish node's capailities (Date object)
+
+	/* Core sockets */
+	this.publisher     = zmq.socket('pub');			// publisher socket (InCh)
+	this.subscriber    = zmq.socket('sub');			// subscriber socket (InCh)
+	this.udp           = dgram.createSocket('udp4');// local udp socket for receiving OSC data (built in endpoint)
+	this.requester     = zmq.socket('dealer');		// async requests (MaCh)
+	this.mach          = zmq.socket('router');		// async replies (MaCh)
+	this.syncRequester = zmq.socket('req');			// sync request (MaCh)
+
+	/* mDNS as part of Core */
 	this.advertiser = createAdvertisement(this.uuid);
-	// _node._tcp. service browser
 	this.browser = mdns.createBrowser(mdns.tcp(NODE_SERVICE));
 }
 // Inherit from `EventEmitter.prototype`.
@@ -68,11 +76,13 @@ var self = module.exports = new Core();
  * Initiliaze the Core singleton
  * Binding sockets, advertising and browsing for other _node._tcp cores
  * Emit 'ready' event when initialized
+ * 
+ * [TODO] use async.series to bind all sockets and properly 'emit' the ready event
  */
 Core.prototype.init = function() {
 	console.log('+[CORE]\tCore starting on '+this.name+' at '+Date());
 	console.log('+[CORE]\tCore id '+this.uuid);
-	// bind local socket
+	// bind local UDP socket
 	this.udp.bind(UDP_PORT, function() {
 		var address = self.udp.address();
 		console.log('+[UDP]\tUDP socket listening on '+address.address+':'+address.port);
@@ -88,7 +98,7 @@ Core.prototype.init = function() {
 			self.browse();
 		}
 	});
-	// bind mach channel
+	// bind MaCh channel
 	this.mach.bind('tcp://*:'+MACH_PORT, function(err) {
 		if (err)
 			console.log('![MACH]\tSocket binding error: '+err);
@@ -97,7 +107,6 @@ Core.prototype.init = function() {
 	});
 	console.log('+[CORE]\tDetect sensors');
 	this.detectSensors();
-	// subscribe socket
 	this.emit('ready');
 };
 
@@ -213,12 +222,13 @@ self.browser.on('serviceUp', function(service) {
 			self.delayedPublishSensors(1000);
 		}
 		else {
-			// note if node discovered itself
+			// node discovered itself
 			new_node.itself = true;
 			// register advertising ip, we should see ourself
 			self.ip = new_node.ip;
 			// link core.sensors with core.nodes[itself].sensors
 			new_node.sensors = self.sensors;
+			self.itself = new_node;
 		}
 		self.nodes.push(new_node);
 		console.log('+[CORE]\tAdding node id '+service.txtRecord.id);
@@ -424,15 +434,18 @@ function createAdvertisement(uuid)  {
  * Procedure for requesting a resource from one node to another
  *		- send a synchronous 'request' 
  *		- return a callback the content of the reply
- * @param  {String}   res      [description]
- * @param  {Integer}   port     [description]
- * @param  {Function} callback [description]
+ * @param  {String}   res			[description]
+ * @param  {Integer}  port			[description]
+ * @param  {String}   client_ip		[description]
+ * @param  {String}   endpoint_ip	[description]
+ * @param  {Function} callback		[description]
  */
-Core.prototype.requestResource = function (res, port, src_ip, callback) {
+Core.prototype.requestResource = function (res, port, client_ip, endpoint_ip, callback) {
 	// Check validity of the request (port, resource)
 	var p = isValidPort(port) ? port : 16161;
 	var found = false;
-	for (var i = 0; i < this.nodes.length; i++) {
+	var i = 0;
+	for (i = 0; i < this.nodes.length; i++) {
 		if (this.nodes[i].id === res || _.findWhere(this.nodes[i].sensors, {id: res}) !== undefined) {
 			found = true;
 			break;
@@ -443,9 +456,10 @@ Core.prototype.requestResource = function (res, port, src_ip, callback) {
 	if (found) {
 		var dst = this.nodes[i].ip;
 		if (dst === this.ip) dst = '127.0.0.1';
-		this.syncSend(dst, 'request', this.requestPayload(res,p), function(header, payload) {
+		if (endpoint_ip === null) endpoint_ip = client_ip;
+		this.syncSend(dst, 'request', this.requestPayload(res,p,endpoint_ip), function(header, payload) {
 			if (payload.status) {
-				var new_record = new Record(res, 'client_request', src_ip, dst, port);
+				var new_record = new Record(res, 'client_request', client_ip, endpoint_ip, port, self.nodes[i]);
 				self.records.push(new_record);
 			}
 			callback(null, header, payload);
@@ -471,7 +485,8 @@ Core.prototype.releaseResource = function (res, callback) {
 		if (this.records[idx].resource === res && this.records[idx].type === 'client_request') {
 			correct = true;
 			var record = this.records[idx];
-			dst = record.dst;
+			dst = record.node.ip;
+			if (dst === this.ip) { dst = "127.0.0.1"; }
 			break;
 		}
 	}
@@ -480,7 +495,6 @@ Core.prototype.releaseResource = function (res, callback) {
 			// remove the 'client_request' record
 			// need to think about the status from the ack
 			// now we erase the record all the time (either the release was successful or not)
-			// 
 			var index = _.indexOf(self.records, record);
 			self.records.splice(index,1);
 			callback(null, header, payload);
@@ -557,9 +571,10 @@ Core.prototype.delayedPublishSensors = function(delay) {
 };
 
 /******* Message payloads *********/
-Core.prototype.requestPayload = function (res, port) {
+Core.prototype.requestPayload = function (res, port, dst) {
 	var _p = port || UDP_PORT;
-	return {data: res, port: _p};
+	var _dst = dst || "127.0.0.1";
+	return {data: res, dst: _dst, port: _p};
 };
 
 Core.prototype.ackPayload = function (s) {
@@ -568,24 +583,4 @@ Core.prototype.ackPayload = function (s) {
 
 Core.prototype.releasePayload = function (res) {
 	return {data: res};
-};
-
-/**
- * Fake the detection of sensors and publish them on InCh
- * This function is intented to be removed later
- * It is just used to simulate the presence of sensors and their capabilities
- */
-Core.prototype.fakeSensors = function () {
-	// Generate fake sensors
-	var sensor1 = new Sensor({name: "Mouse"}, null);
-	sensor1.addData('X','/mouse/x f');
-	sensor1.addData('Y','/mouse/y f');
-	this.sensors.push(sensor1);
-	var sensor2 = new Sensor({name: "Intertial"}, null);
-	sensor2.addData('Roll','/intertial/roll f');
-	sensor2.addData('Pitch','/intertial/pitch f');
-	sensor2.addData('Yaw','/intertial/yaw f');
-	this.sensors.push(sensor2);
-	// publish them
-	this.publish('new_sensor', {sensors: this.sensors});
 };
