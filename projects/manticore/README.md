@@ -675,9 +675,9 @@ For further investigation, enquire <http://0pointer.de/avahi-compat?s=libdns_sd&
 
 You encounter some issues with the mDNSResponder that prevented the node to detect itself. We think that mDNSResponder bug and didn't refresh its cache and so the TXT record associated was not the one really advertised.
 
-A simple way to solve it is to simply restart the daemon on Mac OS X
+A simple way to solve it is to simply restart the daemon on Mac OS X to reset the DNS cache
 
-	$ sudo killall mDNSResponder
+	$ sudo killall -HUP mDNSResponder
 	
 **Note**: mDNSResponder is a daemon invoked at boot time to implement Multicast DNS and DNS Service Discovery in Mac OS X, see `man mDNSResponder` for more information.
 
