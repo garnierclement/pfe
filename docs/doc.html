@@ -9,7 +9,7 @@
 </head>
 <body>
 <div id="header">
-<h1 class="title">Manticore <br> Documentation and Development Guide</h1>
+<h1 class="title">Manticore <br> Documentation, Development Guide and Future Works</h1>
 </div>
 <h1 id="sensors"><span class="header-section-number">1</span> Sensors</h1>
 <p>The main purpose of this project is to allow the use of sensors distributed over a network. In the following, we propose a standardized procedure to describe a sensor and we also explain how it is incorporated within the framework.</p>
@@ -1037,8 +1037,8 @@ $ npm install async</code></pre>
 <p>For further investigation, enquire <a href="http://0pointer.de/avahi-compat?s=libdns_sd&amp;e=node">http://0pointer.de/avahi-compat?s=libdns_sd&amp;e=node</a></p>
 <h3 id="mdnsresponder-issues"><span class="header-section-number">2.4.2</span> mDNSResponder issues</h3>
 <p>You encounter some issues with the mDNSResponder that prevented the node to detect itself. We think that mDNSResponder bug and didn't refresh its cache and so the TXT record associated was not the one really advertised.</p>
-<p>A simple way to solve it is to simply restart the daemon on Mac OS X</p>
-<pre><code>$ sudo killall mDNSResponder</code></pre>
+<p>A simple way to solve it is to simply restart the daemon on Mac OS X to reset the DNS cache</p>
+<pre><code>$ sudo killall -HUP mDNSResponder</code></pre>
 <p><strong>Note</strong>: mDNSResponder is a daemon invoked at boot time to implement Multicast DNS and DNS Service Discovery in Mac OS X, see <code>man mDNSResponder</code> for more information.</p>
 <h3 id="auto-detection-on-multiple-interfaces"><span class="header-section-number">2.4.3</span> Auto-detection on multiple interfaces</h3>
 <p>Because a node advertises a <em>node.</em>tcp service and at the same time browses/discovers any node advertising the same <em>node.</em>tcp service, it is ultimately going to see multiple instance of itself.</p>
