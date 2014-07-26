@@ -184,6 +184,8 @@
 
 * ***description*** : As Node.js is still young one should care about the evolution of the framework. Now we are using the stable branch v0.10.X but when later migrating to new versions
 
+<!-- START old TODO -->
+
 # TODO List
 
 The previous old TODO list below :
@@ -223,3 +225,5 @@ The previous old TODO list below :
 - [ ] Idea: test different mdns module ofr Node.js, see mdns-js in pure js (no dependency) or reimplement a custom discovery and presence system
 - [ ] Sensor "intertial" has no property `data` in its `description.json` file, need to look at the xBeeReadSerial to check the OSC format used
 - [ ] Create a package .pkg for Mac OS X to install dependencies and then copy the repo in /Applications/Manticore and also install a launchd file in /Library/LaunchDaemons or ~/Library/LaunchDaemons 
+
+<!-- END old TODO -->
