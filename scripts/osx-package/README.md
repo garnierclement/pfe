@@ -4,6 +4,12 @@ Create a `.pkg` installer for Mac OS X in order to provide an user friendly GUI 
 
 **WARNING This a work in progress and does not work yet out of the box**
 
+To create new packages, use the following script
+
+	$ ./create-pkg.sh
+
+In the current folder, you will find the newly created complete distribution `manticore-<version>.pkg` and all the packages that it is made of are in the folder `out`.
+
 ## Tree structure and entry point
 
 The main script is `create-pkg.sh` and the tree structure of this folder is the following
@@ -63,3 +69,22 @@ To install [brew-pkg]
 Then to create the required packages
 
 	$ brew pkg --with-deps zeromq
+
+## Create only scripts package
+
+To create some only script packages, you can use the `--nopayload` option.
+
+	$ pkgbuild --nopayload \
+		--identifier <some_identifier> \
+		--scripts <scripts_path> \
+		output.pkg
+
+## Quicklook plugin for packages
+
+[Suspicious Package] is a plugin for the Quick Look feature of OS X. It allows you to preview the contents of a standard Apple installer package without launching the Installer.
+
+[Suspicious Package]: http://www.mothersruin.com/software/SuspiciousPackage/download.html
+
+## Keeping `distribution.xml` up to date
+
+If you create new pacakges with `pkgbuild`, remember to add the identifier in the `distribution.xml` so that it can take the new ones into account.
