@@ -14,53 +14,63 @@
     <pkg-ref id="com.github.garnierclement.pfe.launchd"
              version="0.1"
              auth="root">manticore-launchd.pkg</pkg-ref>
-    <pkg-ref id="com.github.garnierclement.pfe.dependency.brew"
+    <pkg-ref id="com.github.garnierclement.pfe.nodejs"
+             version="0.10.29"
+             auth="root">node-0.10.29.pkg</pkg-ref>
+    <pkg-ref id="com.github.garnierclement.pfe.zeromq"
+             version="4.0.4"
+             auth="root">zeromq-4.0.4.pkg</pkg-ref>
+    <pkg-ref id="com.github.garnierclement.pfe.max5_externals"
              version="0.1"
-             auth="root">brew.pkg</pkg-ref>
-    <pkg-ref id="com.github.garnierclement.pfe.dependency.nodejs"
+             auth="none">max5-java-libs.pkg</pkg-ref>
+    <pkg-ref id="com.github.garnierclement.pfe.max6_externals"
              version="0.1"
-             auth="root">nodejs-brew.pkg</pkg-ref>
-    <pkg-ref id="com.github.garnierclement.pfe.dependency.zeromq"
-             version="0.1"
-             auth="root">zeromq-brew.pkg</pkg-ref>
+             auth="none">max6-java-libs.pkg</pkg-ref>
     <!-- List them again here. They can now be organized
          as a hierarchy if you want. -->
     <choices-outline>
         <line choice="com.github.garnierclement.pfe.manticore"/>
         <line choice="com.github.garnierclement.pfe.launchd"/>
-        <line choice="com.github.garnierclement.pfe.dependency.brew"/>
-        <line choice="com.github.garnierclement.pfe.dependency.nodejs"/>
-        <line choice="com.github.garnierclement.pfe.dependency.zeromq"/>
+        <line choice="com.github.garnierclement.pfe.nodejs"/>
+        <line choice="com.github.garnierclement.pfe.zeromq"/>
+        <line choice="com.github.garnierclement.pfe.max5_externals"/>
+        <line choice="com.github.garnierclement.pfe.max6_externals"/>
     </choices-outline>
     <!-- Define each choice above -->
-    <choice
+    <choice>
         id="com.github.garnierclement.pfe.manticore"
         title="Manticore"
-        description="Manticore">
+        description="Install Manticore in /Applications/Manticore/">
       <pkg-ref id="com.github.garnierclement.pfe.manticore"/>
     </choice>
-    <choice
+    <choice>
         id="com.github.garnierclement.pfe.launchd"
         title="Manticore as a daemon"
-        description="Automatically launches Manticore after the installation and at startup. Keep it running in the background.">
+        description="Automatically launches Manticore after the installation and at startup. Keep it running in the background with launchd.">
       <pkg-ref id="com.github.garnierclement.pfe.launchd"/>
     </choice>
-    <choice
-        id="com.github.garnierclement.pfe.dependency.brew"
-        title="Homebrew"
-        description="Install Homebrew to install other dependencies. If already install, just run 'brew update'">
-      <pkg-ref id="com.github.garnierclement.pfe.dependency.brew"/>
-    </choice>
-    <choice
-        id="com.github.garnierclement.pfe.dependency.nodejs"
+    <choice>
+        id="com.github.garnierclement.pfe.nodejs"
         title="Node.js"
-        description="Install Node.js with Homebrew">
-      <pkg-ref id="com.github.garnierclement.pfe.dependency.brew"/>
+        description="Install Node.js">
+      <pkg-ref id="com.github.garnierclement.pfe.brew"/>
     </choice>
-    <choice
-        id="com.github.garnierclement.pfe.dependency.zeromq"
+    <choice>
+        id="com.github.garnierclement.pfe.zeromq"
         title="ZeroMQ"
         description="Install ZeroMQ with PGM support">
-      <pkg-ref id="com.github.garnierclement.pfe.dependency.zeromq"/>
+      <pkg-ref id="com.github.garnierclement.pfe.zeromq"/>
+    </choice>
+    <choice>
+        id="com.github.garnierclement.pfe.max5_externals"
+        title="Java librairies for Max/MSP 5"
+        description="Install Java dependencies for the Manticore client external">
+      <pkg-ref id="com.github.garnierclement.pfe.max5_externals"/>
+    </choice>
+    <choice>
+        id="com.github.garnierclement.pfe.max6_externals"
+        title="Java librairies for Max/MSP 6.1"
+        description="Install Java dependencies for the Manticore client external">
+      <pkg-ref id="com.github.garnierclement.pfe.max6_externals"/>
     </choice>
 </installer-gui-script>
