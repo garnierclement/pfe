@@ -4,7 +4,8 @@
 # Package for OS X
 scripts/osx-package/out
 scripts/osx-package/package
-scripts/osx-package/manticore-*.pkg
+scripts/osx-package/max_externals
+scripts/osx-package/*.pkg
 
 # Node.js
 node_modules
