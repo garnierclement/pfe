@@ -3,7 +3,7 @@
 
 # Package for OS X
 scripts/osx-package/out
-scripts/osx-package/package
+scripts/osx-package/dist
 scripts/osx-package/max_externals
 scripts/osx-package/*.pkg
 
