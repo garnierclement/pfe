@@ -1,10 +1,7 @@
 #!/bin/sh
 
-if hash node 2>/dev/null; then
-	echo "[INSTALL] Node.js already installed."
-else
-	echo "[INSTALL] Installing Node.js..."
-	brew install node
-fi
+# Add missing symlink
+cd /usr/local/bin
+ln -sf ../lib/node_modules/npm/bin/npm-cli.js npm
 
 exit 0
