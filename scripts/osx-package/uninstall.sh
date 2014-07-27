@@ -7,9 +7,9 @@ MANTICORE_ROOT="/Applications/Manticore"
 # Need sudo
 sudo -v
 # Remove Manticore
-rm -Rf $MANTICORE_ROOT
+sudo rm -Rf $MANTICORE_ROOT
 # Remove launchd
-sudo launchctl unload "/Library/LaunchDaemons/$LAUNCHD_PLIST"
+#sudo launchctl unload "/Library/LaunchDaemons/$LAUNCHD_PLIST"
 # Remove some java libs in MAX 5 and 6.1
 # Restore max.java.config.txt from bkp
 # Remove ZeroMQ files in /usr/local/
