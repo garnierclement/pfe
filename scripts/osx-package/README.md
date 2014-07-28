@@ -27,18 +27,18 @@ The main script is `create-pkg.sh` and the tree structure of this folder is the 
 
 ## Resources
 
-* [Making OS X Installer Packages like a Pro]  (StackOverflow)
+* [Making OS X Installer Packages like a Pro] StackOverflow
 * [Empaqueter un démon pour OS X]
-* [pkgbuild man page]  (Apple Developer)
-* [pkgutil man page]  (Apple Developer)
-* [productbuild man page]  (Apple Developer)
+* [pkgbuild man page] Apple Developer
+* [pkgutil man page] Apple Developer
+* [productbuild man page] Apple Developer
 * [Creating payload-free packages with pkgbuild]
-* [launchd.plist man page]  (Apple Developer)
+* [launchd.plist man page] Apple Developer
 * [launchd.info]
 * [brew-pkg]
 * [Packages]
-* [Installer JavaScript Reference]  (Apple Developer) 
-* [Distribution Definition XML Schema Reference]  (Apple Developer) 
+* [Installer JavaScript Reference] Apple Developer
+* [Distribution Definition XML Schema Reference] Apple Developer
 
 
 [Making OS X Installer Packages like a Pro]: http://stackoverflow.com/questions/11487596/making-os-x-installer-packages-like-a-pro-xcode4-developer-id-mountain-lion-re
