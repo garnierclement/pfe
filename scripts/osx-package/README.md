@@ -37,6 +37,8 @@ The main script is `create-pkg.sh` and the tree structure of this folder is the 
 * [launchd.info]
 * [brew-pkg]
 * [Packages]
+* [Installer JavaScript Reference] (Apple Developer) 
+* [Distribution Definition XML Schema Reference] (Apple Developer) 
 
 
 [Making OS X Installer Packages like a Pro]: http://stackoverflow.com/questions/11487596/making-os-x-installer-packages-like-a-pro-xcode4-developer-id-mountain-lion-re
@@ -49,6 +51,8 @@ The main script is `create-pkg.sh` and the tree structure of this folder is the 
 [launchd.info]: http://launchd.info/
 [brew-pkg]: https://github.com/timsutton/brew-pkg
 [Packages]: http://s.sudre.free.fr/Software/Packages/about.html
+[Installer JavaScript Reference]:https://developer.apple.com/library/mac/documentation/DeveloperTools/Reference/InstallerJavaScriptRef/InstallerJavaScriptRef.pdf
+[Distribution Definition XML Schema Reference]: https://developer.apple.com/library/mac/documentation/DeveloperTools/Reference/DistributionDefinitionRef/DistributionDefinitionRef.pdf
 
 ## Pre and post install scripts
 
