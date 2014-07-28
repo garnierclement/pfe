@@ -1,17 +1,17 @@
 #!/bin/sh
 
 MANTICORE_ROOT=/Applications/Manticore
-MAX5_JAVA_ROOT=/Applications/Max\ 6.1/Cycling\ \'74/java
+MAX6_JAVA_ROOT=/Applications/Max\ 6.1/Cycling\ \'74/java
 
 # Backup Java config file of Max
-cp -v "$MAX5_JAVA_ROOT"/max.java.config.txt "$MAX5_JAVA_ROOT"/max.java.config.bkp
+cp -v "$MAX6_JAVA_ROOT"/max.java.config.txt "$MAX6_JAVA_ROOT"/max.java.config.bkp
 
 # Apply changes assuming Manticore is installed in $MANTICORE_ROOT
 sed -i "" '37c\
 	max.dynamic.class.dir '$MANTICORE_ROOT'/projects/MAX/max_externals/bin/\
-		' "$MAX5_JAVA_ROOT"/max.java.config.txt
+		' "$MAX6_JAVA_ROOT"/max.java.config.txt
 sed -i "" '40c\
 	max.dynamic.class.dir '$MANTICORE_ROOT'/projects/MAX/max_externals/lib/\
-	' "$MAX5_JAVA_ROOT"/max.java.config.txt
+	' "$MAX6_JAVA_ROOT"/max.java.config.txt
 
 exit 0
