@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 PLIST_ID="com.github.garnierclement.pfe.manticore"
 
