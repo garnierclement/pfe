@@ -5,8 +5,8 @@
     <domains enable_localSystem="true"/>
     <options customize="allow" require-scripts="true" rootVolumeOnly="true" />
     <!-- Define documents displayed at various steps -->
-    <welcome    file="welcome.html"    mime-type="text/html" />
-    <conclusion file="conclusion.html" mime-type="text/html" />
+    <welcome    file="welcome.rtf"    mime-type="text/rtf" />
+    <conclusion file="conclusion.rtf" mime-type="text/rtf" />
     <!-- List all component packages -->
     <pkg-ref id="com.github.garnierclement.pfe.manticore"
              version="0.1"
@@ -40,37 +40,43 @@
     <choice
         id="com.github.garnierclement.pfe.manticore"
         title="Manticore"
-        description="Install Manticore in /Applications/Manticore/">
+        description="Install Manticore in /Applications/Manticore/"
+        start_selected="true">
       <pkg-ref id="com.github.garnierclement.pfe.manticore"/>
     </choice>
     <choice
         id="com.github.garnierclement.pfe.launchd"
         title="Manticore as a daemon"
-        description="Automatically launches Manticore after the installation and at startup. Keep it running in the background with launchd.">
+        description="Automatically launches Manticore after the installation and at startup. Keep it running in the background with launchd."
+        start_selected="true">
       <pkg-ref id="com.github.garnierclement.pfe.launchd"/>
     </choice>
     <choice
         id="com.github.garnierclement.pfe.nodejs"
         title="Node.js"
-        description="Install Node.js">
+        description="Install Node.js"
+        start_selected="!system.files.fileExistsAtPath('/usr/local/bin/node')">
       <pkg-ref id="com.github.garnierclement.pfe.nodejs"/>
     </choice>
     <choice
         id="com.github.garnierclement.pfe.zeromq"
         title="ZeroMQ"
-        description="Install ZeroMQ with PGM support">
+        description="Install ZeroMQ with PGM support"
+        start_selected="!system.files.fileExistsAtPath('/usr/local/lib/libzmq.dylib')">
       <pkg-ref id="com.github.garnierclement.pfe.zeromq"/>
     </choice>
     <choice
         id="com.github.garnierclement.pfe.max5_externals"
         title="Java librairies for Max/MSP 5"
-        description="Install Java dependencies for the Manticore client external">
+        description="Install Java dependencies for the Manticore client external"
+        start_selected="system.files.fileExistsAtPath('/Applications/Max5/MaxMSP.app')">
       <pkg-ref id="com.github.garnierclement.pfe.max5_externals"/>
     </choice>
     <choice
         id="com.github.garnierclement.pfe.max6_externals"
         title="Java librairies for Max/MSP 6.1"
-        description="Install Java dependencies for the Manticore client external">
+        description="Install Java dependencies for the Manticore client external"
+        start_selected="system.files.fileExistsAtPath('/Applications/Max\ 6.1/Max.app')">
       <pkg-ref id="com.github.garnierclement.pfe.max6_externals"/>
     </choice>
 </installer-gui-script>
