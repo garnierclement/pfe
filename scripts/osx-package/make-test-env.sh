@@ -1,4 +1,4 @@
-#!/bin.sh
+#!/bin/sh
 
 # Unlink dependencies installed with Homebrew
 brew unlink nodejs
