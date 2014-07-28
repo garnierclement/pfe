@@ -2,7 +2,6 @@
 
 PLIST_ID="com.github.garnierclement.pfe.manticore"
 
-clear
 sudo -v
-sudo launchctl load "/Library/LaunchDaemons/$LAUNCHD_PLIST.plist"
+sudo launchctl unload "/Library/LaunchDaemons/$PLIST_ID.plist"
 read -p "Press Return to Close..."
