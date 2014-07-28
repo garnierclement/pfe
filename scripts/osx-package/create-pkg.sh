@@ -17,6 +17,9 @@ cp -Rf ../../docs/ dist/docs/
 cp -Rf ../../projects/ dist/projects/
 cp -Rf ../../sensors/ dist/sensors/
 cp -Rf ../../var/ dist/var/
+cp -Rf uninstall.sh dist/uninstall.command
+cp -Rf scripts/commands/ dist/
+cp -Rf launchd/ dist/daemon/ # copy .plist
 
 # Create a folder for the Max/MSP externals
 mkdir -p max_externals/Cycling\ \'74/java/lib/
@@ -61,7 +64,7 @@ pkgbuild --root max_externals \
 # Package ZeroMQ & Node.js with brew-pkg
 cd out
 brew pkg --with-deps --identifier-prefix $PKG_ID_PREFIX zeromq
-brew pkg --identifier-prefix $PKG_ID_PREFIX nodejs
+brew pkg --scripts ../scripts/nodejs --identifier-prefix $PKG_ID_PREFIX nodejs
 # or wget http://nodejs.org/dist/v0.10.29/node-v0.10.29.pkg ?
 cd ..
 
