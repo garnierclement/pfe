@@ -573,7 +573,7 @@ Core.prototype.delayedPublishSensors = function(delay) {
 /******* Message payloads *********/
 Core.prototype.requestPayload = function (res, port, dst) {
 	var _p = port || UDP_PORT;
-	var _dst = dst || "127.0.0.1";
+	var _dst = dst;
 	return {data: res, dst: _dst, port: _p};
 };
 

@@ -22,6 +22,11 @@ api.use(express.static(path.join(__dirname, 'web/static')));
  * Thus, we can now handle external communication on the HTTP server
  */
 core.on('ready', function() {
+	// advertise the sensors every 20s
+	setInterval(function() {
+		if (_.has(core, 'sensors'))
+			core.publish('new_sensor', {sensors: core.sensors});
+	}, 20000, 0);
 
 	api.get('/', function(req, res) {
 		//console.log('>[HTTP]\tWeb UI from '+ req.ip +' on ' +req.headers['user-agent']);
@@ -41,6 +46,7 @@ core.on('ready', function() {
 		var resource = req.param('id');
 		var port = req.query.port || 16161;
 		var src = req.ip;
+		if (src === "127.0.0.1") { src = core.ip; } // if src is local then we want to send to the IP advertised on Bonjour
 		var dst = req.query.dst;
 		if (dst === "IP") { dst = src; }  // if dst not specified using the IP of the client
 		core.requestResource(resource, port, src, dst, function(err, header, payload) {
