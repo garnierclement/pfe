@@ -50,26 +50,26 @@ fi
 # Remove ZeroMQ files in /usr/local/
 read -p "Remove ZeroMQ [yn]" rm_zmq
 if [[ $rm_zmq = y ]]; then
-	rm -v /usr/local/bin/curve_keygen
-	rm -v /usr/local/bin/pkg-config
-	rm -v /usr/local/include/zmq.h
-	rm -v /usr/local/include/zmq_utils.h
-	rm -v /usr/local/lib/libzmq.*
-	rm -v /usr/local/lib/pkgconfig/libzmq.pc
-	rm -v /usr/local/share/aclocal/pkg.m4
-	rm -vRf /usr/local/share/doc/pkg-config
-	rm -v /usr/local/share/man/man1/pkg-config.1
-	rm -v /usr/local/share/man/man3/zmq_*
-	rm -v /usr/local/share/man/man7/zmq*
+	sudo rm -v /usr/local/bin/curve_keygen
+	sudo rm -v /usr/local/bin/pkg-config
+	sudo rm -v /usr/local/include/zmq.h
+	sudo rm -v /usr/local/include/zmq_utils.h
+	sudo rm -v /usr/local/lib/libzmq.*
+	sudo rm -v /usr/local/lib/pkgconfig/libzmq.pc
+	sudo rm -v /usr/local/share/aclocal/pkg.m4
+	sudo rm -vRf /usr/local/share/doc/pkg-config
+	sudo rm -v /usr/local/share/man/man1/pkg-config.1
+	sudo rm -v /usr/local/share/man/man3/zmq_*
+	sudo rm -v /usr/local/share/man/man7/zmq*
 fi
 
 # Remove Node.js files in /usr/local/
 read -p "Remove Node.js [yn]" rm_node
 if [[ $node_zmq = y ]]; then
-	rm -v /usr/local/bin/node
-	rm -v /usr/local/etc/bash_completion.d/npm
-	rm -v -Rf /usr/local/include/node
-	rm -v -Rf /usr/local/lib/dtrace/node.d
-	rm -v -Rf /usr/local/libexec/npm
-	rm -v -Rf /usr/local/share/man/man1/node.1
+	sudo rm -v /usr/local/bin/node
+	sudo rm -v /usr/local/etc/bash_completion.d/npm
+	sudo rm -v -Rf /usr/local/include/node
+	sudo rm -v -Rf /usr/local/lib/dtrace/node.d
+	sudo rm -v -Rf /usr/local/libexec/npm
+	sudo rm -v -Rf /usr/local/share/man/man1/node.1
 fi
