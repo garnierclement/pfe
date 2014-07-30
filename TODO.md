@@ -138,7 +138,7 @@
 
 ### Custom Raspbian for Raspberry Pi
 
-* ***description*** : Customize the latest [Raspbian] image to include Manticore, startup scripts, sensors and network configuration. Thus it would be easy to burn it onto a new SD card and to get a new Raspberry Pi working in the networks in few minutes.
+* ***description*** : Customize the latest [Raspbian] image to include Manticore, startup scripts, sensors and network configuration. Thus it would be easy to burn it onto a new SD card and to get a new Raspberry Pi working in the networks in few minutes. Also think to include Pure Data (pd-extended).
 
 [Raspbian]: http://www.raspbian.org/
 
