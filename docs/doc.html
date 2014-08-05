@@ -653,10 +653,12 @@ $ mkdir my_new_sensor</code></pre>
 <li>In turn, node [1] can now respond to the client and thus notify it of the status of the request resource procedure.</li>
 </ul>
 <p><strong>SCENARIO 2</strong></p>
-<pre><code>PUB[1] --remote--&gt; SUB[N] | ROUTER[N] --output--&gt; DEALER[1] --ack--&gt; ROUTER[N]  </code></pre>
-<blockquote>
-<p>// TODO : detail the second scenario mixing InCh and MaCh and used for remote command execution</p>
-</blockquote>
+<pre><code>PUB[1] --remote--&gt; SUB[N] | DEALER[N] --output--&gt; ROUTER[1] --ack--&gt; DEALER[N]  </code></pre>
+<ul>
+<li>In this scenario, one node will publish a remote message with a command that each node should execute. To do so, node [1] used the InCh channel and publish this <code>remote</code> message on its PUB socket.</li>
+<li>As a result, all the other nodes (here [N]) which have subscribed to node [1] will receive this message on the SUB socket. * Subsequently, each of these nodes will take care of the remote execution command and then send back the result (i.e. <code>stdout</code>) to node [1]. To do so, they will all use their DEALER socket that is used to issue asynchronous requests.</li>
+<li>Node [1] is notified of all results on its ROUTER socket and can now simply send <code>ack</code> messages to acknowledge the reception of the remote command execution's result.</li>
+</ul>
 <h3 id="note-about-the-use-of-mdns"><span class="header-section-number">2.2.4</span> Note about the use of mDNS</h3>
 <p>We use the mdns module for Node.js. Each node of the network advertise its presence by providing a service called <code>_node._tcp</code>. When advertising, we also add the <code>id</code> of the node as a TXT record.</p>
 <p>Then to monitor the come and go of nodes in the network, we can use the browser that will focus on other <code>_node._tcp</code> services and events will be emitted when node are discovered or disappear.</p>
@@ -777,18 +779,18 @@ browser.start();</code></pre></li>
 <li><code>test</code> (for testing purpose only)</li>
 </ul>
 <h4 id="core-methods"><span class="header-section-number">2.2.7.3</span> Core methods</h4>
-<p>These are the methods used by the Core singleton to interact with its state and its communication channels.</p>
+<p>These are the main methods used by the Core singleton to interact with its state and its communication channels.</p>
 <ul>
 <li><code>init()</code> will start mDNS advertising and browsing of <code>_node.tcp</code> service, bind sockets</li>
 <li><code>publish()</code> will trigger a <code>inch</code> event on all subscribers</li>
-<li><code>send()</code> will trigger a <code>mach</code> event on the recipient</li>
-<li><code>syncSend()</code> will also trigger a <code>mach</code></li>
-<li><code>reply()</code></li>
-<li><code>close()</code></li>
+<li><code>send()</code> used to initiate a request and will subsequently trigger a <code>mach</code> event on the recipient side</li>
+<li><code>syncSend()</code> used to initiate a synchronous request and will also trigger a <code>mach</code> event on the recipient side (and the sender expects a quick response because it is blocking)</li>
+<li><code>reply()</code> used to send a response to a previous request and will subsequently trigger a <code>reply</code> event on the recipient side</li>
+<li><code>close()</code> to safely stops mDNS services and close sockets</li>
+<li><code>requestResource()</code> to request a resource on a specific node</li>
+<li><code>releaseResource()</code> to release a resource on a specific node</li>
+<li><code>detectSensors()</code> to detect sensors</li>
 </ul>
-<blockquote>
-<p>// TODO add missing important methods</p>
-</blockquote>
 <h3 id="inter-core-messaging"><span class="header-section-number">2.2.8</span> Inter-core messaging</h3>
 <h4 id="message-structure"><span class="header-section-number">2.2.8.1</span> Message structure</h4>
 <p>The message exchanged on the communication channels (InCh and MaCh) are JavaScript serialized objects (JSON) and have the following structure :</p>
