@@ -154,10 +154,12 @@ Here we have 2 nodes, denoted above as [1] and [2]. A client (on node [1]) wants
 
 **SCENARIO 2**
 
-	PUB[1] --remote--> SUB[N] | ROUTER[N] --output--> DEALER[1] --ack--> ROUTER[N]  
+	PUB[1] --remote--> SUB[N] | DEALER[N] --output--> ROUTER[1] --ack--> DEALER[N]  
 	
 
-> // TODO : detail the second scenario mixing InCh and MaCh and used for remote command execution
+* In this scenario, one node will publish a remote message with a command that each node should execute. To do so, node [1] used the InCh channel and publish this `remote` message on its PUB socket. 
+* As a result, all the other nodes (here [N]) which have subscribed to node [1] will receive this message on the SUB socket. * Subsequently, each of these nodes will take care of the remote execution command and then send back the result (i.e. `stdout`) to node [1]. To do so, they will all use their DEALER socket that is used to issue asynchronous requests. 
+* Node [1] is notified of all results on its ROUTER socket and can now simply send `ack` messages to acknowledge the reception of the remote command execution's result.
 
 ### Note about the use of mDNS
 
@@ -300,16 +302,17 @@ The `Core` object has the following attributes :
 
 #### Core methods
 
-These are the methods used by the Core singleton to interact with its state and its communication channels.
+These are the main methods used by the Core singleton to interact with its state and its communication channels.
 
 * `init()` will start mDNS advertising and browsing of `_node.tcp` service, bind sockets
 * `publish()` will trigger a `inch` event on all subscribers
-* `send()` will trigger a `mach` event on the recipient
-* `syncSend()` will also trigger a `mach`
-* `reply()`
-* `close()`
-
-> // TODO add missing important methods
+* `send()` used to initiate a request and will subsequently trigger a `mach` event on the recipient side
+* `syncSend()` used to initiate a synchronous request and will also trigger a `mach` event on the recipient side (and the sender expects a quick response because it is blocking)
+* `reply()` used to send a response to a previous request and will subsequently trigger a `reply` event on the recipient side
+* `close()` to safely stops mDNS services and close sockets
+* `requestResource()` to request a resource on a specific node
+* `releaseResource()` to release a resource on a specific node
+* `detectSensors()` to detect sensors
 
 ### Inter-core messaging
 
