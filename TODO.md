@@ -88,11 +88,7 @@
 
 ### Handle several requests for the same sensor
 
-> TODO description
-
-* ***description*** : Handle several requests for the same sensor
-
-> Let's imagine a several users all request the same sensor data. Instead of having a communication channel delivering OSC packets from the sensor's node to each of these users individually, we would implement some sort of system that would aggregate this data and send it to all the users having requested the sensor data. Should this system be integrated at the core level? should it be integrated at the driver-level of the sensor?
+* ***description*** : Handle several requests for the same sensor. Let's imagine a several users all request the same sensor data. Instead of having a communication channel delivering OSC packets from the sensor's node to each of these users individually, we would implement some sort of system that would aggregate this data and send it to all the users having requested the sensor data. Should this system be integrated at the core level? should it be integrated at the driver-level of the sensor?
 
 
 ## Raspberry Pi
@@ -212,7 +208,7 @@ The previous old TODO list below :
 - [ ] Better logging library for Manticore ? see https://github.com/flatiron/winston
 - [ ] Bootstrap process to install pd-extended on raspberry pi
 - [ ] Find why the PoC (mouse sensor) doesn't work on Rapsberry Pi
-- [ ] Write a documentation about Yang Fan's xBeeSerialReader
+- [x] Write a documentation about Yang Fan's xBeeSerialReader
 - [ ] Write a Q&A readme files for anything specific or not yet mentioned into the readme files
 - [ ] Write a quick start developer guide
 - [ ] Run Manticore as a daemon
@@ -222,7 +218,7 @@ The previous old TODO list below :
 - [x] Fully implement explicit release
 - [x] Implement implicit release (when a node died, look if )
 - [ ] Move the messaging structure into a message.js file
-- [ ] Periodic publishing of node capabilities
+- [x] Periodic publishing of node capabilities
 - [ ] handle properly the crash of manticore is another instance of manticore is already running (ports already bound)
 - [ ] implement the limitation on a specific mode of a specific procedure (number of maximum clients)
 - [ ] periodic detection of sensors (or continusly polling devices and then send a signal to manticore)
