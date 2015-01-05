@@ -606,6 +606,10 @@ Compile and install [ZeroMQ] v4.0.4 from source tarball (it also requires libtoo
 	$ rm zeromq-4.0.4.tar.gz
 	$ rm -rf zeromq-4.0.4
 
+On Linux using the avahi daemon the avahi dns_sd compat library and its header files are required.
+
+	$ sudo apt-get install libavahi-compat-libdnssd-dev
+
 #### Prerequisites on Windows
 
 This is experimental and only tested on Windows 7 x64.
