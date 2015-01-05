@@ -90,7 +90,7 @@ process.stdin.on('readable', function() {
 		else if (/^request /.test(chunk)) {
 			var res = chunk.slice(8,chunk.length-1);
 			console.log("+[REQR]\tRequest resource: "+res);
-			core.requestResource(res, 42424, '127.0.0.1', function(err, header, payload) {
+			core.requestResource(res, 42424, '127.0.0.1', null, function(err, header, payload) {
 				if (err === null) {
 					console.log('>[SYNC]\tResource status from '+header);
 					console.log(payload);

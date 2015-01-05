@@ -48,6 +48,8 @@ function Core()
 	this.sensors = [];			// store node's sensors
 	this.records = [];			// store nodes's records
 
+	this.mobileDevices = {};
+
 	/* Core utils and aliases */
 	this.itself      = null;	// reference of the current node in this.nodes (Node object)
 	this.ip          = null;	// alias to node's IP address advertised on Zeroconf
@@ -455,9 +457,15 @@ Core.prototype.requestResource = function (res, port, client_ip, endpoint_ip, ca
 	// (i.e. the one providing the resource)
 	if (found) {
 		var dst = this.nodes[i].ip;
+		var type = 'normal';
+		if (this.nodes[i].id != res) {
+			var sensor = _.findWhere(this.nodes[i].sensors, {id: res});
+			if (sensor.name == 'mobile device') type = 'mobile';
+		}
+		console.log(type);
 		if (dst === this.ip) dst = '127.0.0.1';
 		if (endpoint_ip === null) endpoint_ip = client_ip;
-		this.syncSend(dst, 'request', this.requestPayload(res,p,endpoint_ip), function(header, payload) {
+		this.syncSend(dst, 'request', this.requestPayload(res,p,endpoint_ip,type), function(header, payload) {
 			if (payload.status) {
 				var new_record = new Record(res, 'client_request', client_ip, endpoint_ip, port, self.nodes[i]);
 				self.records.push(new_record);
@@ -540,7 +548,7 @@ Core.prototype.detectSensors = function() {
 				}
 			});
 			if (systems.length > 0) {
-				var new_sensor = new Sensor(descriptionFile, systems, function(err){
+				var new_sensor = new Sensor('normal', '', descriptionFile, systems, function(err){
 					if (err === null) {
 						// in this callback, 'this' corresponds to 
 						// the object created by the Sensor constructor
@@ -558,6 +566,13 @@ Core.prototype.detectSensors = function() {
 	this.delayedPublishSensors(5000);
 };
 
+Core.prototype.publishSensors = function() {
+	if (this.sensors.length > 0) { 
+		console.log("+[SENS] Publishing "+self.sensors.length+" sensors");
+		self.publish('new_sensor', {sensors: self.sensors});
+	}
+};
+
 Core.prototype.delayedPublishSensors = function(delay) {
 	var now = new Date();
 	var dif = (this.lastPublish === null) ? 2001 : now - this.lastPublish;
@@ -571,10 +586,10 @@ Core.prototype.delayedPublishSensors = function(delay) {
 };
 
 /******* Message payloads *********/
-Core.prototype.requestPayload = function (res, port, dst) {
+Core.prototype.requestPayload = function (res, port, dst, type) {
 	var _p = port || UDP_PORT;
 	var _dst = dst;
-	return {data: res, dst: _dst, port: _p};
+	return {data: res, dst: _dst, port: _p, type: type};
 };
 
 Core.prototype.ackPayload = function (s) {

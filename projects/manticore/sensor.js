@@ -6,6 +6,7 @@ var exec = require('child_process').exec;
 var _ = require('underscore');
 var async = require('async');
 var path = require('path');
+var request = require('request');
 
 /**
  * Sensor object
@@ -14,22 +15,26 @@ var path = require('path');
  * @param {Array}			systems					Array of all system aliases matching
  * @param {Function}	constructor_cb	Callback called when the constructor ends (or fails)
  */
-function Sensor (desc, systems, constructor_cb)
+function Sensor (type, id, desc, systems, constructor_cb)
 {
+	var receiver = [];
+	var data = [];
 	var bootstrap_func = [];
 	var self = this;
 	// parse the content of the bootstrap procedure in the description file
 	// and create a new function for each Command object that matches the system aliases
-	_.each(desc.bootstrap, function(command, key) {
-		var intersect = _.intersection(command.systems, systems);
-		if (intersect.length > 0) {
-			// the bind methods of the Function object creates a new function with defined parameters
-			// here commandHandler(command, sensor_name, next) becomes commandHandler(next)
-			// and the 2 first parameters are set
-			var new_func = commandHandler.bind(null, command, null, desc.name);
-			bootstrap_func.push(new_func);
-		}
-	});
+	if (type == 'normal') {
+		_.each(desc.bootstrap, function(command, key) {
+			var intersect = _.intersection(command.systems, systems);
+			if (intersect.length > 0) {
+				// the bind methods of the Function object creates a new function with defined parameters
+				// here commandHandler(command, sensor_name, next) becomes commandHandler(next)
+				// and the 2 first parameters are set
+				var new_func = commandHandler.bind(null, command, null, desc.name);
+				bootstrap_func.push(new_func);
+			}
+		});
+	}
 
 	// execute all the bootstrap commands one after another
 	if (bootstrap_func.length > 0) {
@@ -44,11 +49,12 @@ function Sensor (desc, systems, constructor_cb)
 				self.id = uuid.v1();
 				self.name = desc.name;
 				self.data = [];
-
 				// parsing the content of 'data' in the description file
 				_.each(desc.data, function(datum) {
 					self.data.push({name: datum.description, osc: datum.osc_format});
 				});
+
+				
 
 				// create the handler for the request procedure
 				self.request = function(mode, options, callback) {
@@ -96,6 +102,18 @@ function Sensor (desc, systems, constructor_cb)
 				constructor_cb.apply(self, [null]);
 			}
 		});
+	}
+	else {
+		// no errors in bootstrap procedure, new sensor found
+		console.log("+[DTEC] New sensor found mobile device");
+		// setting the sensor properties
+		self.id = id;
+		self.name = 'mobile device';
+		self.data = [{name: 'Accelerometer Data', osc: '[x, y, z]'}];
+		self.request = function(mode, options, callback) {
+			callback(null, null);
+		};
+		constructor_cb.apply(self, [null]);
 	}
 }
 

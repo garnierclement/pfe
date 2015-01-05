@@ -4,16 +4,21 @@ var express = require('express');
 var api = express();
 var path = require('path');
 var _ = require("underscore");
+var bodyParser = require('body-parser');
 
 var core = require('./manticore.js');
 var interactive = require('./interactive.js');
 var trigger = require('./trigger.js');
 var Record = require('./record.js');
-
+var Sensor = require('./sensor.js');
+var request = require('request');
 // view engine set up
 api.set('views', path.join(__dirname, 'web/views'));
 api.set('view engine', 'jade');
 api.use(express.static(path.join(__dirname, 'web/static')));
+
+api.use(bodyParser.urlencoded({ extended: false }))
+api.use(bodyParser.json());
 
 /**
  * Handles the 'ready' event on the core
@@ -104,6 +109,40 @@ core.on('ready', function() {
 		}
 	});
 
+	api.post('/receive/:id', function(req, res) {
+		var id = req.param('id');
+		if (!core.mobileDevices[id]) {
+			core.mobileDevices[id] = {};
+			var new_sensor = new Sensor('mobile', id, '', '', function(err){
+				if (err === null) {
+					core.sensors.push(this);
+					core.publishSensors();
+				}
+				else {
+					console.log("![DTEC]\t"+err);
+				}
+			});
+		}
+		core.mobileDevices[id].data = [req.body.x, req.body.y, req.body.z, req.body.timestamp];
+		res.end('ok');
+	});
+	setInterval(function() {
+		for (var id in core.mobileDevices) {
+			if (new Date().getTime() - core.mobileDevices[id].data[3] > 4000) {
+				if (core.mobileDevices[id].tid != undefined) {
+					clearInterval(core.mobileDevices[id].tid);
+				}
+				delete core.mobileDevices[id];
+				console.log("-[SENS]\tSensor down! Mobile device " + id);
+				for (var i in core.sensors) {
+					if (core.sensors[i].id == id) {
+						core.sensors.splice(i, 1);
+					}
+				}
+			};
+		}
+	}, 5000);
+
 });
 
 /**
@@ -168,16 +207,29 @@ core.on('mach', function(envelope, header, payload) {
 				var opts = [dst, payload.port, header.src+'-'+payload.port+'.pd'];
 				var new_record = new Record(payload.data, 'active_resource', header.src, dst, payload.port, core.itself);
 				var mode = (mode in payload) ? payload.mode : 'default';
-				sensor.request(mode, opts, function(err, child) {
-					if (err === null) {
-						returnStatus = true;
-						if (child) {
-						new_record.addChild(child);
+				var type = payload.type;
+				if (type == 'normal') {
+					sensor.request(mode, opts, function(err, child) {
+						if (err === null) {
+							returnStatus = true;
+							if (child) {
+							new_record.addChild(child);
+							}
+							core.records.push(new_record);
 						}
-						core.records.push(new_record);
-					}
+						core.reply('ack', envelope, {status: returnStatus});
+					});		
+				}
+				else if (type == 'mobile') {
+					console.log('mobile request');
+					returnStatus = true;
+					core.records.push(new_record);
 					core.reply('ack', envelope, {status: returnStatus});
-				});		
+					var data;
+					core.mobileDevices[payload.data].tid = setInterval(function() {
+						request.post('http://' + dst + ':' + payload.port + '/receive', {form: core.mobileDevices[payload.data].data});
+					}, 100);
+				}
 			}
 			break;
 		case 'release':
@@ -219,7 +271,7 @@ core.on('died', function(deadNodeId) {
 		// implicit release/kill of active resources
 		var deadNodeRecords = _.where(this.records, {type: 'active_resource', source: deadNodeId});
 		_.each(deadNodeRecords, function(record) {
-			record.child.kill();
+			if (record.child) record.child.kill();
 			var index = _.indexOf(core.records, record);
 			core.records.splice(index,1);
 		});
@@ -234,6 +286,7 @@ core.on('died', function(deadNodeId) {
 core.on('test', function(){
 	// Do some testing here
 	// and use the emit command in interactive mode to trigger the event 'test'
+	console.log('This is test mode.');
 });
 
 /**
