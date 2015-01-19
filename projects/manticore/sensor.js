@@ -105,7 +105,7 @@ function Sensor (type, id, desc, systems, constructor_cb)
 	}
 	else {
 		// no errors in bootstrap procedure, new sensor found
-		console.log("+[DTEC] New sensor found mobile device");
+		console.log("+[DTEC] New sensor found mobile device " + id);
 		// setting the sensor properties
 		self.id = id;
 		self.name = 'mobile device';

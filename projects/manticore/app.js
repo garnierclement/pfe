@@ -109,39 +109,51 @@ core.on('ready', function() {
 		}
 	});
 
-	api.post('/receive/:id', function(req, res) {
-		var id = req.param('id');
-		if (!core.mobileDevices[id]) {
-			core.mobileDevices[id] = {};
-			var new_sensor = new Sensor('mobile', id, '', '', function(err){
-				if (err === null) {
-					core.sensors.push(this);
-					core.publishSensors();
-				}
-				else {
-					console.log("![DTEC]\t"+err);
-				}
-			});
+	api.post('/mobile', function(req, res) {
+		var id = req.body.id;
+		if (req.body.status == 1) {
+			if (!core.mobileDevices[id]) {
+				core.mobileDevices[id] = {};
+				var new_sensor = new Sensor('mobile', id, '', '', function(err){
+					if (err === null) {
+						core.sensors.push(this);
+						core.publishSensors();
+					}
+					else {
+						console.log("![DTEC]\t"+err);
+					}
+				});
+			}
+			core.mobileDevices[id].timestamp = (new Date()).getTime();
 		}
-		core.mobileDevices[id].data = [req.body.x, req.body.y, req.body.z, req.body.timestamp];
+		else {
+			delete core.mobileDevices[id];
+			console.log("-[SENS]\tSensor down! Mobile device " + id);
+			for (var i in core.sensors) {
+				if (core.sensors[i].id == id) {
+					core.sensors.splice(i, 1);
+				}
+			}
+		}
+		// core.mobileDevices[id].data = [req.body.x, req.body.y, req.body.z, req.body.timestamp];
 		res.end('ok');
 	});
-	setInterval(function() {
-		for (var id in core.mobileDevices) {
-			if (new Date().getTime() - core.mobileDevices[id].data[3] > 4000) {
-				if (core.mobileDevices[id].tid != undefined) {
-					clearInterval(core.mobileDevices[id].tid);
-				}
-				delete core.mobileDevices[id];
-				console.log("-[SENS]\tSensor down! Mobile device " + id);
-				for (var i in core.sensors) {
-					if (core.sensors[i].id == id) {
-						core.sensors.splice(i, 1);
-					}
-				}
-			};
-		}
-	}, 5000);
+	// setInterval(function() {
+	// 	for (var id in core.mobileDevices) {
+	// 		if (new Date().getTime() - core.mobileDevices[id].timestamp > 4000) {
+	// 			if (core.mobileDevices[id].tid != undefined) {
+	// 				clearInterval(core.mobileDevices[id].tid);
+	// 			}
+	// 			delete core.mobileDevices[id];
+	// 			console.log("-[SENS]\tSensor down! Mobile device " + id);
+	// 			for (var i in core.sensors) {
+	// 				if (core.sensors[i].id == id) {
+	// 					core.sensors.splice(i, 1);
+	// 				}
+	// 			}
+	// 		};
+	// 	}
+	// }, 5000);
 
 });
 
@@ -213,7 +225,7 @@ core.on('mach', function(envelope, header, payload) {
 						if (err === null) {
 							returnStatus = true;
 							if (child) {
-							new_record.addChild(child);
+								new_record.addChild(child);
 							}
 							core.records.push(new_record);
 						}
@@ -225,10 +237,16 @@ core.on('mach', function(envelope, header, payload) {
 					returnStatus = true;
 					core.records.push(new_record);
 					core.reply('ack', envelope, {status: returnStatus});
-					var data;
-					core.mobileDevices[payload.data].tid = setInterval(function() {
-						request.post('http://' + dst + ':' + payload.port + '/receive', {form: core.mobileDevices[payload.data].data});
-					}, 100);
+					request.post('http://localhost:8081/addRequester', {form: {
+						id: payload.data,
+						port: payload.port,
+						address: dst
+					}}, function(error) {
+						if (error) console.log('![REQ]' + error);
+					});
+					// core.mobileDevices[payload.data].tid = setInterval(function() {
+					// 	request.post('http://' + dst + ':' + payload.port + '/receive', {form: core.mobileDevices[payload.data].data});
+					// }, 100);
 				}
 			}
 			break;
