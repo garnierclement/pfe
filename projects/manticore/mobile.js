@@ -29,14 +29,10 @@ wsServer.on('request', function(req) {
   var connection = req.accept('manticore', req.origin);
   console.log((new Date()) + ' Connection accepted.');
   connection.on('message', function(message) {
-    console.log('Received Message: ' + message.utf8Data);
     var data = JSON.parse(message.utf8Data);
-    console.log(data);
-    if (data.id) {
-    	if (!ipTable[connection.remoteAddress] || ipTable[connection.remoteAddress] != data.id) {
-	    	ipTable[connection.remoteAddress] = data.id;
-	    	request.post('http://127.0.0.1:3000/mobile', {form: {status: 1, id: data.id}}, function(error) {});
-	    }
+  	if (!ipTable[connection.remoteAddress] || ipTable[connection.remoteAddress] != data.id) {
+    	ipTable[connection.remoteAddress] = data.id;
+    	request.post('http://127.0.0.1:3000/mobile', {form: {status: 1, id: data.id}}, function(error) {});
     }
     if (requesters[data.id] != undefined) {
     	for (var rid in requesters[data.id]) {
